@@ -1,127 +1,156 @@
-<<<<<<< HEAD
-# Prebook — Client Project
+# Prebook — preebooking.com
 
-**Client:** Mr. Nambi, Prebooking, Pattamalai, Tirunelveli
-**Domain:** preebooking.com
-**Service Provider:** Roriri Software Solutions (Ragupathi, Kalakad)
+**Crackers · Clothing · Real Estate — one website, one admin panel.**
+
+| | |
+| --- | --- |
+| **Client** | Mr. Nambi · Prebooking · Pattamalai, Tirunelveli, Tamil Nadu |
+| **Domain** | preebooking.com |
+| **Service provider** | Zenyne Labs — Thinesh Rasla, Managing Director |
+| **Contact** | +91 99946 27465 · hello@zenyne.com · zenyne.com |
+| **Proposal** | ZL/2026/008 · issued 11 Sep 2026 · valid until 11 Oct 2026 |
+| **Total cost** | **₹21,000** (Rupees Twenty-One Thousand Only) |
+| **Timeline** | **4 weeks** from kickoff |
+| **Payments in build** | Cash on Delivery / offline only — **no gateway** |
+
+> **[`docs/INVOICE-SUMMARY.txt`](docs/INVOICE-SUMMARY.txt) is the single source of truth**
+> for scope, quotation, timeline and terms. If anything in this README disagrees
+> with it, that document wins. Every earlier plan, proposal and design note has
+> been removed from this repository.
 
 ---
 
-## Repository Layout
+## Scope
 
-This is a **Bun workspace monorepo**. Web code lives in `apps/`, planning and
-proposal material lives in `docs/`.
+Three business sections on one site, one customer login, one admin panel.
+
+**Crackers & Clothing — shops.** Catalogue with per-section categories, filters
+(type / category / price), search, product detail with photo gallery, safety
+information for crackers, size and colour variants with a size chart for
+clothing, festival packs, cart, checkout with delivery address, order
+confirmation, live stock indicators.
+
+**Real Estate — a lead platform, not a shop.** Sellers post listings (land,
+house, apartment) with photos; listings stay hidden until you approve them from
+the verification queue; buyers browse approved listings and request a site visit
+with a preferred time; you coordinate offline. **The seller's phone number is
+never shown to buyers** — contact details are held server-side and never
+serialised into a buyer-facing response.
+
+**Customer accounts.** Email/password or Google sign-in, order history, saved
+delivery address, profile, site-visit requests.
+
+**Admin panel.** Role-based login for owner and staff. Products and stock,
+order pipeline, real-estate approval and site-visit tracking, customer list,
+alerts on new orders and visit requests.
+
+**Core business logic.** All money stored and calculated as **integer paise** —
+no floating-point rounding on totals, GST or discounts. Stock decremented on
+order placement, with sold-out and low-stock states live on listing and product
+pages.
+
+### Not in this build
+
+Online payment gateway · mobile app · delivery/courier integration · Tamil
+content (structure kept ready) · data migration · photography, copywriting,
+logo design · hosting and subscription charges · reports and analytics · map
+search · buyer–seller chat. Each is quoted separately — see PART E of the plan.
+
+---
+
+## Stack
+
+| Area | Choice |
+| --- | --- |
+| Website + admin | TanStack Start — server-rendered React, Tailwind CSS, mobile-first |
+| API | Hono on the Bun runtime |
+| Database | MongoDB Atlas via Prisma ORM |
+| Auth | Better Auth — email/password + Google, role-based access |
+| Media | Cloudflare R2 — presigned direct upload |
+| Hosting | Cloudflare / Vercel with CDN |
+
+**Prisma is pinned to 6.19.3.** Prisma 7 dropped MongoDB support. Keep the pin.
+
+---
+
+## Repository state
+
+`docs/INVOICE-SUMMARY.txt` is currently the only content in this repository.
+There is **no application code on disk** — `apps/` and the previous Next.js
+`store/` build have both been removed, and git was re-initialised from scratch
+on 12 Sep 2026: `main` holds a single commit containing only this README,
+tracking `git@github.com:zenynelabs/prebook.git`. `package.json` still declares
+a Bun workspace at `apps/*`, so `bun run dev` will not work until `apps/web` is
+created.
+
+The build starts from the Week 1 foundation described in the plan.
 
 ```
 prebook/
-├── apps/
-│   └── web/                    # TanStack Start + shadcn/ui (this phase)
-│       ├── src/
-│       │   ├── routes/         # file-based routes (TanStack Router)
-│       │   ├── components/     # app components + components/ui (shadcn)
-│       │   ├── lib/            # utils
-│       │   ├── router.tsx
-│       │   └── styles.css      # Prebook design tokens (see docs/design.md)
-│       ├── components.json     # shadcn configuration
-│       └── vite.config.ts
-│   ├── api/                    # Hono API (planned)
-│   └── mobile/                 # Flutter app (future)
-│
 ├── docs/
-│   ├── plan.md                 # client proposal / scope
-│   ├── design.md               # design system & UI plan
-│   ├── INVOICE-SUMMARY.txt
-│   ├── V1/                     # original real-estate proposal
-│   ├── V3/                     # multi-vertical proposal assets
-│   ├── scripts/                # proposal PDF render script
-│   └── archive/                # superseded plans (Next.js build plan)
-│
-├── AGENTS.md                   # agent orchestration guide
-├── package.json                # workspace root
+│   └── INVOICE-SUMMARY.txt     # the plan — scope, quotation, terms, build status
+├── AGENTS.md                   # how agents work in this repo
+├── package.json                # Bun workspace root (expects apps/*)
 └── README.md
 ```
 
 ---
 
-## Tech Stack
+## Timeline
 
-| Area      | Choice                                          |
-| --------- | ----------------------------------------------- |
-| Web       | TanStack Start (React 19, Vite), TypeScript     |
-| Styling   | Tailwind CSS v4 + shadcn/ui                     |
-| API       | Hono (planned, `apps/api`)                      |
-| Mobile    | Flutter (future)                                |
-| Runtime   | Bun workspaces                                  |
+| Week | Milestone |
+| --- | --- |
+| **1** | Kickoff, accounts and hosting, mockup sign-off. MongoDB schema, Hono API, Better Auth roles, R2 media, first staging deploy. |
+| **2** | Crackers & Clothing storefront — catalogue, categories, filters, search, product detail, variants, festival packs. Admin: products and stock. |
+| **3** | Cart, checkout, orders, customer accounts. Real Estate — seller listing, verification queue, public browse, site-visit requests. |
+| **4** | Admin orders/stock/verification/visits, polish, testing, UAT, production launch, training and handover. |
 
----
+Compressed schedule. It holds only if the Section 11 information — product
+data, photos and credentials — arrives at kickoff.
 
-## Getting Started
+## Payment schedule — ₹21,000
 
-Requires **Bun ≥ 1.4.2** and **Node ≥ 20**.
+| Stage | Milestone | Share | Amount |
+| --- | --- | --- | --- |
+| 1 | On signing — advance to commence work | 50% | ₹10,500 |
+| 2 | Store section and admin panel core (end of Week 3) | 30% | ₹6,300 |
+| 3 | Final delivery, handover and go-live | 20% | ₹4,200 |
 
-```bash
-bun install                 # install all workspaces
-bun run dev                 # start apps/web on http://localhost:3000
-bun run build               # production build
-bun run lint                # eslint
-bun run typecheck           # tsc --noEmit
-```
-
-Add a shadcn component:
-
-```bash
-cd apps/web
-bunx shadcn@latest add <component>
-```
+Invoices payable within 7 days. Free bug-fix support for **15 days** from
+handover.
 
 ---
 
-## Version History
+## Blocked on the client
 
-| Version | Date         | Description                                                           |
-| ------- | ------------ | --------------------------------------------------------------------- |
-| **V1**  | Jul-Aug 2026 | Original real estate listing platform proposal (₹1L, 45 days)         |
-| **V2**  | TBD          | Evolved real estate module (if needed separately)                     |
-| **V3**  | Sep 2026     | Multi-vertical platform: crackers, real estate, clothing — subdomains |
+Chase these at signing, not at kickoff — nothing can be deployed without them.
 
----
+1. **`DATABASE_URL`** — MongoDB Atlas connection string. Never supplied; no
+   schema has ever been pushed and no seed has ever run.
+2. **Google OAuth** — client ID and secret.
+3. **Cloudflare R2** — bucket name and public domain.
+4. Logo file (or confirmation to use a text logo), colour preference, business
+   details and GST number, product list with photos/price/stock, property types
+   and districts to filter by, delivery areas and pincodes, confirmation that
+   COD is acceptable and that Tamil can come later, domain and hosting
+   ownership.
 
-## V3 Platform Overview
+## Open items
 
-**preebooking.com** is a multi-vertical platform:
+| | |
+| --- | --- |
+| **C1 — GSTIN** | Blank on the template. Leave blank or supply. |
+| **C2 — Proposal number** | Three refs in circulation: `ZL/2026/008`, `ZNL/2026/___`, `RSS/2026/___`. This repo uses **ZL/2026/008** — confirm or replace. |
+| **C3 — Town spelling** | "Pattamalai" vs "Pattamadai". Confirm with Mr. Nambi. |
 
-- `crackers.preebooking.com` — E-commerce for crackers/festive goods
-- `realestate.preebooking.com` — Property listing & site visits
-- `clothing.preebooking.com` — Fashion & apparel
-- More verticals plug in via subdomains
-
-**Tech Stack:** TanStack Start + Hono + PostgreSQL + Prisma + Better Auth + Razorpay
-**Timeline:** 12 weeks (3 phases × 4 verticals + foundation + payments + launch)
-
----
-
-## Key Decisions Needed
-
-1. Which verticals launch first?
-2. Payment flow — platform or direct?
-3. Inventory management responsibility?
-4. Delivery logistics?
-5. Seller onboarding process?
-6. Confirmed budget for V3 scope?
-7. Domain & hosting ownership?
+**Real Estate has no data model yet.** Property, PropertyImage, VisitRequest
+and Seller do not exist anywhere. Budget real time for it in Weeks 1 and 3, not
+just Week 3.
 
 ---
 
-_Last updated: September 11, 2026_
-=======
-# Zenyne Store!
+_All "Roriri Software Solutions" branding, the ₹10,000 / 14-day apparel-only
+engagement, the ₹20,000 / 6-week V3 figure, and the PostgreSQL / NextAuth /
+Next.js stack references are superseded and have been removed._
 
-Give a local business a beautiful online store in minutes, and turn store
-visits into WhatsApp orders.
-
-The app lives in [`store/`](store/) - see [`store/README.md`](store/README.md)
-to run it. [`plan.md`](plan.md) is the product spec, [`design.md`](design.md)
-is the design system, [`AGENTS.md`](AGENTS.md) describes how this repo is
-built with sub-agent orchestration.
->>>>>>> 80f86d07790fb50e0a83a8b13fb5370bc71624fe
-# prebook
+_Last updated: 12 September 2026._

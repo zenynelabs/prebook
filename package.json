@@ -1,0 +1,19 @@
+{
+  "name": "prebook",
+  "private": true,
+  "packageManager": "bun@1.4.2",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "bun run --filter '@prebook/web' dev",
+    "build": "bun run --filter '@prebook/web' build",
+    "lint": "bun run --filter '@prebook/web' lint",
+    "typecheck": "bun run --filter '@prebook/web' typecheck",
+    "format": "bun run --filter '@prebook/web' format"
+  },
+  "trustedDependencies": [
+    "esbuild",
+    "lightningcss",
+    "@tailwindcss/oxide",
+    "@swc/core"
+  ]
+}

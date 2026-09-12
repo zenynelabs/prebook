@@ -1,0 +1,699 @@
+================================================================================
+PREBOOK - INVOICE PREPARATION SUMMARY
+================================================================================
+
+Working document for Thinesh Rasla / Zenyne Labs.
+Compiled 11 September 2026.
+
+PART B is the ready-to-paste invoice.
+PART C is the short list of blanks you still need to fill.
+PART D is the build status and what the stack decision means.
+
+
+================================================================================
+PART A - LOCKED DECISIONS
+================================================================================
+
+  Total project cost .... Rs. 21,000
+  Timeline .............. 4 weeks from kickoff
+  Payment schedule ...... 50 / 30 / 20  ->  Rs. 10,500 · Rs. 6,300 · Rs. 4,200
+  Scope ................. Crackers + Clothing + Real Estate, plus customer
+                          accounts and admin panel
+  Service provider ...... Zenyne Labs (supersedes every "Roriri Software
+                          Solutions" reference)
+  Stack ................. TanStack Start · Hono · MongoDB Atlas · Better Auth
+                          · Cloudflare R2
+  Payments in build ..... Cash on Delivery / offline only - no gateway
+  Client ................ Mr. Nambi · Prebooking · Tirunelveli ·
+                          preebooking.com
+
+SUPERSEDED BY THE ABOVE:
+  - the Rs. 10,000 / 14-day apparel-only figure in plan.md
+  - the Rs. 20,000 / 6-week figure in the V3 proposal
+  - the PostgreSQL / NextAuth / Next.js stack references
+  - the Roriri Software Solutions branding in README.md and
+    V3/Prebook-Phase1-Scope-and-Quotation.md
+
+
+================================================================================
+PART B - READY-TO-PASTE INVOICE
+================================================================================
+
+--------------------------------------------------------------------------------
+HEADER
+--------------------------------------------------------------------------------
+
+  PROJECT NAME       Prebook - preebooking.com
+  PROJECT SUBTITLE   Crackers · Clothing · Real Estate - One Website,
+                     One Admin Panel
+
+  CLIENT DETAILS
+    Client Name      Mr. Nambi
+    Business         Prebooking
+    Address          Pattamalai, Tirunelveli, Tamil Nadu
+                     (confirm spelling - see C3)
+    Phone / Email    [fill in manually]
+
+  SERVICE PROVIDER DETAILS
+    Company          ZENYNE LABS
+    Contact Person   Thinesh Rasla, Managing Director
+    Address          26/137/63, ST-3, Mangammal Salai, Devasahayammount,
+                     Aralvoimozhi
+    Phone / Email    +91 99946 27465 · hello@zenyne.com
+    Website          zenyne.com
+    GSTIN            -
+
+  Proposal No.       ZL/2026/008  (confirm - see C2)
+  Date of Issue      11 September 2026
+  Valid Until        11 October 2026
+
+
+--------------------------------------------------------------------------------
+1. INTRODUCTION
+--------------------------------------------------------------------------------
+
+Dear Mr. Nambi,
+
+Thank you for the opportunity to propose a solution for preebooking.com.
+Following our discussions, we understand that you want a single website that
+can host several businesses in one place - Crackers, Clothing and Real Estate
+- where your customers can shop or make enquiries, and where you manage
+everything from one admin panel. Today each of these runs manually across
+phone and messaging, which is time-consuming, hard to track during festival
+season, and prone to error.
+
+This document sets out our understanding of your requirement, the exact scope
+of what we will build, the delivery timeline, the commercial quotation, and
+the terms under which the work will be carried out. Once you are satisfied,
+signing the acceptance page at the end of this document is all that is needed
+for us to begin.
+
+Please read Section 4 carefully. It is the final agreed scope for this
+project, prepared after our discussions, and the price quoted in Section 7
+covers exactly what is described there. Anything that changes materially after
+signing will be treated as separate work.
+
+We look forward to working with you.
+
+Sincerely,
+Thinesh Rasla
+Managing Director, ZENYNE LABS
+
+
+--------------------------------------------------------------------------------
+2. UNDERSTANDING YOUR REQUIREMENT
+--------------------------------------------------------------------------------
+
+Based on our discussions, the system must address the following:
+
+  1. ONE WEBSITE, NOT THREE.
+     You already own preebooking.com. You want Crackers, Clothing and Real
+     Estate to live as sections of the same site, opened from the main menu -
+     one login for the customer, one admin panel for you, one hosting bill to
+     pay.
+
+  2. CRACKERS AND CLOTHING ARE SHOPS.
+     Customers browse a catalogue, filter by category and price, add to cart
+     and place an order. Crackers need safety information and festival packs;
+     Clothing needs sizes, colours and variants.
+
+  3. REAL ESTATE IS A LEAD PLATFORM, NOT A SHOP.
+     Sellers post property listings, you verify each one before it goes live,
+     and buyers request site visits - with the seller's phone number never
+     shown to the buyer.
+
+  4. YOU CONTROL EVERYTHING FROM ONE ADMIN PANEL.
+     Products, stock, orders, property listings, verification and customers,
+     with separate staff logins.
+
+  5. IT MUST WORK ON PHONE, TABLET AND DESKTOP, and be findable on Google.
+
+  6. IT MUST BE BUILT SO NEW BUSINESS SECTIONS CAN BE ADDED LATER,
+     without a rebuild.
+
+
+--------------------------------------------------------------------------------
+3. PROPOSED SOLUTION
+--------------------------------------------------------------------------------
+
+We propose a single connected platform delivered in two parts:
+
+  PUBLIC WEBSITE (preebooking.com)
+    One landing page showing every business section, with a menu to move
+    between Crackers, Clothing and Real Estate. Used by your customers,
+    buyers and sellers.
+
+  ADMIN PANEL (WEB)
+    A role-based back office used by you and your staff to manage products,
+    stock, orders, property verification, site visits and customers across
+    all three sections.
+
+Because all three sections share one website and one login, the customer
+experience is unified and the running cost stays that of a single site. If one
+business later grows into a separate company, it can be moved to its own
+subdomain without rebuilding anything.
+
+
+3.1 WHO USES WHAT
+- - - - - - - - -
+
+  YOU (PLATFORM OWNER)
+    Public Website ..... -
+    Admin Panel ........ Full control across all three sections
+    Seller Area ........ Approve / reject listings
+
+  YOUR STAFF
+    Public Website ..... -
+    Admin Panel ........ Permissions set by you - stock, or orders, or support
+    Seller Area ........ -
+
+  SELLERS (REAL ESTATE)
+    Public Website ..... Browse listings
+    Admin Panel ........ -
+    Seller Area ........ Post and manage own listings, subject to your
+                         approval
+
+  CUSTOMERS (REGISTERED)
+    Public Website ..... Browse, buy, save address, order history, request
+                         site visits
+    Admin Panel ........ -
+    Seller Area ........ -
+
+  CUSTOMERS (GUEST)
+    Public Website ..... Browse, search, add to cart
+    Admin Panel ........ -
+    Seller Area ........ -
+
+
+3.2 HOW AN ORDER WORKS - CRACKERS & CLOTHING
+- - - - - - - - - - - - - - - - - - - - - - -
+
+  STEP 1 - BROWSE
+    Customer opens preebooking.com, picks a section, filters by category /
+    type / price, checks live stock.
+
+  STEP 2 - BUY
+    Adds items to cart, enters delivery address, confirms the order
+    (Cash on Delivery / offline payment).
+
+  STEP 3 - YOU RECEIVE IT
+    Order appears in the admin panel as "Pending" and an alert is sent to you.
+
+  STEP 4 - FULFIL
+    You move the order through the pipeline; the customer sees the status
+    live. Order is delivered and payment collected directly.
+
+
+3.3 HOW A SITE VISIT WORKS - REAL ESTATE
+- - - - - - - - - - - - - - - - - - - - -
+
+  STEP 1 - LIST
+    Seller posts a property with photos and details; it stays "Pending" and is
+    not publicly visible.
+
+  STEP 2 - VERIFY
+    You approve or reject the listing from the verification queue; only
+    approved listings go live.
+
+  STEP 3 - REQUEST
+    Buyer browses approved listings and requests a site visit with a preferred
+    time.
+
+  STEP 4 - COORDINATE
+    You receive the request and coordinate the visit offline. The seller's
+    contact is never shown to the buyer.
+
+
+--------------------------------------------------------------------------------
+4. SCOPE OF WORK
+--------------------------------------------------------------------------------
+
+The following is the complete, agreed scope of this engagement. Anything not
+listed here is treated as outside scope (see Section 5).
+
+
+4.1 WEBSITE & BUSINESS SECTIONS
+
+  - A single landing page showing all three business sections, with a menu to
+    open each one.
+  - Crackers, Clothing and Real Estate each run as a section of the same
+    website.
+  - Mobile-first responsive design - works properly on phone, tablet and
+    desktop.
+  - Basic SEO - clean page titles, sitemap, structured data, server-rendered
+    pages.
+  - Built so further business sections can be added later as new sections.
+
+
+4.2 CRACKERS & CLOTHING STORE
+
+  - Product catalogue with its own categories per section (Crackers:
+    sparklers, flower pots, rockets, gift boxes · Clothing: men, women, kids,
+    accessories).
+  - Product listing with filters (type, category, price) and search.
+  - Product detail page - photo gallery, price, description; safety
+    information for crackers; size and colour variants with a size chart for
+    clothing.
+  - Festival packs / curated bundles for Diwali and similar occasions.
+  - Shopping cart with quantity control.
+  - Checkout with delivery address and order confirmation (Cash on Delivery /
+    offline payment).
+  - Live stock indicators; order status visible to the customer.
+
+
+4.3 REAL ESTATE SECTION
+
+  - Seller area to post and manage own listings (land, house, apartment) with
+    photos.
+  - Admin verification queue - listings stay hidden until approved or
+    rejected.
+  - Public browse of approved listings with filters (type, district, price).
+  - Site-visit request flow - buyer submits a preferred time; admin tracks
+    status (new / confirmed / completed / cancelled).
+  - CONTACT PRIVACY - the seller's phone number is never shown to buyers.
+
+
+4.4 CUSTOMER ACCOUNTS
+
+  - Sign up and login by email/password or Google.
+  - Customer dashboard - my orders, saved delivery address, profile.
+  - Site-visit requests for Real Estate while logged in.
+
+
+4.5 ADMIN PANEL
+
+  - Secure login with role-based access for you and your staff.
+  - PRODUCTS - add / edit / delete, upload photos, set price, stock and
+    variants.
+  - ORDERS - view and manage the order pipeline; update status.
+  - REAL ESTATE - approve / reject listings; view and manage site-visit
+    requests.
+  - CUSTOMERS - view registered customers.
+  - ALERTS - notification on new orders and new site-visit requests.
+
+
+4.6 CORE BUSINESS LOGIC
+
+  - All money stored and calculated as integer paise - no floating-point
+    rounding errors on totals, GST or discounts.
+  - Stock decremented on order placement; sold-out and low-stock states
+    reflect live on the listing and product pages.
+  - Property listings are gated behind admin approval - nothing goes public
+    unverified.
+  - Seller contact details are held server-side and never serialised into any
+    buyer-facing response.
+
+
+4.7 BILLING & PAYMENTS (THIS BUILD)
+
+  - Payments are offline / Cash on Delivery. There is NO online payment
+    gateway in this build.
+  - The order record is built gateway-agnostic (paymentMethod +
+    paymentStatus), so Razorpay or UPI can be added later as a separately
+    quoted module without reworking checkout.
+  - Order and visit-request alerts are issued to the admin. Customer-facing
+    WhatsApp/SMS messaging depends on a third-party service billed to you
+    (Section 8).
+
+
+4.8 TECHNOLOGY
+
+  Public Website (User Interface)
+      TanStack Start - server-rendered React, mobile-first, Tailwind CSS
+  Admin Panel (Admin Interface)
+      Same application, role-gated admin area
+  Backend API Service
+      Hono on the Bun runtime
+  Database Engine
+      MongoDB Atlas via Prisma ORM
+  Authentication
+      Better Auth - email/password + Google, role-based access control
+  Media Storage
+      Cloudflare R2 - product and property images, presigned direct upload
+  Search
+      In-app search with filters
+  Hosting
+      Cloudflare / Vercel with CDN in front
+
+
+4.9 FINAL AGREED SCOPE
+
+This document represents the final and complete scope for this project,
+prepared and confirmed after our discussions. The price and timeline quoted
+cover exactly the work described in this Section 4 and nothing beyond it.
+
+If a major change is required later - a new module, a new business section, a
+change in how billing or payment works, a different platform, a redesign, or
+any significant addition to the features listed above - it will be treated as
+a separate piece of work. It is not part of this package and is not covered by
+the price or the timeline in this document. Any such request will be assessed,
+quoted, and agreed upon in writing before it is taken up.
+
+Minor refinements identified during the build - wording, layout, and small
+usability adjustments within an agreed screen - remain included and are
+handled as part of normal delivery.
+
+
+--------------------------------------------------------------------------------
+5. OUT OF SCOPE
+--------------------------------------------------------------------------------
+
+The following are explicitly NOT included. Each can be scoped and quoted
+separately later.
+
+  - Online payment gateway (Razorpay / UPI / cards) and automatic payment
+    verification.
+  - Mobile app (Android / iOS).
+  - Delivery, logistics or courier integration.
+  - Languages other than English - Tamil content is deferred; the structure is
+    kept ready.
+  - Data migration from any existing system, unless supplied in an agreed
+    structured format.
+  - Product photography, content writing and logo design, unless agreed
+    separately.
+  - Ongoing hosting, domain, cloud storage, messaging or other third-party
+    subscription charges (see Section 8).
+  - Reports, analytics and accounting modules.
+  - Map / geographic property search, and buyer-seller chat.
+
+
+--------------------------------------------------------------------------------
+6. PROJECT TIMELINE
+--------------------------------------------------------------------------------
+
+Estimated duration: 4 WEEKS from the date of kickoff, subject to timely client
+feedback and provision of the information listed in Section 11.
+
+  WEEK 1
+    Kickoff - confirm open items, set up hosting / domain / accounts, sign off
+    screen mockups. Backend foundation: MongoDB schema, Hono API, Better Auth
+    roles, Cloudflare R2 media, first staging deployment.
+
+  WEEK 2
+    Crackers & Clothing storefront core - catalogue, categories, filters,
+    search, product detail pages, variants and festival packs. Admin: product
+    and stock management.
+
+  WEEK 3
+    Cart, checkout and orders; customer accounts. Real Estate - seller listing
+    flow, admin verification queue, public browse with filters, site-visit
+    requests.
+
+  WEEK 4
+    Admin - orders, stock, verification queue and site-visit tracking; polish
+    and edge cases; testing, client review (UAT), production launch, training
+    and handover.
+
+This is a compressed schedule for the scope involved. It holds only if the
+Section 11 information - especially product data, photos and credentials -
+arrives at kickoff. Delays in providing these will extend the timeline
+correspondingly.
+
+
+--------------------------------------------------------------------------------
+7. COMMERCIAL QUOTATION
+--------------------------------------------------------------------------------
+
+The following is a fixed-price quotation for the scope defined in Section 4.
+
+  S.No.  DELIVERABLE / WORK ITEM                             AMOUNT (Rs.)
+  -----  -------------------------------------------------   ------------
+    1    Requirement finalisation, data modelling, UI/UX
+         screen design and mockup sign-off                          2,000
+
+    2    Backend API and database - Hono API service,
+         MongoDB Atlas schema, Better Auth authentication
+         and roles, Cloudflare R2 media storage                     4,000
+
+    3    Web admin panel - products, stock, orders,
+         real-estate verification and site-visit
+         management, customers, role-based staff access             3,000
+
+    4    Crackers & Clothing store - catalogue, categories,
+         filters, search, product detail with variants and
+         safety info, festival packs, cart, checkout,
+         order confirmation                                         7,000
+
+    5    Real Estate section - seller listing, admin
+         verification queue, public browse with filters,
+         site-visit request and tracking, contact privacy           3,500
+
+    6    Testing, deployment to production, training and
+         handover documentation                                     1,500
+  -----  -------------------------------------------------   ------------
+         SUB-TOTAL                                                 21,000
+         Discount                                                       -
+         TOTAL PROJECT COST                                    Rs. 21,000
+  -----  -------------------------------------------------   ------------
+
+  AMOUNT IN WORDS: RUPEES TWENTY-ONE THOUSAND ONLY.
+
+This quotation is valid for 30 days from the date of issue. The total of
+Rs. 21,000 is the complete cost of the work described in Section 4 - there is
+nothing further to add. It is exclusive only of the third-party costs listed
+in Section 8, which you pay directly to the respective provider.
+
+
+7.1 PAYMENT SCHEDULE
+- - - - - - - - - - -
+
+  STAGE  MILESTONE                                      SHARE   AMOUNT (Rs.)
+  -----  --------------------------------------------   -----   ------------
+    1    On signing this proposal - advance, to
+         commence work                                    50%         10,500
+
+    2    On completion of the store section and admin
+         panel core (end of Week 3)                       30%          6,300
+
+    3    On final delivery, handover and go-live          20%          4,200
+  -----  --------------------------------------------   -----   ------------
+         TOTAL                                           100%         21,000
+  -----  --------------------------------------------   -----   ------------
+
+Invoices are payable within 7 days of issue. Bank account details for
+remittance are provided on the invoice raised at each stage.
+
+
+--------------------------------------------------------------------------------
+8. THIRD-PARTY COSTS (PAYABLE BY THE CLIENT)
+--------------------------------------------------------------------------------
+
+The following are recurring or external charges paid directly by you to the
+respective provider. They are not part of the project cost above.
+
+  ITEM                                       INDICATIVE COST
+  ----------------------------------------   --------------------------------
+  Domain name (preebooking.com)              Billed by the registrar,
+  registration / renewal                     typically annually
+
+  Application hosting                        Billed by the provider,
+  (Cloudflare / Vercel)                      monthly / annually
+
+  Database (MongoDB Atlas)                   Billed by the provider, per tier
+
+  Cloud image storage (Cloudflare R2)        Per usage, billed by the provider
+
+  WhatsApp / SMS messaging service           Per-message charge billed by the
+  (order and visit alerts)                   provider
+
+  GST on applicable charges                  As applicable
+
+We recommend that all hosting, domain, and messaging accounts are created in
+your name from the outset so that nothing needs to be transferred later.
+
+
+--------------------------------------------------------------------------------
+9. SUPPORT & WARRANTY
+--------------------------------------------------------------------------------
+
+  - Free bug-fix support for 15 DAYS from the date of handover. This covers
+    correcting anything that does not work as described in Section 4.
+  - Support does not cover new features, scope changes, or issues caused by
+    third-party services, hosting outages, or changes made by the client.
+  - A written user manual and a standard training walkthrough are included at
+    handover.
+  - Continued support beyond the free period can be arranged under a separate
+    annual maintenance contract, quoted on request.
+
+
+--------------------------------------------------------------------------------
+10. TERMS & CONDITIONS
+--------------------------------------------------------------------------------
+
+Use your standard template clauses 1-16 verbatim, with these project-specific
+edits:
+
+  CLAUSE 11 (PAYMENTS AND FUNDS)
+    Replace the UPI/vendor wording with:
+    "Payment is collected offline / Cash on Delivery directly between the
+    customer and the client. The platform does not process, hold or verify
+    payments. The service provider bears no responsibility for any payment
+    dispute, shortfall or non-payment."
+
+  CLAUSE 10 (THIRD-PARTY SERVICES)
+    List hosting, MongoDB Atlas, Cloudflare R2, WhatsApp and email;
+    drop "UPI applications" and "app stores".
+
+  CLAUSE 12 (DATA)
+    Add that the client is responsible for the lawful handling of seller
+    contact details held in the Real Estate section.
+
+  CLAUSE 16 (JURISDICTION)
+    Tirunelveli, Tamil Nadu - already correct for this client.
+
+
+--------------------------------------------------------------------------------
+11. INFORMATION REQUIRED FROM YOU
+--------------------------------------------------------------------------------
+
+To keep to the 4-week timeline, we will need the following at or before
+kickoff:
+
+   1. LOGO - a logo file, or confirmation to use a simple text logo
+      (design chargeable separately).
+   2. THEME / COLOURS - any colour preference; otherwise we will use a clean
+      festive theme (red, cream, gold).
+   3. BUSINESS DETAILS - legal / business name, address, GST number (if
+      registered), phone, email and WhatsApp number to use on the site and on
+      invoices.
+   4. PRODUCTS - a product list with photos, price and stock, and how many
+      items to start with in Crackers and in Clothing.
+   5. REAL ESTATE - typical property types, and the districts / areas buyers
+      should be able to filter by.
+   6. DELIVERY - how store orders are delivered, and which areas / pincodes
+      you serve.
+   7. PAYMENTS - confirmation that Cash on Delivery / offline payment is
+      acceptable to start with.
+   8. LANGUAGE - confirmation that Tamil content can come later.
+   9. DOMAIN & HOSTING - confirmation that you own preebooking.com and will
+      pay the hosting and domain charges.
+  10. CREDENTIALS - MongoDB Atlas connection string, Google OAuth client ID
+      and secret, Cloudflare R2 bucket name and public domain.
+
+
+--------------------------------------------------------------------------------
+12. ACCEPTANCE & AUTHORISATION
+--------------------------------------------------------------------------------
+
+By signing below, both parties confirm that they have read, understood, and
+agreed to the scope of work, the commercial quotation, the payment schedule,
+and the terms and conditions set out in this document. This signed proposal
+constitutes the agreement between the parties for the work described herein.
+
+  TOTAL PROJECT COST      Rs. 21,000 (Rupees Twenty-One Thousand Only)
+  ESTIMATED DELIVERY      4 weeks from kickoff
+
+Standard signature blocks - FOR THE CLIENT and FOR ZENYNE LABS.
+
+
+================================================================================
+PART C - BLANKS YOU STILL NEED TO FILL
+================================================================================
+
+  C1  GSTIN
+      Blank on the template. Leave blank or supply.
+
+  C2  PROPOSAL NUMBER
+      Three refs are in circulation across your documents: ZL/2026/008,
+      ZNL/2026/___, RSS/2026/___. Part B uses ZL/2026/008 - confirm or
+      replace.
+
+  C3  CLIENT TOWN SPELLING
+      "Pattamalai" in README.md and the V3 scope doc, vs "Pattamadai" in the
+      V3 proposal. Confirm with Mr. Nambi.
+
+  SETTLED:
+      Zenyne Labs phone is +91 99946 27465
+      Warranty is 15 days
+      Client's phone and email are filled in manually on the document
+
+
+================================================================================
+PART D - BUILD STATUS & WHAT THE STACK CHANGE MEANS
+================================================================================
+
+THE EXISTING CODE IS NEXT.JS, NOT TANSTACK START
+------------------------------------------------
+
+store/ is a Next.js 16.3.3 App Router application - that was the decision
+locked in BUILD_PLAN.md on 31 Aug and built out on 1 Sep. Moving to TanStack
+Start + Hono means part of that foundation does not carry across. Worth
+knowing before Week 1:
+
+  CARRIES OVER AS-IS
+    - store/prisma/schema.prisma - 482 lines, 21 models, 7 enums, validated
+    - store/prisma/seed.ts - 517 lines, 20 products + variants + collections
+      + promos + pincodes
+    - store/lib/ - prisma.ts, money.ts (integer paise), stock.ts, env.ts
+      (zod), r2.ts, permissions.ts
+    - Better Auth configuration and role model - Better Auth is
+      framework-agnostic
+    - Design tokens in store/app/globals.css - crimson / cream / gold /
+      charcoal, radius 0.75rem
+    - Tailwind v4 setup, and the 25 shadcn UI primitives (React components,
+      framework-independent)
+
+  DOES NOT CARRY OVER - NEEDS REBUILDING ON THE NEW STACK
+    - proxy.ts (Next.js route gate) -> TanStack Start route guards
+    - app/layout.tsx, app/page.tsx, App Router file conventions ->
+      TanStack Router file routes
+    - app/api/auth/[...all]/route.ts and app/api/uploads/route.ts ->
+      Hono route handlers
+    - next-intl i18n wiring -> a TanStack-compatible i18n approach
+    - next/font, next/image -> standard font loading and an image strategy on
+      the new stack
+
+  NOTE ON PRISMA
+    It is pinned to 6.19.3 because Prisma 7 dropped MongoDB support.
+    Keep that pin.
+
+
+REAL ESTATE HAS NO SCHEMA YET
+-----------------------------
+
+The 21 existing Prisma models cover catalogue, commerce and ops. There is NO
+Property, PropertyImage, VisitRequest or Seller model. Section 4.3 is fully
+specified in the proposal but entirely unbuilt - budget real time for it in
+Weeks 1 and 3, not just Week 3.
+
+
+BLOCKED ON THE CLIENT
+---------------------
+
+DATABASE_URL (MongoDB Atlas) has never been supplied, so the schema has never
+been pushed to a live database and the seed has never run. Google OAuth
+credentials and the R2 bucket details are also outstanding. These are item 10
+in Section 11 - chase them at signing, not at kickoff.
+
+
+HOUSEKEEPING IN THE REPO
+------------------------
+
+  - V1/ is an EMPTY DIRECTORY. The five files README.md lists inside it
+    (.docx, TECHNICAL.md, design.md, index.html, plan.md) are not on disk and
+    are not in git history. Either restore them or correct the README.
+
+  - plan.md and README.md still describe the superseded Rs. 10,000 /
+    apparel-only engagement and the PostgreSQL / NextAuth / Roriri details.
+    Update or archive them so the signed proposal is the only live document.
+
+
+================================================================================
+PART E - FUTURE MODULES (QUOTED SEPARATELY)
+================================================================================
+
+Each will be assessed, quoted and agreed in writing before work starts:
+
+  - Online payment gateway - Razorpay / UPI / cards, with automatic payment
+    verification
+  - Mobile app - Android / iOS
+  - Delivery and logistics module
+  - Reports, analytics and accounting
+  - Tamil content and translation
+  - Map / geographic property search
+  - Buyer-seller chat
+  - Any additional business section
+
+================================================================================
+END OF DOCUMENT
+================================================================================
