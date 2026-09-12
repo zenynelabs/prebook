@@ -15,8 +15,12 @@
 
 > **[`docs/INVOICE-SUMMARY.txt`](docs/INVOICE-SUMMARY.txt) is the single source of truth**
 > for scope, quotation, timeline and terms. If anything in this README disagrees
-> with it, that document wins. Every earlier plan, proposal and design note has
-> been removed from this repository.
+> with it, that document wins.
+>
+> **[`docs/design.md`](docs/design.md)** governs how the site looks — tokens,
+> layout, components, states — and carries a paste-ready build brief for the
+> landing page. These two are the only standing documents; every earlier plan,
+> proposal and design note has been removed.
 
 ---
 
@@ -88,7 +92,8 @@ The build starts from the Week 1 foundation described in the plan.
 ```
 prebook/
 ├── docs/
-│   └── INVOICE-SUMMARY.txt     # the plan — scope, quotation, terms, build status
+│   ├── INVOICE-SUMMARY.txt     # the plan — scope, quotation, terms, build status
+│   └── design.md               # the design system + build brief for index.html
 ├── AGENTS.md                   # how agents work in this repo
 ├── package.json                # Bun workspace root (expects apps/*)
 └── README.md

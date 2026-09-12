@@ -6,12 +6,12 @@
 Crackers, Clothing and Real Estate — with one customer login and one admin
 panel. Client: Mr. Nambi, Prebooking, Tirunelveli. Provider: Zenyne Labs.
 
-| | |
-| --- | --- |
-| Total cost | **₹21,000** |
-| Timeline | **4 weeks** from kickoff |
-| Payments in build | Cash on Delivery / offline only — **no gateway** |
-| Stack | TanStack Start · Hono (Bun) · MongoDB Atlas via Prisma · Better Auth · Cloudflare R2 |
+|                   |                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| Total cost        | **₹21,000**                                                                          |
+| Timeline          | **4 weeks** from kickoff                                                             |
+| Payments in build | Cash on Delivery / offline only — **no gateway**                                     |
+| Stack             | TanStack Start · Hono (Bun) · MongoDB Atlas via Prisma · Better Auth · Cloudflare R2 |
 
 > ### [`docs/INVOICE-SUMMARY.txt`](docs/INVOICE-SUMMARY.txt) is the single source of truth.
 >
@@ -35,6 +35,13 @@ Facts that bind every task:
   and Seller do not exist. Building them is real work, not a schema tweak.
 - **Nothing is deployable yet.** `DATABASE_URL`, Google OAuth credentials and
   the R2 bucket details have never been supplied by the client.
+- **Hotels, Restaurants and Gym & Fitness are presentational only.** They exist
+  on the landing page as disabled "coming soon" tiles and nowhere else. Do not
+  build a route, model or query for them — each is a separately quoted PART E
+  module.
+- **Stores inside a section is not in Section 4.** The plan describes one
+  catalogue, not a multi-vendor marketplace. `design.md` specifies the store
+  layer because the client asked for it; it needs quoting before it is built.
 
 ### Repository state
 
@@ -53,11 +60,19 @@ if it cannot be regenerated.
 
 ## Design rules
 
-**No design system is locked yet.** The client has not supplied a logo or a
-colour preference — that is item 2 of Section 11 in the plan, due at kickoff.
-Until it arrives the working default is the clean festive theme named in the
-plan (red, cream, gold). Do not invent a brand, and do not resurrect tokens
-from a deleted document or another project.
+**[`docs/design.md`](docs/design.md) is the design system.** Read it before
+writing any markup or CSS. It carries the tokens, the layout grid, component
+specs, required states, motion rules and accessibility floor. Never hard-code a
+colour, radius or spacing value that is not one of its tokens.
+
+Direction: clean, light, minimal — white ground, one blue accent, hairline
+borders rather than shadows, Inter only, generous whitespace.
+
+Colour and type are **provisional**: the client has not supplied a logo or a
+colour preference (Section 11 item 2 of the plan, due at kickoff). When branding
+arrives, change the accent tokens in `design.md` §2.1 — not the call sites. Do
+not invent a brand, and do not resurrect tokens from a deleted document or
+another project.
 
 What holds regardless of the palette:
 
@@ -148,11 +163,18 @@ Create enough structure to prevent wasted work and conflicting implementations.
 
 ## 3. Create or Update the Plan
 
-The commercial plan already exists and is fixed: `docs/INVOICE-SUMMARY.txt`.
-**Do not create competing plan documents.** No `plan.md`, no `design.md`, no
-`BUILD_PLAN.md` — those were deliberately removed, and re-creating them is how
-the repository ended up with four contradictory scopes and three different
-prices.
+This repository keeps exactly **two** standing documents, and they do not
+overlap:
+
+| File                       | Governs                                               | Authority                                               |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| `docs/INVOICE-SUMMARY.txt` | **What** gets built, for how much, by when            | Final — Section 4 is the agreed scope                   |
+| `docs/design.md`           | **How** it looks — tokens, layout, components, states | Final for visual decisions; yields to the plan on scope |
+
+**Do not create a third.** No `plan.md`, no `BUILD_PLAN.md`, no `ui-spec.md`,
+no `requirements.md` — those were deliberately removed, and re-creating them is
+how this repository ended up with four contradictory scopes at three different
+prices. Update one of the two above instead.
 
 Track execution in the session itself (a todo list), not in new files. Where a
 decision genuinely needs to persist, it belongs in `AGENTS.md` or the README,

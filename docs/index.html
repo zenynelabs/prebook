@@ -1,0 +1,2273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Preebooking - Crackers, Clothing and Real Estate in Tirunelveli
+    </title>
+    <meta
+      name="description"
+      content="One place for Sivakasi crackers, local clothing stores and Tirunelveli property. Reserve online, pay cash on delivery, GST invoice in the box."
+    />
+    <meta name="theme-color" content="#0f1729" />
+    <script>
+      document.documentElement.className += " js";
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=synonym@400,500,600,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── 1. Tokens ─────────────────────────────────────────────────────── */
+      :root {
+        --bg: #ffffff;
+        --surface: #f7f9fc;
+        --surface-2: #f1f4f9;
+        --border: #e6eaf2;
+        --border-strong: #d3dae8;
+        --text: #0f1729;
+        --text-2: #5a6478;
+        --text-3: #8a93a6;
+        --text-disabled: #9aa3b5;
+        --accent: #1550e8;
+        --accent-hover: #1240b8;
+        --accent-press: #0e35a0;
+        --accent-wash: #eef3fe;
+        --accent-border: #c7d9ff;
+        --accent-text: #0e3fbf;
+        --success: #12924f;
+        --warning: #b4690e;
+        --danger: #d92d20;
+        --v-crackers: #e11d2e;
+        --v-clothing: #8b4be8;
+        --v-property: #0e9e7e;
+
+        --r-card: 12px;
+        --r-btn: 10px;
+        --r-input: 10px;
+        --r-chip: 8px;
+        --r-pill: 999px;
+        --shadow-sm: 0 1px 2px rgba(15, 23, 41, 0.04);
+        --shadow-md: 0 6px 20px rgba(15, 23, 41, 0.07);
+        --shadow-lg: 0 16px 40px rgba(15, 23, 41, 0.1);
+        --ease: cubic-bezier(0.4, 0, 0.2, 1);
+        --t-fast: 120ms;
+        --t-base: 180ms;
+        --t-slow: 420ms;
+
+        --pad-section: 96px;
+        --gutter: 24px;
+        --font:
+          Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-heading:
+          Synonym, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      /* ── 2. Base ───────────────────────────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 88px;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 400 15px/1.6 var(--font);
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1,
+      h2,
+      h3 {
+        text-wrap: balance;
+        font-family: var(--font-heading);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+      }
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+
+      .skip {
+        position: absolute;
+        left: 16px;
+        top: -60px;
+        z-index: 100;
+        background: var(--bg);
+        color: var(--accent-text);
+        border: 1px solid var(--accent-border);
+        padding: 12px 18px;
+        border-radius: var(--r-btn);
+        font-weight: 600;
+        font-size: 14px;
+        transition: top var(--t-base) var(--ease);
+      }
+      .skip:focus {
+        top: 16px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin-inline: auto;
+        padding-inline: var(--gutter);
+      }
+      .section {
+        padding-block: var(--pad-section);
+      }
+      .section--band {
+        background: var(--surface);
+        border-block: 1px solid var(--border);
+      }
+      .sprite {
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      }
+      .ico {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+
+      /* ── 3. Type roles ─────────────────────────────────────────────────── */
+      .eyebrow {
+        font: 600 11.5px/1.2 var(--font);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .h2 {
+        font: 600 clamp(26px, 3.2vw, 34px)/1.15 var(--font-heading);
+        letter-spacing: -0.025em;
+      }
+      .h3 {
+        font: 600 18px/1.3 var(--font-heading);
+        letter-spacing: -0.015em;
+      }
+      .lede {
+        font: 400 clamp(16px, 1.6vw, 18px)/1.55 var(--font);
+        letter-spacing: -0.005em;
+        color: var(--text-2);
+        max-width: 65ch;
+      }
+      .meta {
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--text-3);
+      }
+
+      .section-head {
+        margin-bottom: 40px;
+        max-width: 65ch;
+      }
+      .section-head .h2 {
+        margin-bottom: 10px;
+      }
+      .section-head p {
+        color: var(--text-2);
+        font-size: 15px;
+      }
+
+      /* ── 4. Buttons & chips ────────────────────────────────────────────── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 12px 22px;
+        border-radius: var(--r-btn);
+        font: 600 14px/1 var(--font);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          background var(--t-fast) var(--ease),
+          border-color var(--t-fast) var(--ease),
+          color var(--t-fast) var(--ease),
+          transform var(--t-fast) var(--ease);
+      }
+      .btn--primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn--secondary {
+        background: var(--bg);
+        border-color: var(--border-strong);
+        color: var(--text);
+      }
+      .btn--glass {
+        background: rgba(255, 255, 255, 0.13);
+        border-color: rgba(255, 255, 255, 0.38);
+        color: #fff;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .btn--block {
+        width: 100%;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn:disabled {
+        background: var(--surface);
+        border-color: var(--border);
+        color: var(--text-disabled);
+        cursor: not-allowed;
+        transform: none;
+      }
+      .btn-quiet {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 44px;
+        padding: 12px 4px;
+        font: 600 14px/1 var(--font);
+        color: var(--accent-text);
+      }
+      @media (hover: hover) {
+        .btn--primary:hover {
+          background: var(--accent-hover);
+        }
+        .btn--secondary:hover {
+          background: var(--surface);
+          border-color: var(--border-strong);
+        }
+        .btn--glass:hover {
+          background: rgba(255, 255, 255, 0.22);
+        }
+        .btn:disabled:hover {
+          background: var(--surface);
+        }
+        .btn-quiet:hover {
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
+      }
+      .pill-soon {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: var(--r-pill);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        font: 600 11.5px/1.2 var(--font);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-3);
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex: none;
+      }
+
+      /* ── 5. Header ─────────────────────────────────────────────────────── */
+      .hdr {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 50;
+        height: 72px;
+        --hd-fg: #fff;
+        --hd-muted: rgba(255, 255, 255, 0.8);
+        --hd-hover: rgba(255, 255, 255, 0.13);
+        color: var(--hd-fg);
+        background: transparent;
+        border-bottom: 1px solid transparent;
+        transition:
+          background var(--t-base) var(--ease),
+          border-color var(--t-base) var(--ease),
+          backdrop-filter var(--t-base) var(--ease),
+          color var(--t-base) var(--ease);
+      }
+      .hdr.is-solid {
+        --hd-fg: var(--text);
+        --hd-muted: var(--text-2);
+        --hd-hover: var(--surface);
+        background: rgba(255, 255, 255, 0.85);
+        border-bottom-color: var(--border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .hdr__in {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+      .wordmark {
+        font: 600 18px/1 var(--font);
+        letter-spacing: -0.03em;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 10px 4px;
+      }
+      .wordmark .dot {
+        background: var(--v-crackers);
+      }
+      .hdr.is-solid :focus-visible {
+        outline-color: var(--accent);
+      }
+      .hdr :focus-visible {
+        outline-color: #fff;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-inline: auto;
+      }
+      .nav a,
+      .nav__more > button {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 14px;
+        min-height: 44px;
+        border-radius: var(--r-btn);
+        font: 500 14.5px/1 var(--font);
+        color: var(--hd-muted);
+        background: none;
+        border: 0;
+        cursor: pointer;
+        transition:
+          color var(--t-fast) var(--ease),
+          background var(--t-fast) var(--ease);
+      }
+      @media (hover: hover) {
+        .nav a:hover,
+        .nav__more > button:hover {
+          color: var(--hd-fg);
+          background: var(--hd-hover);
+        }
+      }
+      .nav__more {
+        position: relative;
+      }
+      .nav__more > button .ico {
+        width: 14px;
+        height: 14px;
+        transition: transform var(--t-fast) var(--ease);
+      }
+      .nav__more[data-open] > button .ico {
+        transform: rotate(180deg);
+      }
+      .drop {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 50%;
+        translate: -50% 0;
+        width: 248px;
+        padding: 8px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r-card);
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
+        visibility: hidden;
+        transition:
+          opacity var(--t-fast) var(--ease),
+          transform var(--t-fast) var(--ease),
+          visibility var(--t-fast);
+      }
+      .nav__more[data-open] .drop {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+        visibility: visible;
+      }
+      @media (hover: hover) {
+        .nav__more:hover .drop {
+          opacity: 1;
+          transform: none;
+          pointer-events: auto;
+          visibility: visible;
+        }
+      }
+      .drop li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: var(--r-chip);
+        font: 500 14.5px/1.2 var(--font);
+        color: var(--text-disabled);
+      }
+      .drop li .dot {
+        background: var(--text-disabled);
+        margin-right: -4px;
+      }
+      .drop__row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .hdr__actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .iconbtn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border: 0;
+        background: none;
+        border-radius: var(--r-btn);
+        color: var(--hd-muted);
+        cursor: pointer;
+        transition:
+          background var(--t-fast) var(--ease),
+          color var(--t-fast) var(--ease);
+      }
+      @media (hover: hover) {
+        .iconbtn:hover {
+          background: var(--hd-hover);
+          color: var(--hd-fg);
+        }
+      }
+      .badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        display: grid;
+        place-items: center;
+        border-radius: var(--r-pill);
+        background: var(--accent);
+        color: #fff;
+        font: 600 10.5px/1 var(--font);
+        border: 2px solid rgba(15, 23, 42, 0.45);
+        transition: border-color var(--t-base) var(--ease);
+      }
+      .hdr.is-solid .badge {
+        border-color: rgba(255, 255, 255, 0.9);
+      }
+      .hdr__burger {
+        display: none;
+      }
+
+      /* mobile slide-in */
+      .mnav {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        visibility: hidden;
+      }
+      .mnav[data-open] {
+        visibility: visible;
+      }
+      .mnav__scrim {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 41, 0.45);
+        opacity: 0;
+        transition: opacity var(--t-base) var(--ease);
+      }
+      .mnav[data-open] .mnav__scrim {
+        opacity: 1;
+      }
+      .mnav__panel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: min(360px, 86vw);
+        background: var(--bg);
+        border-left: 1px solid var(--border);
+        padding: 16px 20px 32px;
+        overflow-y: auto;
+        transform: translateX(100%);
+        transition: transform var(--t-base) var(--ease);
+      }
+      .mnav[data-open] .mnav__panel {
+        transform: none;
+      }
+      .mnav__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 56px;
+        margin-bottom: 16px;
+      }
+      .mnav__panel h2 {
+        font: 600 11.5px/1.2 var(--font);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin: 24px 0 8px;
+      }
+      .mnav__panel a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 52px;
+        padding: 8px 10px;
+        margin-inline: -10px;
+        border-radius: var(--r-chip);
+        font: 500 17px/1.3 var(--font);
+        letter-spacing: -0.01em;
+      }
+      @media (hover: hover) {
+        .mnav__panel a:hover {
+          background: var(--surface);
+        }
+      }
+      .mnav__panel li.is-soon {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 52px;
+        padding: 8px 0;
+        color: var(--text-disabled);
+        font: 500 17px/1.3 var(--font);
+      }
+      .mnav__panel li.is-soon .dot {
+        background: var(--text-disabled);
+      }
+      .mnav .btn {
+        margin-top: 28px;
+      }
+
+      /* ── 6. Hero ───────────────────────────────────────────────────────── */
+      .hero {
+        position: relative;
+        isolation: isolate;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: grid;
+        align-items: center;
+        overflow: hidden;
+        border-radius: 0 0 36px 36px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        color: #fff;
+      }
+      .hero__media {
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        overflow: hidden;
+      }
+      .hero__media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(10px) brightness(0.66) saturate(1.15);
+        transform: scale(1.08);
+      }
+      .hero__veil {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: radial-gradient(
+          ellipse 90% 75% at 50% 42%,
+          rgba(15, 23, 42, 0.18) 0%,
+          rgba(15, 23, 42, 0.58) 58%,
+          rgba(15, 23, 42, 0.92) 100%
+        );
+        box-shadow:
+          inset 0 -120px 120px -80px rgba(15, 23, 42, 0.95),
+          inset 0 120px 120px -90px rgba(15, 23, 42, 0.75);
+      }
+      .hero__in {
+        padding-block: 132px 72px;
+        max-width: 1080px;
+        margin-inline: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .hero h1 {
+        margin: 0;
+        font-weight: 800;
+        font-size: clamp(56px, 9.5vw, 82px);
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+        text-shadow: 0 2px 24px rgba(15, 23, 42, 0.45);
+      }
+      .hero h1 .gold {
+        background: linear-gradient(
+          96deg,
+          #ffd79a 8%,
+          #f2e4c4 52%,
+          #e8b978 96%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: #ffd79a;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero__lede {
+        margin-top: 20px;
+        max-width: 56ch;
+        font: 400 clamp(13px, 1vw, 15px)/1.55 var(--font);
+        letter-spacing: -0.005em;
+        color: rgba(255, 255, 255, 0.88);
+        text-shadow: 0 1px 12px rgba(15, 23, 42, 0.5);
+      }
+      .hero__actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 32px;
+      }
+      .hero :focus-visible {
+        outline-color: #fff;
+      }
+
+      .stats {
+        border-bottom: 1px solid var(--border);
+      }
+      .stats__in {
+        display: grid;
+        grid-template-columns: 1fr;
+        padding-block: 56px;
+      }
+      .stat {
+        padding: 20px 0;
+        border-top: 1px solid var(--border);
+      }
+      .stat:first-child {
+        border-top: 0;
+      }
+      .stat b {
+        display: block;
+        font: 600 clamp(32px, 5vw, 44px)/1.1 var(--font);
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        color: var(--text);
+      }
+      .stat span {
+        display: block;
+        margin-top: 8px;
+        font-size: 15px;
+        line-height: 1.4;
+        color: var(--text-2);
+      }
+
+      /* ── 7. Cards, shared ──────────────────────────────────────────────── */
+      .grid {
+        display: grid;
+        gap: 20px;
+      }
+      .card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r-card);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition:
+          border-color var(--t-base) var(--ease),
+          box-shadow var(--t-base) var(--ease),
+          transform var(--t-base) var(--ease);
+      }
+      .card__img {
+        position: relative;
+        background: var(--surface);
+        overflow: hidden;
+      }
+      .card__img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .ph {
+        display: grid;
+        place-items: center;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+      .ph span {
+        font: 600 24px/1 var(--font);
+        letter-spacing: 0.08em;
+        color: var(--text-3);
+      }
+      .arrow {
+        transition: transform var(--t-base) var(--ease);
+      }
+      @media (hover: hover) {
+        a.card:hover {
+          box-shadow: var(--shadow-md);
+          transform: translateY(-2px);
+        }
+        a.card:hover .arrow {
+          transform: translateX(4px);
+        }
+      }
+
+      /* ── 8. Category grid ──────────────────────────────────────────────── */
+      .cats {
+        grid-template-columns: 1fr;
+      }
+      .cat {
+        min-height: 180px;
+      }
+      .cat .card__img {
+        aspect-ratio: 16/10;
+        border-bottom: 1px solid var(--border);
+      }
+      .cat__body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      .cat__title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .cat__title .h3 {
+        letter-spacing: -0.015em;
+      }
+      .cat p {
+        margin-top: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--text-2);
+      }
+      .cat__foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: auto;
+        padding-top: 20px;
+      }
+      .cat__foot .arrow {
+        width: 16px;
+        height: 16px;
+        color: var(--text-3);
+      }
+      a.cat--crackers {
+        --v: var(--v-crackers);
+      }
+      a.cat--clothing {
+        --v: var(--v-clothing);
+      }
+      a.cat--property {
+        --v: var(--v-property);
+      }
+      @media (hover: hover) {
+        a.cat:hover {
+          border-color: color-mix(in srgb, var(--v) 40%, var(--border));
+        }
+        a.cat:hover .arrow {
+          color: var(--v);
+        }
+      }
+      .cat--soon {
+        background: var(--surface);
+        cursor: default;
+      }
+      .cat--soon .card__img {
+        border-bottom-color: var(--border);
+      }
+      .cat--soon .card__img img {
+        filter: grayscale(1) contrast(0.92);
+        opacity: 0.5;
+      }
+      .cat--soon .dot {
+        background: var(--text-disabled);
+      }
+      .cat--soon .h3,
+      .cat--soon p {
+        color: var(--text-disabled);
+      }
+      .cat--soon .cat__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      /* ── 9. Stores ─────────────────────────────────────────────────────── */
+      .stores {
+        grid-template-columns: 1fr;
+      }
+      .store .card__img,
+      .store .ph {
+        aspect-ratio: 16/9;
+        border-bottom: 1px solid var(--border);
+      }
+      .store__body {
+        padding: 20px 20px 22px;
+      }
+      .store .h3 {
+        letter-spacing: -0.015em;
+      }
+      .store__where {
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--text-3);
+      }
+      .store__foot {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--text-3);
+      }
+      .store__rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+      }
+      .store__rating .ico {
+        width: 14px;
+        height: 14px;
+        color: #e8a317;
+        fill: #e8a317;
+        stroke: none;
+      }
+
+      /* ── 10. Products ──────────────────────────────────────────────────── */
+      .products {
+        grid-template-columns: 1fr;
+      }
+      .prod .card__img,
+      .prod .ph {
+        aspect-ratio: 1/1;
+        border-bottom: 1px solid var(--border);
+      }
+      .prod__body {
+        padding: 18px 18px 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 8px;
+      }
+      .prod__title {
+        font: 500 15px/1.4 var(--font);
+        color: var(--text);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .prod__from {
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--text-3);
+      }
+      .prod__price {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 2px;
+      }
+      .prod__price b {
+        font: 600 18px/1.2 var(--font);
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+      .prod__mrp {
+        font-size: 13px;
+        color: var(--text-3);
+        text-decoration: line-through;
+        font-variant-numeric: tabular-nums;
+      }
+      .prod__off {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--success);
+      }
+      .prod .stock {
+        margin-bottom: 4px;
+      }
+      .stock {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        color: var(--text-2);
+      }
+      .stock .dot {
+        width: 6px;
+        height: 6px;
+      }
+      .stock--in .dot {
+        background: var(--success);
+      }
+      .stock--in {
+        color: var(--success);
+      }
+      .stock--low .dot {
+        background: var(--warning);
+      }
+      .stock--low {
+        color: var(--warning);
+      }
+      .stock--out .dot {
+        background: var(--text-3);
+      }
+      .stock--out {
+        color: var(--text-3);
+      }
+      .prod .btn {
+        margin-top: auto;
+        padding-top: 12px;
+      }
+
+      /* ── 11. Property ──────────────────────────────────────────────────── */
+      .props {
+        grid-template-columns: 1fr;
+      }
+      .prop .card__img,
+      .prop .ph {
+        aspect-ratio: 16/10;
+        border-bottom: 1px solid var(--border);
+      }
+      .prop__body {
+        padding: 22px 22px 24px;
+      }
+      .prop__where {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 8px;
+        font-size: 13px;
+        color: var(--text-3);
+      }
+      .prop__where .ico {
+        width: 14px;
+        height: 14px;
+      }
+      .prop__price {
+        margin-top: 14px;
+        font: 600 18px/1.2 var(--font);
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+      .prop__facts {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+      }
+      .prop__facts dt {
+        font: 600 11.5px/1.2 var(--font);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-3);
+      }
+      .prop__facts dd {
+        margin: 6px 0 0;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .prop .btn {
+        margin-top: 20px;
+      }
+
+      /* ── 12. Steps ─────────────────────────────────────────────────────── */
+      .steps {
+        display: grid;
+        gap: 40px;
+        grid-template-columns: 1fr;
+      }
+      .step__n {
+        font: 600 15px/1 var(--font);
+        color: var(--accent-text);
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 20px;
+      }
+      .step h3 {
+        margin-bottom: 8px;
+      }
+      .step p {
+        color: var(--text-2);
+        font-size: 15px;
+        max-width: 46ch;
+      }
+
+      /* ── 13. Trust ─────────────────────────────────────────────────────── */
+      .trust {
+        display: grid;
+        gap: 32px;
+        grid-template-columns: 1fr;
+      }
+      .trust__i .ico {
+        width: 20px;
+        height: 20px;
+        color: var(--accent-text);
+        margin-bottom: 14px;
+      }
+      .trust__i b {
+        display: block;
+        font: 600 15px/1.4 var(--font);
+      }
+      .trust__i span {
+        display: block;
+        margin-top: 4px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--text-2);
+      }
+
+      /* ── 14. Footer ────────────────────────────────────────────────────── */
+      .ftr {
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        padding-block: 64px;
+      }
+      .ftr__cols {
+        display: grid;
+        gap: 40px;
+        grid-template-columns: 1fr;
+      }
+      .ftr__about p {
+        margin-top: 14px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text-2);
+        max-width: 34ch;
+      }
+      .ftr h2 {
+        font: 600 11.5px/1.2 var(--font);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-3);
+        margin: 0 0 6px;
+      }
+      .ftr li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 40px;
+        font-size: 14px;
+      }
+      .ftr li a {
+        color: var(--text-2);
+        transition: color var(--t-fast) var(--ease);
+      }
+      @media (hover: hover) {
+        .ftr li a:hover {
+          color: var(--text);
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
+      }
+      .ftr li.is-soon {
+        color: var(--text-disabled);
+      }
+      .ftr__bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 24px;
+        justify-content: space-between;
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--text-3);
+      }
+
+      /* ── 15. Reveal ────────────────────────────────────────────────────── */
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition:
+          opacity var(--t-slow) var(--ease),
+          transform var(--t-slow) var(--ease);
+      }
+      .js .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ── 16. Responsive ────────────────────────────────────────────────── */
+      @media (max-width: 1023px) {
+        .nav {
+          display: none;
+        }
+        .hdr__burger {
+          display: inline-flex;
+        }
+        .hdr__in {
+          gap: 8px;
+        }
+        .hdr__actions {
+          margin-left: auto;
+        }
+        .hdr__actions .iconbtn[data-hide-sm] {
+          display: none;
+        }
+      }
+      @media (min-width: 1024px) {
+        .mnav {
+          display: none;
+        }
+      }
+      @media (min-width: 640px) {
+        .cats,
+        .stores,
+        .products,
+        .props {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .steps {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .trust {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .ftr__cols {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stats__in {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0 56px;
+        }
+        .stat:nth-child(2) {
+          border-top: 0;
+        }
+      }
+      @media (min-width: 1024px) {
+        .cats,
+        .props {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .stores,
+        .products {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .trust {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .ftr__cols {
+          grid-template-columns: 1.6fr 1fr 1fr 1fr;
+          gap: 32px;
+        }
+        .stats__in {
+          grid-template-columns: repeat(4, 1fr);
+          gap: 0 64px;
+          padding-block: 80px;
+        }
+        .stat {
+          border-top: 0;
+          border-left: 1px solid var(--border);
+          padding: 0 0 0 64px;
+        }
+        .stat:first-child {
+          border-left: 0;
+          padding-left: 0;
+        }
+      }
+      @media (max-width: 639px) {
+        :root {
+          --pad-section: 56px;
+          --gutter: 16px;
+        }
+        .grid {
+          gap: 16px;
+        }
+        .cat__body {
+          padding: 20px;
+        }
+        .hero {
+          border-radius: 0 0 24px 24px;
+        }
+        .hero__in {
+          padding-block: 116px 56px;
+        }
+        .hero__actions .btn {
+          flex: 1 1 100%;
+        }
+      }
+
+      /* ── 17. Reduced motion ────────────────────────────────────────────── */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+        .reveal {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <svg class="sprite" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </symbol>
+        <symbol id="i-user" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="3.5" />
+          <path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" />
+        </symbol>
+        <symbol id="i-cart" viewBox="0 0 24 24">
+          <path
+            d="M3 4h2.2l2 11.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.55L20.5 8H6"
+          />
+          <circle cx="10" cy="20" r="1.2" />
+          <circle cx="17" cy="20" r="1.2" />
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M5 12h13m-5.5-5.5L18.5 12l-6 5.5" />
+        </symbol>
+        <symbol id="i-chev" viewBox="0 0 24 24">
+          <path d="m6 9.5 6 6 6-6" />
+        </symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </symbol>
+        <symbol id="i-close" viewBox="0 0 24 24">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24">
+          <path
+            d="M12 21s6.5-5.6 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 15.4 12 21 12 21Z"
+          />
+          <circle cx="12" cy="10.5" r="2.4" />
+        </symbol>
+        <symbol id="i-star" viewBox="0 0 24 24">
+          <path
+            d="m12 3.6 2.6 5.3 5.9.85-4.25 4.15 1 5.85L12 17l-5.25 2.75 1-5.85L3.5 9.75l5.9-.85z"
+          />
+        </symbol>
+        <symbol id="i-truck" viewBox="0 0 24 24">
+          <path d="M2 6.5h11v10H2zM13 10h4l4 3.2v3.3h-8z" />
+          <circle cx="7" cy="18" r="1.6" />
+          <circle cx="17" cy="18" r="1.6" />
+        </symbol>
+        <symbol id="i-receipt" viewBox="0 0 24 24">
+          <path d="M6 3h12v18l-2.4-1.6L13.2 21l-2.4-1.6L8.4 21 6 19.4z" />
+          <path d="M9.2 8h5.6M9.2 12h5.6" />
+        </symbol>
+        <symbol id="i-chat" viewBox="0 0 24 24">
+          <path
+            d="M20 12.5c0 3.6-3.6 6.5-8 6.5a9.6 9.6 0 0 1-2.6-.35L4.5 20.5l1.1-3.2A6.9 6.9 0 0 1 4 12.5C4 8.9 7.6 6 12 6s8 2.9 8 6.5Z"
+          />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path
+            d="M12 3 5 5.8v5.4c0 4.3 2.9 8.1 7 9.3 4.1-1.2 7-5 7-9.3V5.8z"
+          />
+          <path d="m9 12 2.2 2.2L15.4 10" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <header class="hdr" id="hdr">
+      <div class="container hdr__in">
+        <a class="wordmark" href="#main"
+          ><span class="dot"></span>Preebooking</a
+        >
+
+        <nav class="nav" aria-label="Categories">
+          <a href="#categories">Crackers</a>
+          <a href="#categories">Clothing</a>
+          <a href="#property">Real Estate</a>
+          <div class="nav__more" id="more">
+            <button
+              type="button"
+              aria-expanded="false"
+              aria-controls="more-list"
+            >
+              More
+              <svg class="ico" aria-hidden="true"><use href="#i-chev" /></svg>
+            </button>
+            <ul class="drop" id="more-list">
+              <li aria-disabled="true">
+                <span class="drop__row"><span class="dot"></span>Hotels</span
+                ><span class="pill-soon">Soon</span>
+              </li>
+              <li aria-disabled="true">
+                <span class="drop__row"
+                  ><span class="dot"></span>Restaurants</span
+                ><span class="pill-soon">Soon</span>
+              </li>
+              <li aria-disabled="true">
+                <span class="drop__row"
+                  ><span class="dot"></span>Gym &amp; Fitness</span
+                ><span class="pill-soon">Soon</span>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <div class="hdr__actions">
+          <button
+            class="iconbtn"
+            type="button"
+            aria-label="Search"
+            data-hide-sm
+          >
+            <svg class="ico" aria-hidden="true"><use href="#i-search" /></svg>
+          </button>
+          <button
+            class="iconbtn"
+            type="button"
+            aria-label="Account"
+            data-hide-sm
+          >
+            <svg class="ico" aria-hidden="true"><use href="#i-user" /></svg>
+          </button>
+          <button class="iconbtn" type="button" aria-label="Cart, 3 items">
+            <svg class="ico" aria-hidden="true"><use href="#i-cart" /></svg>
+            <span class="badge" aria-hidden="true">3</span>
+          </button>
+          <button
+            class="iconbtn hdr__burger"
+            type="button"
+            id="burger"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="mnav"
+          >
+            <svg class="ico" aria-hidden="true"><use href="#i-menu" /></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mnav" id="mnav">
+      <div class="mnav__scrim" data-close></div>
+      <div
+        class="mnav__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+      >
+        <div class="mnav__top">
+          <span class="wordmark"><span class="dot"></span>Preebooking</span>
+          <button
+            class="iconbtn"
+            type="button"
+            aria-label="Close menu"
+            data-close
+          >
+            <svg class="ico" aria-hidden="true"><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <h2>Open now</h2>
+        <ul>
+          <li>
+            <a href="#categories"
+              ><span class="dot" style="background: var(--v-crackers)"></span
+              >Crackers</a
+            >
+          </li>
+          <li>
+            <a href="#categories"
+              ><span class="dot" style="background: var(--v-clothing)"></span
+              >Clothing</a
+            >
+          </li>
+          <li>
+            <a href="#property"
+              ><span class="dot" style="background: var(--v-property)"></span
+              >Real Estate</a
+            >
+          </li>
+        </ul>
+        <h2>On the way</h2>
+        <ul>
+          <li class="is-soon" aria-disabled="true">
+            <span class="drop__row"><span class="dot"></span>Hotels</span
+            ><span class="pill-soon">Soon</span>
+          </li>
+          <li class="is-soon" aria-disabled="true">
+            <span class="drop__row"><span class="dot"></span>Restaurants</span
+            ><span class="pill-soon">Soon</span>
+          </li>
+          <li class="is-soon" aria-disabled="true">
+            <span class="drop__row"
+              ><span class="dot"></span>Gym &amp; Fitness</span
+            ><span class="pill-soon">Soon</span>
+          </li>
+        </ul>
+        <a class="btn btn--primary btn--block" href="#how">How it works</a>
+      </div>
+    </div>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero" id="hero">
+        <div class="hero__media">
+          <img
+            src="images/hero.jpg"
+            width="1376"
+            height="768"
+            fetchpriority="high"
+            decoding="async"
+            alt="A gold gift box tied with navy ribbon and lit sparklers, folded royal blue and champagne silk, and an illuminated model villa arranged on a marble counter."
+          />
+        </div>
+        <div class="hero__veil" aria-hidden="true"></div>
+
+        <div class="container hero__in">
+          <h1>
+            Exquisite craft.<br /><span class="gold">Everything you need</span>,
+            in one place.
+          </h1>
+          <p class="hero__lede">
+            One home for everything your city has to offer - a few categories
+            today, with more joining as we grow. One login, one cart, and pay
+            only when it reaches your door.
+          </p>
+
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#categories"
+              >Browse categories
+              <svg
+                class="ico arrow"
+                style="width: 16px; height: 16px"
+                aria-hidden="true"
+              >
+                <use href="#i-arrow" /></svg
+            ></a>
+            <a class="btn btn--glass" href="#how">How it works</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="stats">
+        <div class="container stats__in">
+          <div class="stat reveal">
+            <b>100%</b><span>Cash on delivery</span>
+          </div>
+          <div class="stat reveal"><b>24+</b><span>Verified stores</span></div>
+          <div class="stat reveal"><b>580+</b><span>Curated items</span></div>
+          <div class="stat reveal"><b>₹0</b><span>Online advance</span></div>
+        </div>
+      </section>
+
+      <!-- Category grid -->
+      <section class="section" id="categories">
+        <div class="container">
+          <div class="section-head reveal">
+            <h2 class="h2">Choose a section</h2>
+            <p>Three are open now. Three are on the way.</p>
+          </div>
+
+          <div class="grid cats">
+            <a class="card cat cat--crackers reveal" href="/crackers">
+              <div class="card__img">
+                <img
+                  src="images/cat-crackers.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A Sivakasi gift box of crackers beside flower pots and two lit golden sparklers."
+                />
+              </div>
+              <div class="cat__body">
+                <div class="cat__title">
+                  <span
+                    class="dot"
+                    style="background: var(--v-crackers)"
+                  ></span>
+                  <h3 class="h3">Crackers</h3>
+                </div>
+                <p>Gift boxes, sparklers and aerial shots from Sivakasi.</p>
+                <div class="cat__foot">
+                  <span class="meta">12 stores · 240 items</span>
+                  <svg class="ico arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </div>
+              </div>
+            </a>
+
+            <a class="card cat cat--clothing reveal" href="/clothing">
+              <div class="card__img">
+                <img
+                  src="images/cat-clothing.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Two folded silk sarees in lilac and deep purple with gold zari borders on an oak table."
+                />
+              </div>
+              <div class="cat__body">
+                <div class="cat__title">
+                  <span
+                    class="dot"
+                    style="background: var(--v-clothing)"
+                  ></span>
+                  <h3 class="h3">Clothing</h3>
+                </div>
+                <p>Sarees, shirts and kidswear from local stores.</p>
+                <div class="cat__foot">
+                  <span class="meta">8 stores · 316 items</span>
+                  <svg class="ico arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </div>
+              </div>
+            </a>
+
+            <a class="card cat cat--property reveal" href="/real-estate">
+              <div class="card__img">
+                <img
+                  src="images/cat-property.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A two-storey concrete and glass house with a lawn, stone path and small pool."
+                />
+              </div>
+              <div class="cat__body">
+                <div class="cat__title">
+                  <span
+                    class="dot"
+                    style="background: var(--v-property)"
+                  ></span>
+                  <h3 class="h3">Real Estate</h3>
+                </div>
+                <p>Plots, houses and apartments. Book a site visit.</p>
+                <div class="cat__foot">
+                  <span class="meta">58 listings</span>
+                  <svg class="ico arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </div>
+              </div>
+            </a>
+
+            <div class="card cat cat--soon reveal" aria-disabled="true">
+              <div class="card__img">
+                <img
+                  src="images/cat-hotels.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt=""
+                />
+              </div>
+              <div class="cat__body">
+                <div class="cat__head">
+                  <div class="cat__title">
+                    <span class="dot"></span>
+                    <h3 class="h3">Hotels</h3>
+                  </div>
+                  <span class="pill-soon">Soon</span>
+                </div>
+                <p>Rooms and stays, opening later.</p>
+              </div>
+            </div>
+
+            <div class="card cat cat--soon reveal" aria-disabled="true">
+              <div class="card__img">
+                <img
+                  src="images/cat-restaurants.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt=""
+                />
+              </div>
+              <div class="cat__body">
+                <div class="cat__head">
+                  <div class="cat__title">
+                    <span class="dot"></span>
+                    <h3 class="h3">Restaurants</h3>
+                  </div>
+                  <span class="pill-soon">Soon</span>
+                </div>
+                <p>Food and table booking, opening later.</p>
+              </div>
+            </div>
+
+            <div class="card cat cat--soon reveal" aria-disabled="true">
+              <div class="card__img">
+                <img
+                  src="images/cat-gym.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt=""
+                />
+              </div>
+              <div class="cat__body">
+                <div class="cat__head">
+                  <div class="cat__title">
+                    <span class="dot"></span>
+                    <h3 class="h3">Gym &amp; Fitness</h3>
+                  </div>
+                  <span class="pill-soon">Soon</span>
+                </div>
+                <p>Memberships and classes, opening later.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured stores -->
+      <section class="section section--band" id="stores">
+        <div class="container">
+          <div class="section-head reveal">
+            <h2 class="h2">Stores on Preebooking</h2>
+            <p>Shops across Crackers and Clothing.</p>
+          </div>
+
+          <div class="grid stores">
+            <a
+              class="card store reveal"
+              href="/crackers/sri-vinayaga-fireworks"
+            >
+              <div
+                class="card__img"
+                style="
+                  aspect-ratio: 16/9;
+                  border-bottom: 1px solid var(--border);
+                "
+              >
+                <img
+                  src="images/crackers-store.jpg"
+                  width="1376"
+                  height="768"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Staff at the billing counter of a brightly lit Sivakasi cracker shop lined with stocked shelves."
+                />
+              </div>
+              <div class="store__body">
+                <h3 class="h3">Sri Vinayaga Fireworks</h3>
+                <p class="store__where">Crackers · Sivakasi</p>
+                <p class="store__foot">
+                  <span class="store__rating"
+                    ><svg class="ico" aria-hidden="true">
+                      <use href="#i-star" /></svg
+                    >4.8</span
+                  >
+                  <span>· 42 items</span>
+                </p>
+              </div>
+            </a>
+
+            <a class="card store reveal" href="/crackers/sri-amman-fireworks">
+              <div class="card__img">
+                <img
+                  src="images/crackers-aerial.jpg"
+                  width="1024"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A twenty-shot aerial repeater box labelled Diwali Night Sky Sparks against a fireworks sky."
+                />
+              </div>
+              <div class="store__body">
+                <h3 class="h3">Sri Amman Fireworks</h3>
+                <p class="store__where">Crackers · Sivakasi</p>
+                <p class="store__foot">
+                  <span class="store__rating"
+                    ><svg class="ico" aria-hidden="true">
+                      <use href="#i-star" /></svg
+                    >4.7</span
+                  >
+                  <span>· 61 items</span>
+                </p>
+              </div>
+            </a>
+
+            <a class="card store reveal" href="/clothing/lakshmi-silks">
+              <div class="card__img">
+                <img
+                  src="images/cat-clothing.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Two folded silk sarees in lilac and deep purple with gold zari borders on an oak table."
+                />
+              </div>
+              <div class="store__body">
+                <h3 class="h3">Lakshmi Silks</h3>
+                <p class="store__where">Clothing · Tirunelveli Town</p>
+                <p class="store__foot">
+                  <span class="store__rating"
+                    ><svg class="ico" aria-hidden="true">
+                      <use href="#i-star" /></svg
+                    >4.9</span
+                  >
+                  <span>· 128 items</span>
+                </p>
+              </div>
+            </a>
+
+            <a class="card store reveal" href="/clothing/meenakshi-textiles">
+              <div class="card__img">
+                <img
+                  src="images/cat-clothing.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Two folded silk sarees in lilac and deep purple with gold zari borders on an oak table."
+                />
+              </div>
+              <div class="store__body">
+                <h3 class="h3">Meenakshi Textiles</h3>
+                <p class="store__where">Clothing · Palayamkottai</p>
+                <p class="store__foot">
+                  <span class="store__rating"
+                    ><svg class="ico" aria-hidden="true">
+                      <use href="#i-star" /></svg
+                    >4.6</span
+                  >
+                  <span>· 87 items</span>
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured products -->
+      <section class="section" id="popular">
+        <div class="container">
+          <div class="section-head reveal">
+            <h2 class="h2">Popular right now</h2>
+            <p>
+              Reserved today, delivered to the door. Nothing is charged online.
+            </p>
+          </div>
+
+          <div class="grid products">
+            <article class="card prod reveal">
+              <div class="card__img">
+                <img
+                  src="images/crackers-giftbox.jpg"
+                  width="1024"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                  alt="An open Diwali gift box compartmented with sparklers, flower pots, ground chakkars and colour smokes."
+                />
+              </div>
+              <div class="prod__body">
+                <h3 class="prod__title">Celebrations gift box - 40 items</h3>
+                <p class="prod__from">from Sri Vinayaga Fireworks</p>
+                <p class="prod__price">
+                  <b>₹1,899</b><span class="prod__mrp">₹2,600</span
+                  ><span class="prod__off">27% off</span>
+                </p>
+                <p class="stock stock--in"><span class="dot"></span>In stock</p>
+                <button class="btn btn--secondary btn--block" type="button">
+                  Add to cart
+                </button>
+              </div>
+            </article>
+
+            <article class="card prod reveal">
+              <div class="card__img">
+                <img
+                  src="images/crackers-aerial.jpg"
+                  width="1024"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A twenty-shot aerial repeater box labelled Diwali Night Sky Sparks against a fireworks sky."
+                />
+              </div>
+              <div class="prod__body">
+                <h3 class="prod__title">
+                  Night Sky Sparks - 20 shot aerial repeater
+                </h3>
+                <p class="prod__from">from Sri Amman Fireworks</p>
+                <p class="prod__price">
+                  <b>₹749</b><span class="prod__mrp">₹950</span
+                  ><span class="prod__off">21% off</span>
+                </p>
+                <p class="stock stock--low">
+                  <span class="dot"></span>Only 6 left
+                </p>
+                <button class="btn btn--secondary btn--block" type="button">
+                  Add to cart
+                </button>
+              </div>
+            </article>
+
+            <article class="card prod reveal">
+              <div class="card__img">
+                <img
+                  src="images/cat-clothing.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A folded deep purple silk saree with a woven gold zari border."
+                />
+              </div>
+              <div class="prod__body">
+                <h3 class="prod__title">
+                  Kanchipuram pure silk saree, temple border
+                </h3>
+                <p class="prod__from">from Lakshmi Silks</p>
+                <p class="prod__price">
+                  <b>₹6,450</b><span class="prod__mrp">₹8,200</span
+                  ><span class="prod__off">21% off</span>
+                </p>
+                <p class="stock stock--in"><span class="dot"></span>In stock</p>
+                <button class="btn btn--secondary btn--block" type="button">
+                  Add to cart
+                </button>
+              </div>
+            </article>
+
+            <article class="card prod reveal">
+              <div class="card__img">
+                <img
+                  src="images/product.jpg"
+                  width="1024"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A ribboned gift box holding brass incense holders and a hammered copper urli."
+                />
+              </div>
+              <div class="prod__body">
+                <h3 class="prod__title">Deepam brass and copper gift hamper</h3>
+                <p class="prod__from">from Meenakshi Textiles</p>
+                <p class="prod__price">
+                  <b>₹2,250</b><span class="prod__mrp">₹2,999</span
+                  ><span class="prod__off">25% off</span>
+                </p>
+                <p class="stock stock--out">
+                  <span class="dot"></span>Out of stock
+                </p>
+                <button
+                  class="btn btn--secondary btn--block"
+                  type="button"
+                  disabled
+                >
+                  Notify me
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Real Estate -->
+      <section class="section section--band" id="property">
+        <div class="container">
+          <div class="section-head reveal">
+            <h2 class="h2">Property in and around Tirunelveli</h2>
+            <p>
+              Every listing is admin-approved before it appears. Book a visit -
+              nothing goes in a cart.
+            </p>
+          </div>
+
+          <div class="grid props">
+            <article class="card prop reveal">
+              <div class="card__img">
+                <img
+                  src="images/property.jpg"
+                  width="1376"
+                  height="768"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A lit modern villa at dusk with a reflecting pool and palm-lined garden."
+                />
+              </div>
+              <div class="prop__body">
+                <h3 class="h3">New 4BHK villa with pool</h3>
+                <p class="prop__where">
+                  <svg class="ico" aria-hidden="true"><use href="#i-pin" /></svg
+                  >Perumalpuram, Tirunelveli
+                </p>
+                <p class="prop__price">₹2.40 Cr</p>
+                <dl class="prop__facts">
+                  <div>
+                    <dt>Built-up</dt>
+                    <dd>3,200 sqft</dd>
+                  </div>
+                  <div>
+                    <dt>Approval</dt>
+                    <dd>DTCP</dd>
+                  </div>
+                  <div>
+                    <dt>Facing</dt>
+                    <dd>East</dd>
+                  </div>
+                </dl>
+                <a
+                  class="btn btn--primary btn--block"
+                  href="/real-estate/perumalpuram-villa"
+                  >Book site visit</a
+                >
+              </div>
+            </article>
+
+            <article class="card prop reveal">
+              <div class="card__img">
+                <img
+                  src="images/cat-property.jpg"
+                  width="1200"
+                  height="896"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A concrete and glass two-storey house with a lawn and stepping-stone path."
+                />
+              </div>
+              <div class="prop__body">
+                <h3 class="h3">Modern 3BHK house, gated street</h3>
+                <p class="prop__where">
+                  <svg class="ico" aria-hidden="true"><use href="#i-pin" /></svg
+                  >Vannarpettai, Tirunelveli
+                </p>
+                <p class="prop__price">₹95 L</p>
+                <dl class="prop__facts">
+                  <div>
+                    <dt>Built-up</dt>
+                    <dd>1,850 sqft</dd>
+                  </div>
+                  <div>
+                    <dt>Approval</dt>
+                    <dd>DTCP</dd>
+                  </div>
+                  <div>
+                    <dt>Facing</dt>
+                    <dd>North</dd>
+                  </div>
+                </dl>
+                <a
+                  class="btn btn--primary btn--block"
+                  href="/real-estate/vannarpettai-house"
+                  >Book site visit</a
+                >
+              </div>
+            </article>
+
+            <article class="card prop reveal">
+              <div class="card__img">
+                <img
+                  src="images/property.jpg"
+                  width="1376"
+                  height="768"
+                  loading="lazy"
+                  decoding="async"
+                  alt="A lit modern villa at dusk with a reflecting pool and palm-lined garden."
+                />
+              </div>
+              <div class="prop__body">
+                <h3 class="h3">DTCP plot in a gated layout</h3>
+                <p class="prop__where">
+                  <svg class="ico" aria-hidden="true"><use href="#i-pin" /></svg
+                  >Gangaikondan, NH-44
+                </p>
+                <p class="prop__price">₹18.5 L</p>
+                <dl class="prop__facts">
+                  <div>
+                    <dt>Area</dt>
+                    <dd>1,200 sqft</dd>
+                  </div>
+                  <div>
+                    <dt>Approval</dt>
+                    <dd>DTCP</dd>
+                  </div>
+                  <div>
+                    <dt>Facing</dt>
+                    <dd>East</dd>
+                  </div>
+                </dl>
+                <a
+                  class="btn btn--primary btn--block"
+                  href="/real-estate/gangaikondan-plot"
+                  >Book site visit</a
+                >
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section class="section" id="how">
+        <div class="container">
+          <div class="section-head reveal">
+            <h2 class="h2">How it works</h2>
+            <p>Three steps, and no card details anywhere.</p>
+          </div>
+          <div class="steps">
+            <div class="step reveal">
+              <p class="step__n">01</p>
+              <h3 class="h3">Pick a section</h3>
+              <p>
+                Choose crackers, clothing or property, and browse the stores in
+                it.
+              </p>
+            </div>
+            <div class="step reveal">
+              <p class="step__n">02</p>
+              <h3 class="h3">Reserve it</h3>
+              <p>
+                Add to cart or request a site visit. Nothing is charged online.
+              </p>
+            </div>
+            <div class="step reveal">
+              <p class="step__n">03</p>
+              <h3 class="h3">Pay on delivery</h3>
+              <p>Cash or UPI at the door, with a GST invoice in the box.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trust -->
+      <section class="section section--band">
+        <div class="container">
+          <div class="trust">
+            <div class="trust__i reveal">
+              <svg class="ico" aria-hidden="true"><use href="#i-truck" /></svg>
+              <b>Cash on delivery</b
+              ><span>Pay the delivery person, not a gateway.</span>
+            </div>
+            <div class="trust__i reveal">
+              <svg class="ico" aria-hidden="true">
+                <use href="#i-receipt" />
+              </svg>
+              <b>GST invoice</b
+              ><span>A printed invoice travels with every order.</span>
+            </div>
+            <div class="trust__i reveal">
+              <svg class="ico" aria-hidden="true"><use href="#i-chat" /></svg>
+              <b>Tamil support</b
+              ><span>Call or message us in Tamil or English.</span>
+            </div>
+            <div class="trust__i reveal">
+              <svg class="ico" aria-hidden="true"><use href="#i-shield" /></svg>
+              <b>Verified stores</b
+              ><span>Every shop and listing is checked before it lists.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="ftr">
+      <div class="container">
+        <div class="ftr__cols">
+          <div class="ftr__about">
+            <span class="wordmark" style="padding-left: 0"
+              ><span class="dot"></span>Preebooking</span
+            >
+            <p>
+              Crackers, clothing and property from Tirunelveli stores - reserved
+              online, paid on delivery.
+            </p>
+          </div>
+
+          <nav aria-label="Categories">
+            <h2>Categories</h2>
+            <ul>
+              <li><a href="/crackers">Crackers</a></li>
+              <li><a href="/clothing">Clothing</a></li>
+              <li><a href="/real-estate">Real Estate</a></li>
+              <li class="is-soon" aria-disabled="true">
+                Hotels <span class="pill-soon">Soon</span>
+              </li>
+              <li class="is-soon" aria-disabled="true">
+                Restaurants <span class="pill-soon">Soon</span>
+              </li>
+              <li class="is-soon" aria-disabled="true">
+                Gym &amp; Fitness <span class="pill-soon">Soon</span>
+              </li>
+            </ul>
+          </nav>
+
+          <nav aria-label="Company">
+            <h2>Company</h2>
+            <ul>
+              <li><a href="/about">About Preebooking</a></li>
+              <li><a href="#stores">Stores on Preebooking</a></li>
+              <li><a href="/sell">Sell with us</a></li>
+              <li><a href="/contact">Contact</a></li>
+            </ul>
+          </nav>
+
+          <nav aria-label="Support">
+            <h2>Support</h2>
+            <ul>
+              <li><a href="#how">How it works</a></li>
+              <li><a href="/delivery">Delivery &amp; cash on delivery</a></li>
+              <li><a href="/returns">Returns</a></li>
+              <li><a href="/terms">Terms &amp; privacy</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <div class="ftr__bar">
+          <span>© 2026 Preebooking · Tirunelveli</span>
+          <span
+            >Prices include GST · No online payment · Crackers sold per state
+            rules</span
+          >
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var mq = matchMedia("(prefers-reduced-motion: reduce)");
+
+        /* Header: dark glass over the hero, white glass past it. */
+        var hdr = document.getElementById("hdr"),
+          hero = document.getElementById("hero");
+        new IntersectionObserver(
+          function (es) {
+            hdr.classList.toggle("is-solid", !es[0].isIntersecting);
+          },
+          { rootMargin: "-72px 0px 0px 0px" },
+        ).observe(hero);
+
+        /* "More" dropdown — its contents are inert text, so only the button toggles. */
+        var more = document.getElementById("more"),
+          moreBtn = more.querySelector("button");
+        function setMore(open) {
+          more.toggleAttribute("data-open", open);
+          moreBtn.setAttribute("aria-expanded", open);
+        }
+        moreBtn.addEventListener("click", function () {
+          setMore(!more.hasAttribute("data-open"));
+        });
+        document.addEventListener("click", function (e) {
+          if (!more.contains(e.target)) setMore(false);
+        });
+
+        /* Mobile panel */
+        var mnav = document.getElementById("mnav"),
+          burger = document.getElementById("burger");
+        var panel = mnav.querySelector(".mnav__panel");
+        function setNav(open, focus) {
+          mnav.toggleAttribute("data-open", open);
+          burger.setAttribute("aria-expanded", open);
+          panel.inert = !open;
+          document.body.style.overflow = open ? "hidden" : "";
+          if (focus)
+            (open ? panel.querySelector("[data-close]") : burger).focus();
+        }
+        setNav(false);
+        burger.addEventListener("click", function () {
+          setNav(true, true);
+        });
+        mnav.addEventListener("click", function (e) {
+          if (e.target.closest("[data-close], a")) setNav(false, true);
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Escape") return;
+          setMore(false);
+          if (mnav.hasAttribute("data-open")) setNav(false, true);
+        });
+
+        /* Scroll reveal — 60ms stagger, capped at 6 so the last card never lags. */
+        var io = new IntersectionObserver(
+          function (es) {
+            es.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              e.target.classList.add("in");
+              io.unobserve(e.target);
+            });
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -10% 0px" },
+        );
+
+        document.querySelectorAll(".reveal").forEach(function (el) {
+          if (!mq.matches) {
+            var sibs = [].filter.call(el.parentNode.children, function (n) {
+              return n.classList.contains("reveal");
+            });
+            el.style.transitionDelay =
+              Math.min(sibs.indexOf(el), 5) * 60 + "ms";
+          }
+          io.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>
