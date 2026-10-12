@@ -2,7 +2,7 @@
 
 ## The project
 
-**Prebook — preebooking.com.** One website hosting three business sections —
+**Prebook — prebooking.com.** One website hosting three business sections —
 Crackers, Clothing and Real Estate — with one customer login and one admin
 panel. Client: Mr. Nambi, Prebooking, Tirunelveli. Provider: Zenyne Labs.
 
@@ -13,12 +13,7 @@ panel. Client: Mr. Nambi, Prebooking, Tirunelveli. Provider: Zenyne Labs.
 | Payments in build | Cash on Delivery / offline only — **no gateway**                                     |
 | Stack             | TanStack Start · Hono (Bun) · MongoDB Atlas via Prisma · Better Auth · Cloudflare R2 |
 
-> ### [`docs/INVOICE-SUMMARY.txt`](docs/INVOICE-SUMMARY.txt) is the single source of truth.
->
-> Scope, quotation, timeline, terms and build status all live there, and **Section 4
-> of it is the final agreed scope**. Read it before starting any task. If this file,
-> the README, or anything a user says in passing disagrees with it, that document
-> wins — or the scope has genuinely changed and needs to be quoted separately.
+> **Current authority: [README.md](README.md#agreed-product-scope).** The user explicitly requested removing `docs/` on 12 October 2026. The agreed product scope and commercial facts are retained in README; the current task is the landing page only. Do not recreate the deleted documents.
 
 Facts that bind every task:
 
@@ -33,46 +28,38 @@ Facts that bind every task:
 - **Prisma is pinned to 6.19.3.** Prisma 7 dropped MongoDB support. Keep the pin.
 - **Real Estate has no data model yet.** Property, PropertyImage, VisitRequest
   and Seller do not exist. Building them is real work, not a schema tweak.
-- **Nothing is deployable yet.** `DATABASE_URL`, Google OAuth credentials and
+- **The full business platform is not deployable yet.** `DATABASE_URL`, Google OAuth credentials and
   the R2 bucket details have never been supplied by the client.
 - **Hotels, Restaurants and Gym & Fitness are presentational only.** They exist
   on the landing page as disabled "coming soon" tiles and nowhere else. Do not
   build a route, model or query for them — each is a separately quoted PART E
   module.
-- **Stores inside a section is not in Section 4.** The plan describes one
-  catalogue, not a multi-vendor marketplace. `design.md` specifies the store
-  layer because the client asked for it; it needs quoting before it is built.
+- **Stores inside a section is outside the agreed scope.** There is one catalogue per
+  section, not a multi-vendor marketplace. Quote any store layer separately.
 
 ### Repository state
 
-There is **no application code on disk**. `apps/` and the earlier Next.js
-`store/` build have both been removed, and git was re-initialised from scratch
-on 12 Sep 2026 — `main` holds a single "first commit" containing only
-`README.md`, tracking `git@github.com:zenynelabs/prebook.git`. The earlier
-history is gone and nothing in it is recoverable. `package.json` still declares
-a Bun workspace at `apps/*`, so `bun run dev` fails until `apps/web` exists.
-
-Almost nothing is committed yet, so git is not yet a safety net: before
-deleting or overwriting anything, look at it first, and copy it somewhere safe
-if it cannot be regenerated.
+The landing page lives in `apps/web/` as a TanStack Start React application.
+`bun run dev`, `build`, `typecheck` and `test` target that workspace.
+`apps/app/` is an unrelated Flutter starter and is preserved.
+The legacy `docs/` preview and its images were deleted at the user's request;
+a pre-cleanup backup is at `/private/tmp/prebook-cleanup-2026-10-12.zip`.
+Do not overwrite unrelated work or delete native platform icons.
 
 ---
 
 ## Design rules
 
-**[`docs/design.md`](docs/design.md) is the design system.** Read it before
-writing any markup or CSS. It carries the tokens, the layout grid, component
-specs, required states, motion rules and accessibility floor. Never hard-code a
-colour, radius or spacing value that is not one of its tokens.
+The landing page follows BNI's photographic introduction and alternating
+editorial sections with original Prebooking copy and imagery. Durable design
+choices are recorded in [README.md](README.md#design); implementation tokens
+live in `apps/web/src/styles.css`. Never recreate a competing design document.
 
-Direction: clean, light, minimal — white ground, one blue accent, hairline
-borders rather than shadows, Inter only, generous whitespace.
-
-Colour and type are **provisional**: the client has not supplied a logo or a
-colour preference (Section 11 item 2 of the plan, due at kickoff). When branding
-arrives, change the accent tokens in `design.md` §2.1 — not the call sites. Do
-not invent a brand, and do not resurrect tokens from a deleted document or
-another project.
+Direction: light, minimal, one blue accent, Inter Variable, generous whitespace,
+hairline borders. Text wordmark only; no confirmed client logo exists.
+The accent remains provisional. Change its CSS tokens when branding arrives.
+Use shadcn primitives, Motion for interaction feedback and GSAP for the hero
+opening. Respect reduced motion; leave content readable without JavaScript.
 
 What holds regardless of the palette:
 
@@ -163,26 +150,14 @@ Create enough structure to prevent wasted work and conflicting implementations.
 
 ## 3. Create or Update the Plan
 
-This repository keeps exactly **two** standing documents, and they do not
-overlap:
-
-| File                       | Governs                                               | Authority                                               |
-| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
-| `docs/INVOICE-SUMMARY.txt` | **What** gets built, for how much, by when            | Final — Section 4 is the agreed scope                   |
-| `docs/design.md`           | **How** it looks — tokens, layout, components, states | Final for visual decisions; yields to the plan on scope |
-
-**Do not create a third.** No `plan.md`, no `BUILD_PLAN.md`, no `ui-spec.md`,
-no `requirements.md` — those were deliberately removed, and re-creating them is
-how this repository ended up with four contradictory scopes at three different
-prices. Update one of the two above instead.
-
-Track execution in the session itself (a todo list), not in new files. Where a
-decision genuinely needs to persist, it belongs in `AGENTS.md` or the README,
-next to the facts it affects.
+Use README for durable project facts and AGENTS.md for agent instructions.
+The user deleted `docs/`; do not recreate it or create PRODUCT.md, DESIGN.md,
+plan.md, BUILD_PLAN.md, ui-spec.md or requirements.md. Keep execution tracking
+in the session. Design tokens are code in `apps/web/src/styles.css`.
 
 Still think the work through before touching files. Decide, for the task at hand:
 
-- Objective and constraints, checked against Section 4 of the plan
+- Objective and constraints, checked against the agreed product scope in README.md
 - Architecture and data flow
 - Implementation phases
 - Sub-agent responsibilities and dependencies between them
@@ -209,7 +184,7 @@ Phase 4 - Verification
     Main Agent + Review Agent
 ```
 
-If the work turns out to fall outside Section 4 of the plan, stop and say so.
+If the work turns out to fall outside the agreed product scope in README.md, stop and say so.
 Scope changes are quoted separately — they are not absorbed silently.
 
 ---
@@ -479,7 +454,7 @@ Before considering the task complete, verify:
 ### Requirements
 
 Compare the final implementation against the original user request and
-Section 4 of `docs/INVOICE-SUMMARY.txt`.
+the agreed product scope in README.md.
 
 Do not rely only on the sub-agents' claims that their work is complete.
 
@@ -648,7 +623,7 @@ For most substantial projects, use this pattern:
 2. Inspect the existing project
 3. Understand requirements
 4. Think through architecture
-5. Check the task against Section 4 of docs/INVOICE-SUMMARY.txt
+5. Check the task against the agreed product scope in README.md
 6. Identify independent tasks
 7. Spawn appropriate sub-agents
 8. Run independent tasks in parallel
@@ -658,7 +633,7 @@ For most substantial projects, use this pattern:
 12. Integrate into the main project
 13. Run tests/review
 14. Fix discovered issues
-15. Verify against Section 4 of docs/INVOICE-SUMMARY.txt
+15. Verify against the agreed product scope in README.md
 16. Deliver the final result
 ```
 

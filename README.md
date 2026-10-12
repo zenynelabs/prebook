@@ -1,161 +1,121 @@
-# Prebook — preebooking.com
+# Prebooking
 
-**Crackers · Clothing · Real Estate — one website, one admin panel.**
+Crackers, Clothing and Real Estate — one website for Mr. Nambi, Tirunelveli.
+Built by Zenyne Labs. The current deliverable is the public landing page in
+`apps/web/`, using the user-requested domain **prebooking.com**. The original
+proposal spelled it `preebooking.com`; confirm the actual domain before launch.
 
-| | |
-| --- | --- |
-| **Client** | Mr. Nambi · Prebooking · Pattamalai, Tirunelveli, Tamil Nadu |
-| **Domain** | preebooking.com |
-| **Service provider** | Zenyne Labs — Thinesh Rasla, Managing Director |
-| **Contact** | +91 99946 27465 · hello@zenyne.com · zenyne.com |
-| **Proposal** | ZL/2026/008 · issued 11 Sep 2026 · valid until 11 Oct 2026 |
-| **Total cost** | **₹21,000** (Rupees Twenty-One Thousand Only) |
-| **Timeline** | **4 weeks** from kickoff |
-| **Payments in build** | Cash on Delivery / offline only — **no gateway** |
+## Run
 
-> **[`docs/INVOICE-SUMMARY.txt`](docs/INVOICE-SUMMARY.txt) is the single source of truth**
-> for scope, quotation, timeline and terms. If anything in this README disagrees
-> with it, that document wins.
->
-> **[`docs/design.md`](docs/design.md)** governs how the site looks — tokens,
-> layout, components, states — and carries a paste-ready build brief for the
-> landing page. These two are the only standing documents; every earlier plan,
-> proposal and design note has been removed.
+Requires Bun 1.4.2 or later. Run these commands from the repository root.
 
----
-
-## Scope
-
-Three business sections on one site, one customer login, one admin panel.
-
-**Crackers & Clothing — shops.** Catalogue with per-section categories, filters
-(type / category / price), search, product detail with photo gallery, safety
-information for crackers, size and colour variants with a size chart for
-clothing, festival packs, cart, checkout with delivery address, order
-confirmation, live stock indicators.
-
-**Real Estate — a lead platform, not a shop.** Sellers post listings (land,
-house, apartment) with photos; listings stay hidden until you approve them from
-the verification queue; buyers browse approved listings and request a site visit
-with a preferred time; you coordinate offline. **The seller's phone number is
-never shown to buyers** — contact details are held server-side and never
-serialised into a buyer-facing response.
-
-**Customer accounts.** Email/password or Google sign-in, order history, saved
-delivery address, profile, site-visit requests.
-
-**Admin panel.** Role-based login for owner and staff. Products and stock,
-order pipeline, real-estate approval and site-visit tracking, customer list,
-alerts on new orders and visit requests.
-
-**Core business logic.** All money stored and calculated as **integer paise** —
-no floating-point rounding on totals, GST or discounts. Stock decremented on
-order placement, with sold-out and low-stock states live on listing and product
-pages.
-
-### Not in this build
-
-Online payment gateway · mobile app · delivery/courier integration · Tamil
-content (structure kept ready) · data migration · photography, copywriting,
-logo design · hosting and subscription charges · reports and analytics · map
-search · buyer–seller chat. Each is quoted separately — see PART E of the plan.
-
----
-
-## Stack
-
-| Area | Choice |
-| --- | --- |
-| Website + admin | TanStack Start — server-rendered React, Tailwind CSS, mobile-first |
-| API | Hono on the Bun runtime |
-| Database | MongoDB Atlas via Prisma ORM |
-| Auth | Better Auth — email/password + Google, role-based access |
-| Media | Cloudflare R2 — presigned direct upload |
-| Hosting | Cloudflare / Vercel with CDN |
-
-**Prisma is pinned to 6.19.3.** Prisma 7 dropped MongoDB support. Keep the pin.
-
----
-
-## Repository state
-
-`docs/INVOICE-SUMMARY.txt` is currently the only content in this repository.
-There is **no application code on disk** — `apps/` and the previous Next.js
-`store/` build have both been removed, and git was re-initialised from scratch
-on 12 Sep 2026: `main` holds a single commit containing only this README,
-tracking `git@github.com:zenynelabs/prebook.git`. `package.json` still declares
-a Bun workspace at `apps/*`, so `bun run dev` will not work until `apps/web` is
-created.
-
-The build starts from the Week 1 foundation described in the plan.
-
-```
-prebook/
-├── docs/
-│   ├── INVOICE-SUMMARY.txt     # the plan — scope, quotation, terms, build status
-│   └── design.md               # the design system + build brief for index.html
-├── AGENTS.md                   # how agents work in this repo
-├── package.json                # Bun workspace root (expects apps/*)
-└── README.md
+```sh
+bun install --frozen-lockfile
+bun run dev        # http://localhost:3000
+bun run typecheck
+bun run test
+bun run build
+bun run start      # production SSR server after building
 ```
 
----
+`apps/web/` is a TanStack Start app with React, Tailwind CSS, shadcn components,
+Motion, GSAP and self-hosted Inter Variable. Exact dependency versions and
+the root `bun.lock` make workspace installs reproducible. Native Flutter starter
+code in `apps/app/` is separate from this website and has been left intact.
 
-## Timeline
+The page provides section navigation, a mobile menu, product/property guides,
+FAQs and disabled coming-soon sections. Catalogues, checkout, accounts, seller
+submissions and admin functions are **not implemented**. Every page CTA stays
+inside this landing page. The launch note and FAQ explain availability.
+No credentials or database are needed to run this landing page.
 
-| Week | Milestone |
-| --- | --- |
-| **1** | Kickoff, accounts and hosting, mockup sign-off. MongoDB schema, Hono API, Better Auth roles, R2 media, first staging deploy. |
-| **2** | Crackers & Clothing storefront — catalogue, categories, filters, search, product detail, variants, festival packs. Admin: products and stock. |
-| **3** | Cart, checkout, orders, customer accounts. Real Estate — seller listing, verification queue, public browse, site-visit requests. |
-| **4** | Admin orders/stock/verification/visits, polish, testing, UAT, production launch, training and handover. |
+## Agreed product scope
 
-Compressed schedule. It holds only if the Section 11 information — product
-data, photos and credentials — arrives at kickoff.
+The original invoice summary was read before the user-requested cleanup on
+12 October 2026. `docs/` and its old photographs have been removed. The original
+documents and root metadata were backed up to
+`/private/tmp/prebook-cleanup-2026-10-12.zip` before deletion. Keep a permanent
+copy of that archive if the exact original invoice wording is needed later.
 
-## Payment schedule — ₹21,000
+The original Section 4 defines the full product, independently of this landing
+page task:
 
-| Stage | Milestone | Share | Amount |
-| --- | --- | --- | --- |
-| 1 | On signing — advance to commence work | 50% | ₹10,500 |
-| 2 | Store section and admin panel core (end of Week 3) | 30% | ₹6,300 |
-| 3 | Final delivery, handover and go-live | 20% | ₹4,200 |
+- One responsive, server-rendered website with Crackers, Clothing and Real
+  Estate, shared customer accounts, basic SEO and one role-based admin area.
+- Crackers and Clothing: separate catalogues and categories, search and filters,
+  image galleries, descriptions, prices, crackers safety information, clothing
+  sizes/colours/variants and size charts, festival bundles, cart, delivery
+  address, order confirmation, live stock and customer-visible order status.
+- Real Estate: sellers manage land/house/apartment listings and photos;
+  listings stay hidden pending admin review. Buyers browse only approved
+  listings with type/district/price filters and request a preferred visit time.
+  Admin tracks new/confirmed/completed/cancelled visits.
+- Customer accounts: email/password or Google, orders, saved addresses,
+  profile and site-visit requests.
+- Admin: owner/staff permissions, products/photos/prices/stock/variants, order
+  pipeline, listing review, visits, customers and order/visit alerts.
+- All money is integer paise. Stock is decremented on order placement.
+  Seller contact details remain server-side and never enter buyer-facing
+  payloads or markup. Property publication requires admin approval.
+- Cash on Delivery/offline payments only. Orders keep `paymentMethod` and
+  `paymentStatus`; there is no payment gateway. Customer WhatsApp/SMS alerts
+  require a separately billed third-party service.
+- Full stack: TanStack Start, Hono/Bun, MongoDB Atlas through Prisma, Better
+  Auth and Cloudflare R2. **Keep Prisma at 6.19.3** when adding MongoDB support.
 
-Invoices payable within 7 days. Free bug-fix support for **15 days** from
-handover.
+Multi-vendor stores are outside the agreed scope. Hotels, Restaurants and
+Gym & Fitness are presentation-only coming-soon sections. Online payments,
+mobile apps, logistics, Tamil translation, migration, photography/copywriting/
+logo design, analytics/accounting, map search, buyer–seller chat and additional
+business modules require separate agreements. Hosting/storage/messaging/domain
+charges are paid by the client.
 
----
+## Commercial facts
 
-## Blocked on the client
+- Client: Mr. Nambi, Prebooking, Tirunelveli. Provider: Zenyne Labs.
+- Proposal: ZL/2026/008, dated 11 September 2026, originally valid 30 days.
+- Total: ₹21,000. Delivery: four weeks from kickoff, subject to timely data,
+  credentials, feedback and confirmation.
+- Payments: ₹10,500 on signing; ₹6,300 on store/admin core completion;
+  ₹4,200 at delivery and handover. Invoices payable within seven days.
+- Fifteen days of bug-fix support from handover; new work and third-party
+  issues excluded. Manual and training included in the full engagement.
+- The platform collects, processes, holds and verifies no payments. Seller
+  contact-data handling belongs to the client. Jurisdiction: Tirunelveli.
+- GSTIN, final proposal number and Pattamalai/Pattamadai spelling remain open.
 
-Chase these at signing, not at kickoff — nothing can be deployed without them.
+The full platform still needs MongoDB Atlas, Google OAuth and Cloudflare R2
+credentials, client branding/contact details, genuine products/photos/prices/
+stock, property types/districts and delivery areas. None are configured here.
 
-1. **`DATABASE_URL`** — MongoDB Atlas connection string. Never supplied; no
-   schema has ever been pushed and no seed has ever run.
-2. **Google OAuth** — client ID and secret.
-3. **Cloudflare R2** — bucket name and public domain.
-4. Logo file (or confirmation to use a text logo), colour preference, business
-   details and GST number, product list with photos/price/stock, property types
-   and districts to filter by, delivery areas and pincodes, confirmation that
-   COD is acceptable and that Tamil can come later, domain and hosting
-   ownership.
+## Design
 
-## Open items
+Reference: [BNI](https://www.bni.com/). Its full-width photographic introduction,
+clear navigation, alternating image/text sections and three-step guide inform
+the composition. Prebooking has its own content, palette and images; no BNI
+branding, customer statements or business statistics are copied.
 
-| | |
-| --- | --- |
-| **C1 — GSTIN** | Blank on the template. Leave blank or supply. |
-| **C2 — Proposal number** | Three refs in circulation: `ZL/2026/008`, `ZNL/2026/___`, `RSS/2026/___`. This repo uses **ZL/2026/008** — confirm or replace. |
-| **C3 — Town spelling** | "Pattamalai" vs "Pattamadai". Confirm with Mr. Nambi. |
+The visual system is a white ground, blue accent `#1550e8`, dark navy text,
+Inter Variable, generous spacing and fine borders. Tokens live in
+`apps/web/src/styles.css`. Buttons use 10px corners; image sections remain plain
+rectangles. Desktop alternates image and text; mobile always places images
+first and stacks the sections. The mobile menu uses shadcn/Radix focus trapping
+and Escape handling. FAQs use native disclosures that also work without JavaScript. GSAP animates only the
+hero entrance; Motion provides selection/press feedback. Reduced-motion
+preferences disable the entrance, feedback transforms and smooth scrolling.
+Main copy and FAQ answers are present in server-rendered HTML. Interactive
+guides and the mobile menu require JavaScript; section links also appear in
+the footer.
 
-**Real Estate has no data model yet.** Property, PropertyImage, VisitRequest
-and Seller do not exist anywhere. Budget real time for it in Weeks 1 and 3, not
-just Week 3.
+## Photograph credits
 
----
+These are illustrative category photographs, not actual customers, products
+or approved property listings. Images are local optimized WebP files, with a
+separate mobile hero crop. Source metadata accompanies each asset.
 
-_All "Roriri Software Solutions" branding, the ₹10,000 / 14-day apparel-only
-engagement, the ₹20,000 / 6-week V3 figure, and the PostgreSQL / NextAuth /
-Next.js stack references are superseded and have been removed._
+- Hero: [Yan Krukau, people holding sparklers](https://www.pexels.com/photo/people-holding-sparkler-fireworks-8818585/).
+- Crackers: [RDNE Stock project, a group holding sparklers](https://www.pexels.com/photo/group-of-happy-people-holding-sparklers-7686379/).
+- Clothing: [Lara Jameson, choosing fabric in an Indian shop](https://www.pexels.com/photo/woman-in-an-indian-shop-choosing-a-fabric-8886959/).
+- Property: [NJ socialmedia, a house in Kerala](https://www.pexels.com/photo/large-country-style-house-with-balcony-under-blue-sky-20445164/).
 
-_Last updated: 12 September 2026._
+All are under the [Pexels License](https://www.pexels.com/license/).

@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "bun run --filter '@prebook/web' dev",
     "build": "bun run --filter '@prebook/web' build",
-    "lint": "bun run --filter '@prebook/web' lint",
+    "start": "bun run --filter '@prebook/web' start",
     "typecheck": "bun run --filter '@prebook/web' typecheck",
-    "format": "bun run --filter '@prebook/web' format"
+    "test": "bun run --filter '@prebook/web' test"
   },
   "trustedDependencies": [
     "esbuild",
