@@ -7,21 +7,24 @@ proposal spelled it `preebooking.com`; confirm the actual domain before launch.
 
 ## Run
 
-Requires Bun 1.4.2 or later. Run these commands from the repository root.
+Requires Bun 1.4.2+ and Node.js 20.9+. Run these commands from the repository root.
 
 ```sh
 bun install --frozen-lockfile
 bun run dev        # http://localhost:3000
 bun run typecheck
 bun run test
-bun run build
-bun run start      # production SSR server after building
+bun run build      # Next.js production build
+bun run start      # Next.js production server after building
 ```
 
-`apps/web/` is a TanStack Start app with React, Tailwind CSS, shadcn components,
+`apps/web/` is a Next.js App Router app with React, Tailwind CSS, shadcn components,
 Motion, GSAP and self-hosted Inter Variable. Exact dependency versions and
 the root `bun.lock` make workspace installs reproducible. Native Flutter starter
 code in `apps/app/` is separate from this website and has been left intact.
+
+Development and builds use Next.js's Webpack option because Turbopack's CSS
+worker hits a local port-permission error in this environment.
 
 The page provides section navigation, a mobile menu, product/property guides,
 FAQs and disabled coming-soon sections. Catalogues, checkout, accounts, seller
@@ -60,8 +63,11 @@ page task:
 - Cash on Delivery/offline payments only. Orders keep `paymentMethod` and
   `paymentStatus`; there is no payment gateway. Customer WhatsApp/SMS alerts
   require a separately billed third-party service.
-- Full stack: TanStack Start, Hono/Bun, MongoDB Atlas through Prisma, Better
-  Auth and Cloudflare R2. **Keep Prisma at 6.19.3** when adding MongoDB support.
+- Original agreed stack: TanStack Start, Hono/Bun, MongoDB Atlas through Prisma,
+  Better Auth and Cloudflare R2. **Keep Prisma at 6.19.3** when adding MongoDB support.
+
+The user requested switching the landing page framework to Next.js App Router
+on 12 October 2026. The business scope and commercial facts remain unchanged.
 
 Multi-vendor stores are outside the agreed scope. Hotels, Restaurants and
 Gym & Fitness are presentation-only coming-soon sections. Online payments,

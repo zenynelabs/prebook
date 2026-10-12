@@ -11,7 +11,7 @@ panel. Client: Mr. Nambi, Prebooking, Tirunelveli. Provider: Zenyne Labs.
 | Total cost        | **₹21,000**                                                                          |
 | Timeline          | **4 weeks** from kickoff                                                             |
 | Payments in build | Cash on Delivery / offline only — **no gateway**                                     |
-| Stack             | TanStack Start · Hono (Bun) · MongoDB Atlas via Prisma · Better Auth · Cloudflare R2 |
+| Original agreed stack | TanStack Start · Hono (Bun) · MongoDB Atlas via Prisma · Better Auth · Cloudflare R2 |
 
 > **Current authority: [README.md](README.md#agreed-product-scope).** The user explicitly requested removing `docs/` on 12 October 2026. The agreed product scope and commercial facts are retained in README; the current task is the landing page only. Do not recreate the deleted documents.
 
@@ -39,7 +39,8 @@ Facts that bind every task:
 
 ### Repository state
 
-The landing page lives in `apps/web/` as a TanStack Start React application.
+The landing page lives in `apps/web/` as a Next.js App Router application,
+switched from TanStack Start at the user's request on 12 October 2026.
 `bun run dev`, `build`, `typecheck` and `test` target that workspace.
 `apps/app/` is an unrelated Flutter starter and is preserved.
 The legacy `docs/` preview and its images were deleted at the user's request;
