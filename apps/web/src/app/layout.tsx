@@ -12,16 +12,16 @@ const inter = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://prebooking.com'),
-  title: 'Prebooking — Crackers, Clothing & Real Estate',
-  description: 'One place for celebrations, everyday style, and your next address. Discover Crackers, Clothing and Real Estate with Prebooking, Tirunelveli.',
+  title: 'Prebooking — A Community for Business Connections',
+  description: 'Connect with business owners, exchange ideas and build trusted relationships through the Prebooking business community in Tirunelveli.',
   alternates: { canonical: '/' },
   icons: { icon: { url: '/favicon.svg', type: 'image/svg+xml' } },
   openGraph: {
-    title: 'Prebooking — Crackers, Clothing & Real Estate',
-    description: 'Celebrations, everyday style, and your next address. All in one place.',
+    title: 'Prebooking — A Community for Business Connections',
+    description: 'Business connections, shared ideas and trusted relationships. Get to know the Prebooking community.',
     type: 'website',
     url: '/',
-    images: ['/images/hero.webp'],
+    images: ['/images/community-hero.webp'],
   },
   twitter: { card: 'summary_large_image' },
 }

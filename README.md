@@ -1,9 +1,14 @@
 # Prebooking
 
-Crackers, Clothing and Real Estate — one website for Mr. Nambi, Tirunelveli.
-Built by Zenyne Labs. The current deliverable is the public landing page in
+Built for Mr. Nambi, Tirunelveli, by Zenyne Labs. The current deliverable is a
+business networking community landing page in
 `apps/web/`, using the user-requested domain **prebooking.com**. The original
 proposal spelled it `preebooking.com`; confirm the actual domain before launch.
+On 13 October 2026, the user authorized repositioning this landing page around
+business connections, referrals and shared learning. This supersedes the previous
+retail/property landing presentation; the original agreed business scope and
+commercial facts below remain unchanged. Membership, chapters and referral
+databases are not part of this landing-page work.
 
 ## Run
 
@@ -19,17 +24,19 @@ bun run start      # Next.js production server after building
 ```
 
 `apps/web/` is a Next.js App Router app with React, Tailwind CSS, shadcn components,
-Motion, GSAP and self-hosted Inter Variable. Exact dependency versions and
+Motion, GSAP, Lenis and self-hosted Inter Variable. Exact dependency versions and
 the root `bun.lock` make workspace installs reproducible. Native Flutter starter
 code in `apps/app/` is separate from this website and has been left intact.
 
 Development and builds use Next.js's Webpack option because Turbopack's CSS
 worker hits a local port-permission error in this environment.
 
-The page provides section navigation, a mobile menu, product/property guides,
-FAQs and disabled coming-soon sections. Catalogues, checkout, accounts, seller
-submissions and admin functions are **not implemented**. Every page CTA stays
-inside this landing page. The launch note and FAQ explain availability.
+The page provides community information, section navigation, a mobile menu,
+a three-step contact journey and native FAQs. Enquiry links call Prebooking at
+**7397167111**. There is no online signup, membership system or referral tracking.
+Catalogues, checkout, accounts, seller submissions and admin functions are
+**not implemented**.
+This public business number is separate from private property seller contacts.
 No credentials or database are needed to run this landing page.
 
 ## Agreed product scope
@@ -96,32 +103,38 @@ stock, property types/districts and delivery areas. None are configured here.
 
 ## Design
 
-Reference: [BNI](https://www.bni.com/). Its full-width photographic introduction,
+Reference: [BNI](https://www.bni.com/). Its photographic introduction,
 clear navigation, alternating image/text sections and three-step guide inform
 the composition. Prebooking has its own content, palette and images; no BNI
 branding, customer statements or business statistics are copied.
 
-The visual system is a white ground, blue accent `#1550e8`, dark navy text,
+The visual system is white `#ffffff`, blue accent `#1550e8`, navy text `#0f1729`,
 Inter Variable, generous spacing and fine borders. Tokens live in
 `apps/web/src/styles.css`. Buttons use 10px corners; image sections remain plain
-rectangles. Desktop alternates image and text; mobile always places images
-first and stacks the sections. The mobile menu uses shadcn/Radix focus trapping
-and Escape handling. FAQs use native disclosures that also work without JavaScript. GSAP animates only the
-hero entrance; Motion provides selection/press feedback. Reduced-motion
-preferences disable the entrance, feedback transforms and smooth scrolling.
-Main copy and FAQ answers are present in server-rendered HTML. Interactive
-guides and the mobile menu require JavaScript; section links also appear in
+rectangles. A large text/photo hero introduces the community; an alternating
+editorial section, divided benefits list and numbered contact journey follow.
+A five-metric community panel uses user-requested illustrative preview figures,
+visibly labelled as unverified. Replace them with verified Prebooking statistics
+and their reporting period before launch.
+Desktop pairs images with text; mobile stacks the sections. The mobile menu uses shadcn/Radix focus trapping
+and Escape handling. FAQs use native disclosures that also work without JavaScript.
+Lenis smooths wheel and section-link scrolling through GSAP's animation clock;
+touch gestures stay native. GSAP handles the hero entrance, paired community
+and relationship introductions, the three contact steps and closing CTA.
+Scroll sequences play once. The mobile menu pauses background scrolling and
+hands keyboard focus to the destination after closing. Motion provides press
+feedback. Reduced-motion preferences disable decorative movement and smooth
+scrolling, including when the preference changes while the page is open.
+Main copy and FAQ answers are present in server-rendered HTML. The mobile menu
+requires JavaScript; section links also appear in
 the footer.
 
 ## Photograph credits
 
-These are illustrative category photographs, not actual customers, products
-or approved property listings. Images are local optimized WebP files, with a
-separate mobile hero crop. Source metadata accompanies each asset.
+These are illustrative stock photographs, not actual Prebooking members or
+events. Images are local optimized WebP files.
 
-- Hero: [Yan Krukau, people holding sparklers](https://www.pexels.com/photo/people-holding-sparkler-fireworks-8818585/).
-- Crackers: [RDNE Stock project, a group holding sparklers](https://www.pexels.com/photo/group-of-happy-people-holding-sparklers-7686379/).
-- Clothing: [Lara Jameson, choosing fabric in an Indian shop](https://www.pexels.com/photo/woman-in-an-indian-shop-choosing-a-fabric-8886959/).
-- Property: [NJ socialmedia, a house in Kerala](https://www.pexels.com/photo/large-country-style-house-with-balcony-under-blue-sky-20445164/).
+- Hero: [Edmond Dantès, people at a business meeting](https://www.pexels.com/photo/people-at-the-business-meeting-4342126/).
+- Community: [Thirdman, a group discussing together](https://www.pexels.com/photo/group-of-people-discussing-together-5256999/).
 
 All are under the [Pexels License](https://www.pexels.com/license/).
