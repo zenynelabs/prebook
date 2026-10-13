@@ -26,7 +26,7 @@ import {
 
 const navigation = [
   ["The community", "#community"],
-  ["Why Prebook", "#why-prebooking"],
+  ["Why PreBooking", "#why-prebooking"],
   ["How to connect", "#how-it-works"],
   ["FAQs", "#questions"],
 ];
@@ -89,7 +89,7 @@ const benefits = [
 const steps = [
   [
     "Start a conversation",
-    "Call the Prebook team. Tell us a little about yourself and what you’re looking for in a business community.",
+    "Call the PreBooking team. Tell us a little about yourself and what you’re looking for in a business community.",
   ],
   [
     "Introduce your business",
@@ -103,8 +103,8 @@ const steps = [
 
 const questions = [
   [
-    "What is Prebook?",
-    "Prebook is a global business community. Its focus is bringing business owners and professionals together around relationships, ideas and shared opportunities.",
+    "What is PreBooking?",
+    "PreBooking is a global business community. Its focus is bringing business owners and professionals together around relationships, ideas and shared opportunities.",
   ],
   [
     "Who is the community for?",
@@ -112,7 +112,7 @@ const questions = [
   ],
   [
     "How do I get involved?",
-    "Call the Prebook team on 73971 67111. They can explain the community, discuss your business and help you understand the next steps.",
+    "Call the PreBooking team on 73971 67111. They can explain the community, discuss your business and help you understand the next steps.",
   ],
   [
     "Are there membership fees or regular meetings?",
@@ -384,7 +384,7 @@ export default function LandingPage() {
       </a>
       <header className="site-header" ref={header}>
         <div className="container header-inner">
-          <a className="brand" href="#main" aria-label="Prebook home">
+          <a className="brand" href="#main" aria-label="PreBooking home">
             <img
               src="/brand/navbar-logo-transparent.png"
               alt=""
@@ -392,7 +392,7 @@ export default function LandingPage() {
               height="192"
             />
             <span className="brand-copy">
-              <strong>Prebook</strong>
+              <strong>PreBooking</strong>
               <span>Business Connect</span>
             </span>
           </a>
@@ -404,7 +404,7 @@ export default function LandingPage() {
             ))}
           </nav>
           <Button asChild className="header-cta">
-            <a href="tel:7397167111" aria-label="Call Prebook on 7397167111">
+            <a href="tel:7397167111" aria-label="Call PreBooking on 7397167111">
               Let’s connect <ArrowUpRight aria-hidden="true" />
             </a>
           </Button>
@@ -448,7 +448,7 @@ export default function LandingPage() {
                     height="256"
                   />
                   <span className="brand-copy">
-                    <strong>Prebook</strong>
+                    <strong>PreBooking</strong>
                     <span>Business Connect</span>
                   </span>
                 </SheetTitle>
@@ -498,7 +498,7 @@ export default function LandingPage() {
                 <span>across borders.</span>
               </h1>
               <p data-hero-copy>
-                Prebook brings business owners and professionals together to
+                PreBooking brings business owners and professionals together to
                 share ideas, build relationships and explore thoughtful
                 referrals.
               </p>
@@ -514,7 +514,7 @@ export default function LandingPage() {
                   variant="outline"
                   className="hero-call"
                 >
-                  <a href="tel:7397167111">Call Prebook</a>
+                  <a href="tel:7397167111">Call PreBooking</a>
                 </Button>
               </div>
             </div>
@@ -566,7 +566,7 @@ export default function LandingPage() {
                 small wins. It helps to have people around you who understand.
               </p>
               <p>
-                Prebook is a global business community. Meet
+                PreBooking is a global business community. Meet
                 people beyond your usual circle, learn from their experience and
                 understand where a thoughtful referral could help. Begin with a
                 conversation and explore what you can do together.
@@ -607,7 +607,7 @@ export default function LandingPage() {
                 connections that bring a business community to life.
               </p>
               <p id="statistics-note" className="statistics-note">
-                Illustrative figures for this preview, not verified Prebook
+                Illustrative figures for this preview, not verified PreBooking
                 results.
               </p>
             </div>
@@ -994,10 +994,10 @@ export default function LandingPage() {
               <Button asChild size="lg" className="closing-button">
                 <a
                   href="tel:7397167111"
-                  aria-label="Call Prebook on 7397167111"
+                  aria-label="Call PreBooking on 7397167111"
                 >
                   <Phone size={20} aria-hidden="true" />
-                  Talk to Prebook <ArrowUpRight size={18} aria-hidden="true" />
+                  Talk to PreBooking <ArrowUpRight size={18} aria-hidden="true" />
                 </a>
               </Button>
               <a className="closing-number" href="tel:7397167111">
@@ -1015,7 +1015,7 @@ export default function LandingPage() {
               <a
                 className="brand footer-logo"
                 href="#main"
-                aria-label="Prebook home"
+                aria-label="PreBooking home"
               >
                 <img
                   src="/brand/emblem.webp?v=transparent-1"
@@ -1025,14 +1025,14 @@ export default function LandingPage() {
                   loading="lazy"
                 />
                 <span className="brand-copy">
-                  <strong>Prebook</strong>
+                  <strong>PreBooking</strong>
                   <span>Business Connect</span>
                 </span>
               </a>
               <p>Good people. Better business.</p>
             </div>
-            <nav aria-label="Explore Prebook">
-              <h2>Explore Prebook</h2>
+            <nav aria-label="Explore PreBooking">
+              <h2>Explore PreBooking</h2>
               {[...navigation, ["Let’s connect", "#connect"]].map(
                 ([label, href]) => (
                   <a key={href} href={href}>
@@ -1068,7 +1068,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="footer-bottom">
-            <span>© {new Date().getFullYear()} Prebook.</span>
+            <span>© {new Date().getFullYear()} PreBooking.</span>
             <span>Photographs are illustrative.</span>
             <a href="#main">
               Back to top <ArrowUpRight size={13} aria-hidden="true" />

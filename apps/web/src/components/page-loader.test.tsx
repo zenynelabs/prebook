@@ -10,7 +10,7 @@ describe("page loader public contract", () => {
 
     expect(html).toContain('data-state="loading"');
     expect(html).toContain('role="progressbar"');
-    expect(html).toContain('aria-label="Loading Prebook"');
+    expect(html).toContain('aria-label="Loading PreBooking"');
     expect(html).toContain('aria-valuetext="Loading page"');
     expect(html).not.toContain("aria-valuenow=");
   });

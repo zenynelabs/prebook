@@ -1,4 +1,4 @@
-# Prebook.
+# PreBooking.
 
 Built for Mr. Nambi, Tirunelveli, by Zenyne Labs. The current deliverable is a
 global business networking community landing page in
@@ -8,7 +8,7 @@ business connections, referrals and shared learning. This supersedes the previou
 retail/property landing presentation; the original agreed business scope and
 commercial facts below remain unchanged. Membership, chapters and referral
 databases are not part of this landing-page work.
-The public brand is **Prebook**, as corrected by the user on 13 October 2026.
+The public brand is **PreBooking**, as corrected by the user on 13 October 2026.
 The supplied email address retains its existing spelling.
 
 ## Run
@@ -34,7 +34,7 @@ worker hits a local port-permission error in this environment.
 
 The page provides community information, an audience guide, a practical referral
 example, shared-learning prompts, community values, section navigation, a mobile
-menu, a three-step contact journey and native FAQs. Enquiry links call Prebook at
+menu, a three-step contact journey and native FAQs. Enquiry links call PreBooking at
 **7397167111** or email **prebookingpbkworld1@gmail.com**. The footer groups
 exploration, community links and contact details alongside the brand, with a
 back-to-top link in its bottom row. The email appears in the footer.
@@ -110,7 +110,7 @@ stock, property types/districts and delivery areas. None are configured here.
 
 Reference: [BNI](https://www.bni.com/). Its photographic introduction,
 clear navigation, alternating image/text sections and three-step guide inform
-the composition. Prebook has its own content, palette and images; no BNI
+the composition. PreBooking has its own content, palette and images; no BNI
 branding, customer statements or business statistics are copied.
 
 The user supplied the **PBK1 Prebooking World 1 — Business Connect** logo on
@@ -132,7 +132,7 @@ Additional photographs show a one-to-one conversation, shared planning and a
 coffee gathering across the introduction, learning section and closing invitation.
 The statistics numbers use self-hosted Inter at weight 750 with a larger responsive scale; labels and other
 text retain Plus Jakarta Sans. A five-metric community panel uses user-requested illustrative preview figures,
-visibly labelled as unverified. Replace them with verified Prebook statistics
+visibly labelled as unverified. Replace them with verified PreBooking statistics
 and their reporting period before launch. Four divided metrics surround a
 highlighted revenue row in normal document flow. A short GSAP entrance and
 count-up play once on entering view. Final values ship in HTML and remain stable
@@ -157,7 +157,7 @@ the footer.
 
 The header uses the transparent `brand/navbar-logo-transparent.png` globe/PBK
 emblem with readable brand text and a separate filename from the earlier cached
-emblem export. The header, mobile menu and footer pair the emblem with **Prebook**
+emblem export. The header, mobile menu and footer pair the emblem with **PreBooking**
 brand text. The original full logo contains the earlier name and is preserved as
 a source asset. The original upload is preserved byte-for-byte at
 `apps/web/public/brand/logo-original.png`. The user requested background removal;
@@ -177,7 +177,8 @@ Browser icons include a 16/32/48px multi-image ICO, separate 16/32/48px PNGs,
 a 180px Apple touch icon and 192/512px PNG icons. Next.js metadata references
 them directly. The Apple icon composites the cutout onto the site's uniform warm
 background for platform rendering. Open Graph and Twitter use the
-256×256 `brand/emblem.png` image, keeping sharing previews free of location-specific copy. Organization structured
+1730×909 `brand/og-prebooking-global.png` card with the headline “Business networking
+across borders.”, the PreBooking emblem and the confirmed website address. Organization structured
 data uses the emblem. Browser icons and logo consumers retain the
 `transparent-1` asset revision to refresh cached opaque logos.
 `/robots.txt` and `/sitemap.xml` expose the single
@@ -192,7 +193,7 @@ verification and production performance measurements remain launch tasks.
 
 ## Photograph credits
 
-These are illustrative stock photographs, not actual Prebook members or
+These are illustrative stock photographs, not actual PreBooking members or
 events. Images are local optimized WebP files.
 
 - Hero: [Edmond Dantès, people at a business meeting](https://www.pexels.com/photo/people-at-the-business-meeting-4342126/).

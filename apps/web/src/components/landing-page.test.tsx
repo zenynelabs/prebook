@@ -47,9 +47,9 @@ test("section scrolling preserves history and focus, with native and instant fal
 });
 
 describe("landing page public contract", () => {
-  test("uses the corrected Prebook name while preserving the supplied email", () => {
-    expect(html).toContain('<strong>Prebook</strong>');
-    expect(html).not.toMatch(/\bPrebooking\b|World 1|PBK1/);
+  test("uses the corrected PreBooking name while preserving the supplied email", () => {
+    expect(html).toContain('<strong>PreBooking</strong>');
+    expect(html).not.toMatch(/\b(?:Prebook|Prebooking)\b|World 1|PBK1/);
     expect(html).not.toContain('/brand/logo.webp');
     expect(html).toContain('mailto:prebookingpbkworld1@gmail.com');
   });
@@ -122,7 +122,7 @@ describe("landing page public contract", () => {
     const title = hero?.match(/<h1\b[^>]*>(.*?)<\/h1>/)?.[1];
     expect(title?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()).toBe("Business networking across borders.");
     const introduction = hero?.match(/<p\b[^>]*data-hero-copy[^>]*>(.*?)<\/p>/)?.[1];
-    expect(introduction).toContain("Prebook");
+    expect(introduction).toContain("PreBooking");
     for (const concept of [/business owners/i, /professionals/i, /ideas/i, /referrals/i]) {
       expect(introduction).toMatch(concept);
     }
@@ -139,7 +139,7 @@ describe("landing page public contract", () => {
     expect(section).toMatch(/^<div\b[^>]*data-nosnippet=""[^>]*>.*<\/div>$/s);
     const text = section!.replace(/<[^>]+>/g, " ");
     expect(text).toContain(
-      "Illustrative figures for this preview, not verified Prebook results.",
+      "Illustrative figures for this preview, not verified PreBooking results.",
     );
     expect(section).toContain('aria-describedby="statistics-note"');
     expect(section).toContain('id="statistics-note"');
@@ -191,7 +191,7 @@ describe("landing page public contract", () => {
     expect(footer).toContain('href="tel:7397167111"');
     expect(footer).toContain("73971 67111");
     expect(footer).toContain('href="mailto:prebookingpbkworld1@gmail.com"');
-    expect(footer).toContain('aria-label="Explore Prebook"');
+    expect(footer).toContain('aria-label="Explore PreBooking"');
     expect(footer).toContain('aria-label="Community links"');
     expect(footer).toContain('href="#referrals"');
     expect(footer).toContain("Back to top");

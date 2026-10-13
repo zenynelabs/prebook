@@ -28,7 +28,7 @@ export default function PageLoader() {
       className="page-loader"
       data-state={phase}
       role="progressbar"
-      aria-label="Loading Prebook"
+      aria-label="Loading PreBooking"
       aria-valuetext={phase === "complete" ? "Page ready" : "Loading page"}
       aria-valuemin={0}
       aria-valuemax={100}

@@ -44,13 +44,13 @@ export const metadata: Metadata = {
     siteName: site.name,
     locale: 'en_IN',
     url: '/',
-    images: [{ url: '/brand/emblem.png', width: 256, height: 256, alt: 'Prebook — Global business networking' }],
+    images: [{ url: '/brand/og-prebooking-global.png', width: 1730, height: 909, alt: 'PreBooking — Business networking across borders' }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: site.title,
     description: site.description,
-    images: [{ url: '/brand/emblem.png', width: 256, height: 256, alt: 'Prebook — Global business networking' }],
+    images: [{ url: '/brand/og-prebooking-global.png', width: 1730, height: 909, alt: 'PreBooking — Business networking across borders' }],
   },
 }
 
