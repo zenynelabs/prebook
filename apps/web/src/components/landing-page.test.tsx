@@ -39,6 +39,13 @@ test("section scrolling preserves history and focus, with native and instant fal
 });
 
 describe("landing page public contract", () => {
+  test("uses the corrected Prebook name while preserving the supplied email", () => {
+    expect(html).toContain('<strong>Prebook</strong>');
+    expect(html).not.toMatch(/\bPrebooking\b|World 1|PBK1/);
+    expect(html).not.toContain('/brand/logo.webp');
+    expect(html).toContain('mailto:prebookingpbkworld1@gmail.com');
+  });
+
   test("every navigation anchor leads to a section in the rendered page", () => {
     const ids = new Set(
       [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]),
@@ -52,6 +59,10 @@ describe("landing page public contract", () => {
       "main",
       "community",
       "why-prebooking",
+      "who-its-for",
+      "referrals",
+      "shared-learning",
+      "community-values",
       "how-it-works",
       "questions",
       "connect",
@@ -65,16 +76,31 @@ describe("landing page public contract", () => {
     const images = [
       ...html.matchAll(/(?:src|srcSet|srcset)="(\/images\/[^" ]+)"/g),
     ].map((match) => match[1]);
-    expect(new Set(images).size).toBe(2);
+    expect(new Set(images).size).toBe(5);
     for (const image of images)
       expect(
         existsSync(resolve(import.meta.dir, "../../public", `.${image}`)),
       ).toBe(true);
   });
 
+  test("photographic backgrounds preserve page content and image semantics", () => {
+    const hero = html.match(/<section\b[^>]*class="hero"[^>]*>(.*?)<\/section>/s)?.[1];
+    expect(hero).toBeDefined();
+    expect(hero).toMatch(/<img[^>]*class="hero-background"[^>]*alt=""[^>]*aria-hidden="true"/);
+    expect(hero).toContain('fetchPriority="high"');
+    expect(hero).toContain('id="hero-title"');
+    expect(hero).toContain('href="#connect"');
+    expect(hero).not.toContain("Discover what brings us together");
+    for (const filename of ["community-introduction.webp", "community-learning.webp"]) {
+      const image = [...html.matchAll(/<img\b[^>]*>/g)].find(([markup]) => markup.includes(filename))?.[0];
+      expect(image).toMatch(/\balt="[^"]+"/);
+      expect(image).toContain('loading="lazy"');
+    }
+  });
+
   test("section destinations can receive keyboard focus after navigation", () => {
     for (const destination of html.matchAll(
-      /<(?:main|section)\b[^>]*\bid="(?:main|community|why-prebooking|how-it-works|questions|connect)"[^>]*>/g,
+      /<(?:main|section)\b[^>]*\bid="(?:main|community|why-prebooking|who-its-for|referrals|shared-learning|community-values|how-it-works|questions|connect)"[^>]*>/g,
     )) {
       expect(destination[0]).toContain('tabindex="-1"');
     }
@@ -84,21 +110,28 @@ describe("landing page public contract", () => {
     const text = html.replace(/<[^>]+>/g, " ");
     expect(html.match(/<h1\b/g)).toHaveLength(1);
     expect(html).toContain("Skip to content");
-    const introduction = html.match(/<h1\b[^>]*>(.*?)<\/h1>/)?.[1];
-    expect(introduction).toMatch(/business|connect|community/i);
+    const hero = html.match(/<section\b[^>]*\bclass="hero"[^>]*>(.*?)<\/section>/s)?.[1];
+    const title = hero?.match(/<h1\b[^>]*>(.*?)<\/h1>/)?.[1];
+    expect(title?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()).toBe("Business networking in Tirunelveli.");
+    const introduction = hero?.match(/<p\b[^>]*data-hero-copy[^>]*>(.*?)<\/p>/)?.[1];
+    expect(introduction).toContain("Prebook");
+    for (const concept of [/business owners/i, /professionals/i, /ideas/i, /referrals/i]) {
+      expect(introduction).toMatch(concept);
+    }
     for (const concept of [/community/i, /referral/i, /learn/i, /business/i]) {
       expect(text).toMatch(concept);
     }
   });
 
-  test("preview statistics are clearly labelled as illustrative", () => {
+  test("preview statistics are labelled as illustrative and excluded from search snippets", () => {
     const section = html.match(
       /<section\b[^>]*\bid="community-numbers"[^>]*>(.*?)<\/section>/s,
     )?.[1];
     expect(section).toBeDefined();
+    expect(section).toMatch(/^<div\b[^>]*data-nosnippet=""[^>]*>.*<\/div>$/s);
     const text = section!.replace(/<[^>]+>/g, " ");
     expect(text).toContain(
-      "Illustrative figures for this preview, not verified Prebooking results.",
+      "Illustrative figures for this preview, not verified Prebook results.",
     );
     expect(section).toContain('aria-describedby="statistics-note"');
     expect(section).toContain('id="statistics-note"');
@@ -115,6 +148,7 @@ describe("landing page public contract", () => {
       expect(
         destination.startsWith("#") ||
           destination === "tel:7397167111" ||
+          destination === "mailto:prebookingpbkworld1@gmail.com" ||
           destination === "https://zenyne.com",
       ).toBe(true);
       if (destination === "https://zenyne.com") {
@@ -137,10 +171,19 @@ describe("landing page public contract", () => {
     expect(header).toBeDefined();
     expect(header).not.toContain("Tirunelveli");
     expect(header).toContain('href="tel:7397167111"');
+    expect(header).not.toContain('href="mailto:prebookingpbkworld1@gmail.com"');
+    const navigation = header!.match(/<nav\b[^>]*aria-label="Main navigation"[^>]*>(.*?)<\/nav>/s)?.[1];
+    const links = [...(navigation ?? "").matchAll(/href="#([^"]+)"/g)].map((match) => match[1]);
+    expect(links).toEqual(["community", "why-prebooking", "how-it-works", "questions"]);
     const footer = html.match(/<footer\b[^>]*>.*?<\/footer>/)?.[0];
     expect(footer).toContain("Tirunelveli, Tamil Nadu");
     expect(footer).toContain('href="tel:7397167111"');
     expect(footer).toContain("73971 67111");
+    expect(footer).toContain('href="mailto:prebookingpbkworld1@gmail.com"');
+    expect(footer).toContain('aria-label="Explore Prebook"');
+    expect(footer).toContain('aria-label="Community links"');
+    expect(footer).toContain('href="#referrals"');
+    expect(footer).toContain("Back to top");
   });
 
   test("FAQ answers ship in HTML and can expand without JavaScript", () => {

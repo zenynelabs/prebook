@@ -1,4 +1,4 @@
-# Prebooking!
+# Prebook
 
 Built for Mr. Nambi, Tirunelveli, by Zenyne Labs. The current deliverable is a
 business networking community landing page in
@@ -9,6 +9,8 @@ business connections, referrals and shared learning. This supersedes the previou
 retail/property landing presentation; the original agreed business scope and
 commercial facts below remain unchanged. Membership, chapters and referral
 databases are not part of this landing-page work.
+The public brand is **Prebook**, as corrected by the user on 13 October 2026.
+The domain and supplied email address retain their existing spelling.
 
 ## Run
 
@@ -31,9 +33,13 @@ code in `apps/app/` is separate from this website and has been left intact.
 Development and builds use Next.js's Webpack option because Turbopack's CSS
 worker hits a local port-permission error in this environment.
 
-The page provides community information, section navigation, a mobile menu,
-a three-step contact journey and native FAQs. Enquiry links call Prebooking at
-**7397167111**. There is no online signup, membership system or referral tracking.
+The page provides community information, an audience guide, a practical referral
+example, shared-learning prompts, community values, section navigation, a mobile
+menu, a three-step contact journey and native FAQs. Enquiry links call Prebook at
+**7397167111** or email **prebookingpbkworld1@gmail.com**. The footer groups
+exploration, community links and contact details alongside the brand, with a
+back-to-top link in its bottom row. The email appears in the footer.
+There is no online signup, membership system or referral tracking.
 Catalogues, checkout, accounts, seller submissions and admin functions are
 **not implemented**.
 This public business number is separate from private property seller contacts.
@@ -98,43 +104,99 @@ charges are paid by the client.
 - GSTIN, final proposal number and Pattamalai/Pattamadai spelling remain open.
 
 The full platform still needs MongoDB Atlas, Google OAuth and Cloudflare R2
-credentials, client branding/contact details, genuine products/photos/prices/
+credentials, remaining client details, genuine products/photos/prices/
 stock, property types/districts and delivery areas. None are configured here.
 
 ## Design
 
 Reference: [BNI](https://www.bni.com/). Its photographic introduction,
 clear navigation, alternating image/text sections and three-step guide inform
-the composition. Prebooking has its own content, palette and images; no BNI
+the composition. Prebook has its own content, palette and images; no BNI
 branding, customer statements or business statistics are copied.
 
-The visual system is white `#ffffff`, blue accent `#1550e8`, navy text `#0f1729`,
-Inter Variable, generous spacing and fine borders. Tokens live in
+The user supplied the **PBK1 Prebooking World 1 — Business Connect** logo on
+13 October 2026. Its sampled palette is deep green `#09432b`, teal `#259194`,
+orange `#f97602`, light gold `#edd374` and warm white `#f6f5f0`. Teal is darkened
+to `#176f72` for accessible light-on-teal buttons; text uses the deeper green
+`#062c1c`, including on the orange hero button. Inter Variable, generous spacing
+and fine borders remain.
+Tokens live in
 `apps/web/src/styles.css`. Buttons use 10px corners; image sections remain plain
-rectangles. A large text/photo hero introduces the community; an alternating
+rectangles. A full-viewport photographic hero introduces the community, with a
+deep-green shade, white and gold type, and a gentle GSAP opening zoom. The navbar
+overlays the image and switches to a warm frosted background on scroll. An alternating
 editorial section, divided benefits list and numbered contact journey follow.
+A divided audience guide, a three-part referral example, a shared-learning
+section with a deep-green question panel and a plain community-values list add depth
+to the introduction. New section links appear in the mobile menu and footer.
+Additional photographs show a one-to-one conversation, shared planning and a
+coffee gathering across the introduction, learning section and closing invitation.
 A five-metric community panel uses user-requested illustrative preview figures,
-visibly labelled as unverified. Replace them with verified Prebooking statistics
+visibly labelled as unverified. Replace them with verified Prebook statistics
 and their reporting period before launch.
 Desktop pairs images with text; mobile stacks the sections. The mobile menu uses shadcn/Radix focus trapping
 and Escape handling. FAQs use native disclosures that also work without JavaScript.
 Lenis smooths wheel and section-link scrolling through GSAP's animation clock;
 touch gestures stay native. GSAP handles the hero entrance, paired community
-and relationship introductions, the three contact steps and closing CTA.
+and relationship introductions, the referral example, learning question,
+three contact steps and closing CTA.
 Scroll sequences play once. The mobile menu pauses background scrolling and
 hands keyboard focus to the destination after closing. Motion provides press
 feedback. Reduced-motion preferences disable decorative movement and smooth
 scrolling, including when the preference changes while the page is open.
+A slim loading bar joins three teal traces when the browser finishes loading,
+then fades out. It stays static with reduced motion and never blocks content.
 Main copy and FAQ answers are present in server-rendered HTML. The mobile menu
 requires JavaScript; section links also appear in
 the footer.
 
+### Logo and sharing assets
+
+The header uses the transparent `brand/navbar-logo-transparent.png` globe/PBK
+emblem with readable brand text and a separate filename from the earlier cached
+emblem export. The header, mobile menu and footer pair the emblem with **Prebook**
+brand text. The original full logo contains the earlier name and is preserved as
+a source asset. The original upload is preserved byte-for-byte at
+`apps/web/public/brand/logo-original.png`. The user requested background removal;
+the built-in image tool produced the transparent cutout preserved at
+`apps/web/public/brand/logo-transparent-source.png`. PNG/WebP logos, emblems and
+browser icons preserve real alpha transparency, including the negative spaces
+inside the artwork. Intentional narrow white letter outlines remain.
+
+FFmpeg crops/resizes the transparent master; `cwebp` optimizes delivery copies
+because the local FFmpeg build has no WebP encoder. The full-logo crop is
+`crop=900:1050:305:20`, fitted without stretching onto a transparent 480×594
+canvas. The emblem crop is `crop=900:700:305:20`, with only the isolated lower
+text fragment removed at source coordinates `(985,690,100,30)`, then padded
+to a transparent square. The delivered emblem is 256×256.
+
+Browser icons include a 16/32/48px multi-image ICO, separate 16/32/48px PNGs,
+a 180px Apple touch icon and 192/512px PNG icons. Next.js metadata references
+them directly. The Apple icon composites the cutout onto the site's uniform warm
+background for platform rendering. Open Graph and Twitter use the 512×512 emblem
+icon, avoiding the earlier name embedded in the original social preview.
+Organization structured data also uses the emblem. Every consumer uses the
+`transparent-1` asset revision to refresh cached opaque logos.
+`/robots.txt` and `/sitemap.xml` expose the single
+public landing route using the existing `https://prebooking.com` canonical host.
+
+SEO titles and descriptions focus on business networking in Tirunelveli.
+The canonical host and metadata share `apps/web/src/lib/site.ts`; update its URL
+if the confirmed launch domain differs. The homepage renders `Organization` and
+`WebSite` JSON-LD using the supplied logo and public business contact, without
+unverified statistics. Preview statistics retain their visible disclosure and
+use `data-nosnippet` to exclude them from Google search snippets. Search Console
+verification and production performance measurements remain launch tasks.
+
 ## Photograph credits
 
-These are illustrative stock photographs, not actual Prebooking members or
+These are illustrative stock photographs, not actual Prebook members or
 events. Images are local optimized WebP files.
 
 - Hero: [Edmond Dantès, people at a business meeting](https://www.pexels.com/photo/people-at-the-business-meeting-4342126/).
 - Community: [Thirdman, a group discussing together](https://www.pexels.com/photo/group-of-people-discussing-together-5256999/).
+- Introduction: [Ketut Subiyanto, Indian partners discussing work](https://www.pexels.com/photo/happy-indian-partners-talking-while-working-on-project-using-laptop-4308104/).
+- Learning: [Anna Shvets, professionals planning together](https://www.pexels.com/photo/businesspeople-preparing-schemes-on-papers-at-table-5324973/).
+- Closing: [Alena Darmel, a coffee break in a conference room](https://www.pexels.com/photo/group-of-people-having-coffee-break-inside-conference-room-8134164/).
 
 All are under the [Pexels License](https://www.pexels.com/license/).

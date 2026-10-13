@@ -56,9 +56,9 @@ editorial sections with original Prebooking copy and imagery. Durable design
 choices are recorded in [README.md](README.md#design); implementation tokens
 live in `apps/web/src/styles.css`. Never recreate a competing design document.
 
-Direction: light, minimal, one blue accent, Inter Variable, generous whitespace,
-hairline borders. Text wordmark only; no confirmed client logo exists.
-The accent remains provisional. Change its CSS tokens when branding arrives.
+Direction: light, minimal, Inter Variable, generous whitespace and hairline
+borders. Use the client-supplied PBK1 Prebooking World 1 logo and its green,
+teal, orange and gold palette, as recorded in README's Design section.
 Use shadcn primitives, Motion for interaction feedback and GSAP for the hero
 opening. Respect reduced motion; leave content readable without JavaScript.
 
