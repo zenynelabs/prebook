@@ -36,13 +36,13 @@ export const metadata: Metadata = {
     siteName: site.name,
     locale: 'en_IN',
     url: '/',
-    images: [{ url: '/icon-512.png?v=transparent-1', width: 512, height: 512, alt: 'Prebook' }],
+    images: [{ url: '/brand/og-prebook.png', width: 1200, height: 630, alt: 'Prebook — Business networking in Tirunelveli' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: site.title,
     description: site.description,
-    images: [{ url: '/icon-512.png?v=transparent-1', width: 512, height: 512, alt: 'Prebook' }],
+    images: [{ url: '/brand/og-prebook.png', width: 1200, height: 630, alt: 'Prebook — Business networking in Tirunelveli' }],
   },
 }
 

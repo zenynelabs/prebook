@@ -173,9 +173,10 @@ to a transparent square. The delivered emblem is 256×256.
 Browser icons include a 16/32/48px multi-image ICO, separate 16/32/48px PNGs,
 a 180px Apple touch icon and 192/512px PNG icons. Next.js metadata references
 them directly. The Apple icon composites the cutout onto the site's uniform warm
-background for platform rendering. Open Graph and Twitter use the 512×512 emblem
-icon, avoiding the earlier name embedded in the original social preview.
-Organization structured data also uses the emblem. Every consumer uses the
+background for platform rendering. Open Graph and Twitter use the dedicated
+1200×630 `brand/og-prebook.png` card, featuring the Prebook emblem, business
+networking headline, Tirunelveli and the website address. Organization structured
+data uses the emblem. Browser icons and logo consumers retain the
 `transparent-1` asset revision to refresh cached opaque logos.
 `/robots.txt` and `/sitemap.xml` expose the single
 public landing route using the existing `https://prebooking.com` canonical host.

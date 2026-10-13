@@ -233,8 +233,12 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          <div className="container hero-bottom" data-hero-copy>
-            <p className="hero-caption">A conversation today.<br /><strong>A possibility tomorrow.</strong></p>
+          <div className="hero-bottom">
+            <div className="container hero-invitation">
+              <p className="hero-caption">A conversation today.<br /><strong>A possibility tomorrow.</strong></p>
+              <p className="hero-invitation-copy">Your business has a story.<br />Let’s start with yours.</p>
+              <Button asChild size="lg"><a href="tel:7397167111"><Phone aria-hidden="true" />Call Prebook <ArrowUpRight aria-hidden="true" /></a></Button>
+            </div>
           </div>
         </section>
 
