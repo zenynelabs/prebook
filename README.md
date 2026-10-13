@@ -1,7 +1,7 @@
 # Prebook!
 
 Built for Mr. Nambi, Tirunelveli, by Zenyne Labs. The current deliverable is a
-business networking community landing page in
+global business networking community landing page in
 `apps/web/`, using the confirmed domain **www.prebookingpbkworld.com**.
 On 13 October 2026, the user authorized repositioning this landing page around
 business connections, referrals and shared learning. This supersedes the previous
@@ -176,15 +176,14 @@ to a transparent square. The delivered emblem is 256×256.
 Browser icons include a 16/32/48px multi-image ICO, separate 16/32/48px PNGs,
 a 180px Apple touch icon and 192/512px PNG icons. Next.js metadata references
 them directly. The Apple icon composites the cutout onto the site's uniform warm
-background for platform rendering. Open Graph and Twitter use the dedicated
-1731×909 `brand/og-prebook-domain.png` card, featuring the Prebook emblem, business
-networking headline, Tirunelveli and the confirmed website address. Organization structured
+background for platform rendering. Open Graph and Twitter use the
+256×256 `brand/emblem.png` image, keeping sharing previews free of location-specific copy. Organization structured
 data uses the emblem. Browser icons and logo consumers retain the
 `transparent-1` asset revision to refresh cached opaque logos.
 `/robots.txt` and `/sitemap.xml` expose the single
 public landing route using the confirmed `https://www.prebookingpbkworld.com` canonical host.
 
-SEO titles and descriptions focus on business networking in Tirunelveli.
+SEO titles and descriptions focus on global business networking.
 The canonical host and metadata share `apps/web/src/lib/site.ts`. The homepage renders `Organization` and
 `WebSite` JSON-LD using the supplied logo and public business contact, without
 unverified statistics. Preview statistics retain their visible disclosure and

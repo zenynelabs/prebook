@@ -7,7 +7,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Mail,
-  MapPin,
   Menu,
   Phone,
   Plus,
@@ -105,7 +104,7 @@ const steps = [
 const questions = [
   [
     "What is Prebook?",
-    "Prebook is a business community based in Tirunelveli, Tamil Nadu. Its focus is bringing business owners and professionals together around relationships, ideas and shared opportunities.",
+    "Prebook is a global business community. Its focus is bringing business owners and professionals together around relationships, ideas and shared opportunities.",
   ],
   [
     "Who is the community for?",
@@ -496,7 +495,7 @@ export default function LandingPage() {
               <h1 id="hero-title" data-hero-copy>
                 Business networking
                 <br />
-                <span>in Tirunelveli.</span>
+                <span>across borders.</span>
               </h1>
               <p data-hero-copy>
                 Prebook brings business owners and professionals together to
@@ -567,7 +566,7 @@ export default function LandingPage() {
                 small wins. It helps to have people around you who understand.
               </p>
               <p>
-                Prebook is a business community in Tirunelveli, Tamil Nadu. Meet
+                Prebook is a global business community. Meet
                 people beyond your usual circle, learn from their experience and
                 understand where a thoughtful referral could help. Begin with a
                 conversation and explore what you can do together.
@@ -1031,10 +1030,6 @@ export default function LandingPage() {
                 </span>
               </a>
               <p>Good people. Better business.</p>
-              <span className="location">
-                <MapPin size={15} aria-hidden="true" />
-                Tirunelveli, Tamil Nadu
-              </span>
             </div>
             <nav aria-label="Explore Prebook">
               <h2>Explore Prebook</h2>

@@ -120,7 +120,7 @@ describe("landing page public contract", () => {
     expect(html).toContain("Skip to content");
     const hero = html.match(/<section\b[^>]*\bclass="hero"[^>]*>(.*?)<\/section>/s)?.[1];
     const title = hero?.match(/<h1\b[^>]*>(.*?)<\/h1>/)?.[1];
-    expect(title?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()).toBe("Business networking in Tirunelveli.");
+    expect(title?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()).toBe("Business networking across borders.");
     const introduction = hero?.match(/<p\b[^>]*data-hero-copy[^>]*>(.*?)<\/p>/)?.[1];
     expect(introduction).toContain("Prebook");
     for (const concept of [/business owners/i, /professionals/i, /ideas/i, /referrals/i]) {
@@ -171,7 +171,7 @@ describe("landing page public contract", () => {
     );
   });
 
-  test("shows the public enquiry contact and keeps location out of the header", () => {
+  test("shows the public enquiry contact without limiting the community to one location", () => {
     const contacts = [...html.matchAll(/href="(tel:[^"]+)"/g)].map(
       (match) => match[1],
     );
@@ -186,7 +186,8 @@ describe("landing page public contract", () => {
     const links = [...(navigation ?? "").matchAll(/href="#([^"]+)"/g)].map((match) => match[1]);
     expect(links).toEqual(["community", "why-prebooking", "how-it-works", "questions"]);
     const footer = html.match(/<footer\b[^>]*>.*?<\/footer>/)?.[0];
-    expect(footer).toContain("Tirunelveli, Tamil Nadu");
+    expect(html).not.toMatch(/Tirunelveli|Tamil Nadu/i);
+    expect(html).toContain("global business community");
     expect(footer).toContain('href="tel:7397167111"');
     expect(footer).toContain("73971 67111");
     expect(footer).toContain('href="mailto:prebookingpbkworld1@gmail.com"');

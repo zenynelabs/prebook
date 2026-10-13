@@ -224,7 +224,6 @@ svg { flex-shrink: 0; }
 .site-footer { padding-top: 64px; background: var(--surface); border-top: 1px solid var(--border); }
 .footer-top { display: grid; grid-template-columns: 1.2fr 0.9fr 1fr 1.35fr; gap: 48px; padding-bottom: 56px; }
 .footer-brand p { margin-top: 18px; color: var(--text-2); font-size: 14px; }
-.location { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; color: var(--text-2); font-size: 12px; }
 .footer-top h2 { margin-bottom: 20px; font-size: 14px; font-weight: 600; line-height: 1.5; letter-spacing: 0; }
 .footer-top nav a { display: block; width: fit-content; padding-block: 9px; min-height: 44px; font-size: 14px; color: var(--text-2); }
 .footer-top nav a:hover { color: var(--accent); }
@@ -315,7 +314,7 @@ svg { flex-shrink: 0; }
   .hero-copy { width: 100%; max-width: 480px; text-align: center; }
   .hero::after { background: linear-gradient(180deg, color-mix(in srgb, var(--text) 58%, transparent), color-mix(in srgb, var(--text) 88%, transparent) 52%, color-mix(in srgb, var(--text) 96%, transparent)); }
   .hero-background { object-position: 65% 45%; }
-  .hero h1 { font-size: clamp(36px, 9vw, 48px); line-height: 1.08; }
+  .hero h1 { font-size: clamp(40px, 12vw, 64px); line-height: 1.04; font-weight: 750; }
   .hero-copy > p { max-width: 35ch; margin: 22px auto 0; font-size: 16px; }
   .hero-actions { justify-content: center; margin-top: 26px; gap: 12px 22px; }
   .hero-actions [data-slot='button'] { padding-inline: 22px; font-size: 14px; }

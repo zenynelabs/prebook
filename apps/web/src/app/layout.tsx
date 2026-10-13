@@ -44,13 +44,13 @@ export const metadata: Metadata = {
     siteName: site.name,
     locale: 'en_IN',
     url: '/',
-    images: [{ url: '/brand/og-prebook-domain.png', width: 1731, height: 909, alt: 'Prebook — Business networking in Tirunelveli' }],
+    images: [{ url: '/brand/emblem.png', width: 256, height: 256, alt: 'Prebook — Global business networking' }],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: site.title,
     description: site.description,
-    images: [{ url: '/brand/og-prebook-domain.png', width: 1731, height: 909, alt: 'Prebook — Business networking in Tirunelveli' }],
+    images: [{ url: '/brand/emblem.png', width: 256, height: 256, alt: 'Prebook — Global business networking' }],
   },
 }
 
