@@ -5,11 +5,19 @@ import PageLoader from '@/components/page-loader'
 import { site } from '@/lib/site'
 import '../styles.css'
 
-const inter = localFont({
+const jakarta = localFont({
+  src: '../../node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2',
+  variable: '--font-jakarta',
+  weight: '200 800',
+  display: 'swap',
+})
+
+const statFont = localFont({
   src: '../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2',
-  variable: '--font-inter',
+  variable: '--font-statistics',
   weight: '100 900',
   display: 'swap',
+  preload: false,
 })
 
 export const metadata: Metadata = {
@@ -36,19 +44,19 @@ export const metadata: Metadata = {
     siteName: site.name,
     locale: 'en_IN',
     url: '/',
-    images: [{ url: '/brand/og-prebook.png', width: 1200, height: 630, alt: 'Prebook — Business networking in Tirunelveli' }],
+    images: [{ url: '/brand/og-prebook-domain.png', width: 1731, height: 909, alt: 'Prebook — Business networking in Tirunelveli' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: site.title,
     description: site.description,
-    images: [{ url: '/brand/og-prebook.png', width: 1200, height: 630, alt: 'Prebook — Business networking in Tirunelveli' }],
+    images: [{ url: '/brand/og-prebook-domain.png', width: 1731, height: 909, alt: 'Prebook — Business networking in Tirunelveli' }],
   },
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${jakarta.variable} ${statFont.variable}`}>
       <body><PageLoader />{children}</body>
     </html>
   )

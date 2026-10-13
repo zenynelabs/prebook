@@ -3,9 +3,17 @@ import type Lenis from "lenis";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
-import LandingPage, { navigateToSection } from "./landing-page";
+import LandingPage, { formatStatNumber, navigateToSection } from "./landing-page";
 
 const html = renderToStaticMarkup(<LandingPage />);
+
+test("stat counters format whole and decimal display units without decimal drift", () => {
+  expect(formatStatNumber(79111)).toBe("79,111");
+  expect(formatStatNumber(1499)).toBe("1,499");
+  expect(formatStatNumber(0, 1)).toBe("0.0");
+  expect(formatStatNumber(149, 1)).toBe("14.9");
+  expect(formatStatNumber(408.8, 1)).toBe("40.9");
+});
 
 test("section scrolling preserves history and focus, with native and instant fallbacks", () => {
   const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
@@ -139,6 +147,8 @@ describe("landing page public contract", () => {
     expect(values.length).toBeGreaterThan(0);
     for (const value of values) {
       expect(value[1]).toMatch(/\d/);
+      expect(value[1]).toContain('aria-hidden="true"');
+      expect(value[1]).toContain('class="sr-only"');
     }
   });
 

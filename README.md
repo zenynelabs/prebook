@@ -2,15 +2,14 @@
 
 Built for Mr. Nambi, Tirunelveli, by Zenyne Labs. The current deliverable is a
 business networking community landing page in
-`apps/web/`, using the user-requested domain **prebooking.com**. The original
-proposal spelled it `preebooking.com`; confirm the actual domain before launch.
+`apps/web/`, using the confirmed domain **www.prebookingpbkworld.com**.
 On 13 October 2026, the user authorized repositioning this landing page around
 business connections, referrals and shared learning. This supersedes the previous
 retail/property landing presentation; the original agreed business scope and
 commercial facts below remain unchanged. Membership, chapters and referral
 databases are not part of this landing-page work.
 The public brand is **Prebook**, as corrected by the user on 13 October 2026.
-The domain and supplied email address retain their existing spelling.
+The supplied email address retains its existing spelling.
 
 ## Run
 
@@ -26,7 +25,7 @@ bun run start      # Next.js production server after building
 ```
 
 `apps/web/` is a Next.js App Router app with React, Tailwind CSS, shadcn components,
-Motion, GSAP, Lenis and self-hosted Inter Variable. Exact dependency versions and
+Motion, GSAP, Lenis and self-hosted Plus Jakarta Sans Variable. Exact dependency versions and
 the root `bun.lock` make workspace installs reproducible. Native Flutter starter
 code in `apps/app/` is separate from this website and has been left intact.
 
@@ -118,7 +117,7 @@ The user supplied the **PBK1 Prebooking World 1 — Business Connect** logo on
 13 October 2026. Its sampled palette is deep green `#09432b`, teal `#259194`,
 orange `#f97602`, light gold `#edd374` and warm white `#f6f5f0`. Teal is darkened
 to `#176f72` for accessible light-on-teal buttons; text uses the deeper green
-`#062c1c`, including on the orange hero button. Inter Variable, generous spacing
+`#062c1c`, including on the orange hero button. Plus Jakarta Sans Variable, generous spacing
 and fine borders remain.
 Tokens live in
 `apps/web/src/styles.css`. Buttons use 10px corners; image sections remain plain
@@ -131,9 +130,13 @@ section with a deep-green question panel and a plain community-values list add d
 to the introduction. New section links appear in the mobile menu and footer.
 Additional photographs show a one-to-one conversation, shared planning and a
 coffee gathering across the introduction, learning section and closing invitation.
-A five-metric community panel uses user-requested illustrative preview figures,
+The statistics numbers use self-hosted Inter at weight 750 with a larger responsive scale; labels and other
+text retain Plus Jakarta Sans. A five-metric community panel uses user-requested illustrative preview figures,
 visibly labelled as unverified. Replace them with verified Prebook statistics
-and their reporting period before launch.
+and their reporting period before launch. Four divided metrics surround a
+highlighted revenue row in normal document flow. A short GSAP entrance and
+count-up play once on entering view. Final values ship in HTML and remain stable
+for screen readers; reduced motion displays the final values immediately.
 Desktop pairs images with text; mobile stacks the sections. The mobile menu uses shadcn/Radix focus trapping
 and Escape handling. FAQs use native disclosures that also work without JavaScript.
 Lenis smooths wheel and section-link scrolling through GSAP's animation clock;
@@ -144,7 +147,7 @@ Scroll sequences play once. The mobile menu pauses background scrolling and
 hands keyboard focus to the destination after closing. Motion provides press
 feedback. Reduced-motion preferences disable decorative movement and smooth
 scrolling, including when the preference changes while the page is open.
-A slim loading bar joins three teal traces when the browser finishes loading,
+A minimal 2px teal loading bar moves across the top until the browser finishes loading,
 then fades out. It stays static with reduced motion and never blocks content.
 Main copy and FAQ answers are present in server-rendered HTML. The mobile menu
 requires JavaScript; section links also appear in
@@ -174,16 +177,15 @@ Browser icons include a 16/32/48px multi-image ICO, separate 16/32/48px PNGs,
 a 180px Apple touch icon and 192/512px PNG icons. Next.js metadata references
 them directly. The Apple icon composites the cutout onto the site's uniform warm
 background for platform rendering. Open Graph and Twitter use the dedicated
-1200×630 `brand/og-prebook.png` card, featuring the Prebook emblem, business
-networking headline, Tirunelveli and the website address. Organization structured
+1731×909 `brand/og-prebook-domain.png` card, featuring the Prebook emblem, business
+networking headline, Tirunelveli and the confirmed website address. Organization structured
 data uses the emblem. Browser icons and logo consumers retain the
 `transparent-1` asset revision to refresh cached opaque logos.
 `/robots.txt` and `/sitemap.xml` expose the single
-public landing route using the existing `https://prebooking.com` canonical host.
+public landing route using the confirmed `https://www.prebookingpbkworld.com` canonical host.
 
 SEO titles and descriptions focus on business networking in Tirunelveli.
-The canonical host and metadata share `apps/web/src/lib/site.ts`; update its URL
-if the confirmed launch domain differs. The homepage renders `Organization` and
+The canonical host and metadata share `apps/web/src/lib/site.ts`. The homepage renders `Organization` and
 `WebSite` JSON-LD using the supplied logo and public business contact, without
 unverified statistics. Preview statistics retain their visible disclosure and
 use `data-nosnippet` to exclude them from Google search snippets. Search Console

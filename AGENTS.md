@@ -2,7 +2,7 @@
 
 ## The project
 
-**Prebook — prebooking.com.** One website hosting three business sections —
+**Prebook — www.prebookingpbkworld.com.** One website hosting three business sections —
 Crackers, Clothing and Real Estate — with one customer login and one admin
 panel. Client: Mr. Nambi, Prebooking, Tirunelveli. Provider: Zenyne Labs.
 
@@ -56,7 +56,7 @@ editorial sections with original Prebooking copy and imagery. Durable design
 choices are recorded in [README.md](README.md#design); implementation tokens
 live in `apps/web/src/styles.css`. Never recreate a competing design document.
 
-Direction: light, minimal, Inter Variable, generous whitespace and hairline
+Direction: light, minimal, Plus Jakarta Sans Variable, generous whitespace and hairline
 borders. Use the client-supplied PBK1 Prebooking World 1 logo and its green,
 teal, orange and gold palette, as recorded in README's Design section.
 Use shadcn primitives, Motion for interaction feedback and GSAP for the hero

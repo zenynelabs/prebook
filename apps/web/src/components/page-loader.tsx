@@ -34,11 +34,7 @@ export default function PageLoader() {
       aria-valuemax={100}
       aria-valuenow={phase === "complete" ? 100 : undefined}
     >
-      <div className="page-loader-trace" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
+      <div className="page-loader-trace" aria-hidden="true" />
     </div>
   );
 }
