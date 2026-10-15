@@ -27,7 +27,7 @@ test('homepage ships linked organization and website data without JavaScript', (
   expect(website).not.toHaveProperty('alternateName')
   expect(organization.url).toBe(`${site.url}/`)
   expect(website.url).toBe(organization.url)
-  expect(organization.telephone).toBe('+917397167111')
+  expect(organization.telephone).toEqual(['+917397167111', '+917397197111'])
   const logo = new URL(organization.logo)
   expect(logo.origin).toBe(site.url)
   expect(existsSync(resolve(import.meta.dir, '../../public', `.${logo.pathname}`))).toBe(true)

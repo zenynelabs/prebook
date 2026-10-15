@@ -158,6 +158,7 @@ describe("landing page public contract", () => {
       expect(
         destination.startsWith("#") ||
           destination === "tel:7397167111" ||
+          destination === "tel:7397197111" ||
           destination === "mailto:prebookingpbkworld1@gmail.com" ||
           destination === "https://zenyne.com",
       ).toBe(true);
@@ -176,7 +177,10 @@ describe("landing page public contract", () => {
       (match) => match[1],
     );
     expect(contacts.length).toBeGreaterThanOrEqual(3);
-    for (const contact of contacts) expect(contact).toBe("tel:7397167111");
+    for (const contact of contacts) {
+      expect(["tel:7397167111", "tel:7397197111"]).toContain(contact);
+    }
+    expect(contacts).toContain("tel:7397197111");
     const header = html.match(/<header\b[^>]*>.*?<\/header>/)?.[0];
     expect(header).toBeDefined();
     expect(header).not.toContain("Tirunelveli");
@@ -190,11 +194,14 @@ describe("landing page public contract", () => {
     expect(html).toContain("global business community");
     expect(footer).toContain('href="tel:7397167111"');
     expect(footer).toContain("73971 67111");
+    expect(footer).toContain('href="tel:7397197111"');
+    expect(footer).toContain("73971 97111");
     expect(footer).toContain('href="mailto:prebookingpbkworld1@gmail.com"');
     expect(footer).toContain('aria-label="Explore PreBooking"');
     expect(footer).toContain('aria-label="Community links"');
     expect(footer).toContain('href="#referrals"');
     expect(footer).toContain("Back to top");
+    expect(html).not.toContain('class="closing-number"');
   });
 
   test("FAQ answers ship in HTML and can expand without JavaScript", () => {

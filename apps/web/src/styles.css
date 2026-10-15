@@ -218,8 +218,6 @@ svg { flex-shrink: 0; }
 .closing-inner > div:last-child { flex-shrink: 0; }
 .closing-button { color: var(--accent-text); background: var(--bg); }
 .closing-button:hover { color: var(--accent-text); background: var(--accent-wash); }
-.closing-number { display: block; width: fit-content; margin: 14px auto 0; padding-block: 5px; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--on-accent-muted); }
-.closing-number:hover { color: var(--bg); }
 .closing-section :where(a, button):focus-visible { outline-color: var(--bg); }
 .site-footer { padding-top: 64px; background: var(--surface); border-top: 1px solid var(--border); }
 .footer-top { display: grid; grid-template-columns: 1.2fr 0.9fr 1fr 1.35fr; gap: 48px; padding-bottom: 56px; }
@@ -227,7 +225,7 @@ svg { flex-shrink: 0; }
 .footer-top h2 { margin-bottom: 20px; font-size: 14px; font-weight: 600; line-height: 1.5; letter-spacing: 0; }
 .footer-top nav a { display: block; width: fit-content; padding-block: 9px; min-height: 44px; font-size: 14px; color: var(--text-2); }
 .footer-top nav a:hover { color: var(--accent); }
-.footer-contact .text-link { min-height: 40px; font-size: 16px; }
+.footer-contact .text-link { display: flex; width: fit-content; min-height: 40px; font-size: 16px; }
 .contact-email { max-width: 100%; }
 .contact-email span { min-width: 0; overflow-wrap: anywhere; }
 .footer-contact .contact-email { display: flex; font-size: 14px; }
@@ -297,7 +295,6 @@ svg { flex-shrink: 0; }
   .community-value { padding-inline: 24px; }
   .faq-layout { gap: 40px; }
   .closing-inner { align-items: start; flex-direction: column; gap: 32px; }
-  .closing-number { margin-left: 0; }
   .footer-top { gap: 36px; }
 }
 @media (max-width: 639px) {

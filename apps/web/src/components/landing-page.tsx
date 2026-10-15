@@ -474,6 +474,10 @@ export default function LandingPage() {
                 <Phone size={18} aria-hidden="true" />
                 73971 67111
               </a>
+              <a className="text-link mobile-contact" href="tel:7397197111">
+                <Phone size={18} aria-hidden="true" />
+                73971 97111
+              </a>
             </SheetContent>
           </Sheet>
         </div>
@@ -1000,9 +1004,6 @@ export default function LandingPage() {
                   Talk to PreBooking <ArrowUpRight size={18} aria-hidden="true" />
                 </a>
               </Button>
-              <a className="closing-number" href="tel:7397167111">
-                73971 67111
-              </a>
             </motion.div>
           </div>
         </section>
@@ -1056,6 +1057,10 @@ export default function LandingPage() {
               <a className="text-link" href="tel:7397167111">
                 <Phone size={17} aria-hidden="true" />
                 73971 67111
+              </a>
+              <a className="text-link" href="tel:7397197111">
+                <Phone size={17} aria-hidden="true" />
+                73971 97111
               </a>
               <a
                 className="text-link contact-email"

@@ -35,13 +35,13 @@ worker hits a local port-permission error in this environment.
 The page provides community information, an audience guide, a practical referral
 example, shared-learning prompts, community values, section navigation, a mobile
 menu, a three-step contact journey and native FAQs. Enquiry links call PreBooking at
-**7397167111** or email **prebookingpbkworld1@gmail.com**. The footer groups
+**7397167111** or **7397197111**, or email **prebookingpbkworld1@gmail.com**. The footer groups
 exploration, community links and contact details alongside the brand, with a
 back-to-top link in its bottom row. The email appears in the footer.
 There is no online signup, membership system or referral tracking.
 Catalogues, checkout, accounts, seller submissions and admin functions are
 **not implemented**.
-This public business number is separate from private property seller contacts.
+These public business numbers are separate from private property seller contacts.
 No credentials or database are needed to run this landing page.
 
 ## Agreed product scope

@@ -11,7 +11,7 @@ const structuredData = {
       url: `${site.url}/`,
       description: site.description,
       logo: `${site.url}/brand/emblem.png?v=transparent-1`,
-      telephone: '+917397167111',
+      telephone: ['+917397167111', '+917397197111'],
     },
     {
       '@type': 'WebSite',
