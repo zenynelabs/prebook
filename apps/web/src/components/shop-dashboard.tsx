@@ -79,6 +79,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
+  DialogTrigger,
 } from "./ui/dialog";
 import {
   Sheet,
@@ -1188,23 +1189,23 @@ function AffiliatesView({
     affiliate: ShopAffiliate,
   ) => void;
 }) {
+  const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState("");
   const link = `${site.url}${affiliatePath}?shop=${slug}`;
 
   async function saveCommission(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
-    setSaved(false);
     setError("");
     const problem = await onCommission(
       Number(new FormData(event.currentTarget).get("commission")),
     );
     setSaving(false);
     if (problem) setError(problem);
-    else setSaved(true);
+    else setEditing(false);
   }
 
   async function copyLink() {
@@ -1212,7 +1213,7 @@ function AffiliatesView({
       await navigator.clipboard.writeText(link);
       setCopied(true);
     } catch {
-      setError("Couldn’t copy. Select the link and copy it instead.");
+      setCopyError("Couldn’t copy. Select the link and copy it instead.");
     }
   }
 
@@ -1220,33 +1221,73 @@ function AffiliatesView({
   return (
     <>
       <Card className="shop-section gap-0 py-0 shadow-none">
-        <form className="edit-form" onSubmit={saveCommission}>
-          <h2>Commission</h2>
-          <Field className="field">
-            <FieldLabel htmlFor="commission">Commission percent</FieldLabel>
-            <Input
-              id="commission"
-              name="commission"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={50}
-              step={1}
-              required
-              defaultValue={data.commission_percent}
-            />
-          </Field>
-          <p className="max-w-none text-(--text-2)">
-            Paid on delivered orders placed through an approved affiliate’s link.
+        <div className="shop-link">
+          <p className="max-w-none min-w-0 flex-1 basis-64">
+            <span className="admin-name">
+              {data.commission_percent}% commission
+            </span>
+            <span className="admin-sub">
+              On delivered orders placed through an approved affiliate’s link.
+            </span>
           </p>
-          <FieldError>{error}</FieldError>
-          <div className="shop-save">
-            <Button type="submit" size="lg" disabled={saving}>
-              {saving ? "Saving…" : "Save"}
-            </Button>
-            {saved && <p role="status">Saved.</p>}
-          </div>
-        </form>
+          <Dialog
+            open={editing}
+            onOpenChange={(open) => {
+              setEditing(open);
+              setError("");
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline" type="button" className="admin-refresh">
+                <Pencil aria-hidden="true" />
+                Edit
+                <span className="sr-only"> commission</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="delete-dialog">
+              <form className="edit-form" onSubmit={saveCommission}>
+                <DialogTitle>Commission</DialogTitle>
+                <DialogDescription>
+                  Paid on delivered orders placed through an approved
+                  affiliate’s link. Orders already placed keep the commission
+                  they were placed with.
+                </DialogDescription>
+                <Field className="field">
+                  <FieldLabel htmlFor="commission">
+                    Commission percent <span>(0–50)</span>
+                  </FieldLabel>
+                  <Input
+                    id="commission"
+                    name="commission"
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    max={50}
+                    step={1}
+                    required
+                    defaultValue={data.commission_percent}
+                  />
+                </Field>
+                <FieldError>{error}</FieldError>
+                <div className="delete-actions">
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="outline"
+                      className="edit-cancel"
+                    >
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button type="submit" size="lg" disabled={saving}>
+                    {saving ? "Saving…" : "Save"}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
         <div className="shop-link">
           <p className="max-w-none min-w-0 flex-1 basis-64 text-(--text-2) [overflow-wrap:anywhere]">
             Affiliates apply from your shop page or at {link}
@@ -1261,6 +1302,7 @@ function AffiliatesView({
             {copied ? "Copied" : "Copy link"}
           </Button>
         </div>
+        {copyError && <FieldError className="mt-3">{copyError}</FieldError>}
       </Card>
 
       <Card

@@ -941,6 +941,7 @@ svg { flex-shrink: 0; }
 .shop-section h2 { font-size: 20px; letter-spacing: -0.02em; }
 .shop-section .edit-form [data-slot='field-set'] { gap: 12px; }
 .shop-link { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; }
+.shop-section > .shop-link:first-child { margin-top: 0; }
 .shop-url { flex: 1 1 260px; min-width: 0; color: var(--accent-text); font-weight: 500; overflow-wrap: anywhere; }
 .shop-theme { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
 .shop-theme-option { display: flex; align-items: center; gap: 12px; min-height: 56px; padding-inline: 16px; font-size: 15px; font-weight: 550; border: 1px solid var(--border); border-radius: var(--radius-button); cursor: pointer; transition: border-color 180ms var(--ease), background-color 180ms var(--ease); }
