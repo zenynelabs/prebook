@@ -66,6 +66,14 @@ found, so the page says "to be announced" and the team confirms by phone.
   MongoDB/Prisma plan. One mobile number registers once per event. Public POSTs
   are rate-limited per IP, and CORS allows only `ALLOWED_ORIGINS` in
   `apps/api/wrangler.jsonc`.
+- Affiliate links: staff create an affiliate (name plus an optional link code)
+  under "Affiliate links" in the dashboard and share
+  `/events/helicopter-ride?ref=<code>`. The form sends the `ref`; unknown codes
+  still register, just unattributed. The browser remembers the last `ref`, so a
+  later visit without it still credits that affiliate. The dashboard ranks
+  affiliates by registrations, seats, confirmed and paid; staff can rename an
+  affiliate (the code and link stay fixed) or delete one, which keeps its
+  registrations but unattributes them. Also outside the agreed scope.
 - The dashboard token is the Worker secret `ADMIN_TOKEN`. Locally it is in the
   gitignored `apps/api/.dev.vars`. Rotate it with `wrangler secret put ADMIN_TOKEN`.
 - The web app reads the API URL from `NEXT_PUBLIC_EVENTS_API` and falls back to

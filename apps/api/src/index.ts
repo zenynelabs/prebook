@@ -2,6 +2,7 @@ import { type Context, Hono } from 'hono'
 import { bearerAuth } from 'hono/bearer-auth'
 import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
+import { createMiddleware } from 'hono/factory'
 import { timingSafeEqual } from 'hono/utils/buffer'
 
 type Bindings = {
@@ -13,7 +14,7 @@ type Bindings = {
 }
 
 const EVENT = 'helicopter-ride'
-const COLUMNS = 'id, name, phone, email, address, passengers, status, payment_status, notes, created_at, updated_at'
+const COLUMNS = 'id, name, phone, email, address, passengers, status, payment_status, notes, ref, created_at, updated_at'
 export const STATUSES = ['new', 'contacted', 'confirmed', 'cancelled'] as const
 export const PAYMENT_STATUSES = ['unpaid', 'paid'] as const
 
@@ -63,39 +64,59 @@ export function parseUpdate(input: unknown): RegistrationUpdate | string {
   return { ...registration, status, payment_status, notes }
 }
 
+export type Affiliate = { code: string; name: string }
+
+/** The code becomes the `?ref=` in a shareable link, so it defaults to a slug of the name. */
+export function parseAffiliate(input: unknown): Affiliate | string {
+  if (!input || typeof input !== 'object') return 'Send the affiliate as JSON.'
+  const body = input as Record<string, unknown>
+  const name = typeof body.name === 'string' ? body.name.trim().replace(/\s+/g, ' ') : ''
+  const given = typeof body.code === 'string' ? body.code.trim() : ''
+  const code = (given || name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32)
+  if (name.length < 2 || name.length > 80) return 'Enter the affiliate’s name.'
+  if (code.length < 2) return 'Add a link code using English letters or numbers.'
+  return { code, name }
+}
+
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('*', (c, next) =>
   cors({
     origin: c.env.ALLOWED_ORIGINS.split(','),
-    allowMethods: ['GET', 'POST', 'PUT'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowHeaders: ['Content-Type', 'Authorization'],
     maxAge: 86400,
   })(c, next),
 )
 
 // Per-IP limits: a tight one for the public form, a roomier one for admin work and token guesses.
-app.use('/registrations/*', bodyLimit({ maxSize: 8 * 1024 }), async (c, next) => {
+const limit = createMiddleware<{ Bindings: Bindings }>(async (c, next) => {
   if (c.req.method === 'OPTIONS') return next()
-  const limiter = c.req.method === 'POST' ? c.env.LIMITER : c.env.ADMIN_LIMITER
+  const limiter = c.req.method === 'POST' && c.req.path === '/registrations' ? c.env.LIMITER : c.env.ADMIN_LIMITER
   const { success } = await limiter.limit({ key: c.req.header('cf-connecting-ip') ?? 'unknown' })
   if (!success) return c.json({ error: 'Too many attempts. Please wait a minute and try again.' }, 429)
   return next()
 })
+app.use('/registrations/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
+app.use('/affiliates/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
 
 const admin = bearerAuth({
   verifyToken: (token, c: Context<{ Bindings: Bindings }>) => timingSafeEqual(token, c.env.ADMIN_TOKEN),
 })
 
 app.post('/registrations', async (c) => {
-  const registration = parseRegistration(await c.req.json().catch(() => null))
+  const body = await c.req.json().catch(() => null)
+  const registration = parseRegistration(body)
   if (typeof registration === 'string') return c.json({ error: registration }, 400)
   const { name, phone, email, address, passengers } = registration
+  // An unknown or missing ?ref= still registers, just without an affiliate.
+  const ref = typeof body.ref === 'string' ? body.ref.trim().toLowerCase() : ''
   try {
     await c.env.DB.prepare(
-      'INSERT INTO registrations (event, name, phone, email, address, passengers) VALUES (?, ?, ?, ?, ?, ?)',
+      `INSERT INTO registrations (event, name, phone, email, address, passengers, ref)
+       VALUES (?, ?, ?, ?, ?, ?, (SELECT code FROM affiliates WHERE code = ?))`,
     )
-      .bind(EVENT, name, phone, email, address, passengers)
+      .bind(EVENT, name, phone, email, address, passengers, ref)
       .run()
   } catch (error) {
     if (String(error).includes('UNIQUE')) return c.json({ error: 'This mobile number is already registered.' }, 409)
@@ -133,6 +154,55 @@ app.put('/registrations/:id{[0-9]+}', admin, async (c) => {
     if (String(error).includes('UNIQUE')) return c.json({ error: 'Another registration already uses this mobile number.' }, 409)
     throw error
   }
+})
+
+app.get('/affiliates', admin, async (c) => {
+  const { results } = await c.env.DB.prepare('SELECT code, name, created_at FROM affiliates ORDER BY created_at').all()
+  return c.json({ affiliates: results })
+})
+
+app.post('/affiliates', admin, async (c) => {
+  const affiliate = parseAffiliate(await c.req.json().catch(() => null))
+  if (typeof affiliate === 'string') return c.json({ error: affiliate }, 400)
+  try {
+    const saved = await c.env.DB.prepare('INSERT INTO affiliates (code, name) VALUES (?, ?) RETURNING code, name, created_at')
+      .bind(affiliate.code, affiliate.name)
+      .first()
+    return c.json({ affiliate: saved }, 201)
+  } catch (error) {
+    if (String(error).includes('UNIQUE')) return c.json({ error: `The link code “${affiliate.code}” is already used.` }, 409)
+    throw error
+  }
+})
+
+app.put('/affiliates/:code{[a-z0-9-]+}', admin, async (c) => {
+  const code = c.req.param('code')
+  const affiliate = parseAffiliate({ ...(await c.req.json().catch(() => null)), code })
+  if (typeof affiliate === 'string') return c.json({ error: affiliate }, 400)
+  const saved = await c.env.DB.prepare('UPDATE affiliates SET name = ? WHERE code = ? RETURNING code, name, created_at')
+    .bind(affiliate.name, code)
+    .first()
+  if (!saved) return c.json({ error: 'This affiliate no longer exists.' }, 404)
+  return c.json({ affiliate: saved })
+})
+
+// Registrations stay; they just stop counting for the deleted affiliate.
+app.delete('/affiliates/:code{[a-z0-9-]+}', admin, async (c) => {
+  const code = c.req.param('code')
+  const [, removed] = await c.env.DB.batch([
+    c.env.DB.prepare('UPDATE registrations SET ref = NULL WHERE ref = ?').bind(code),
+    c.env.DB.prepare('DELETE FROM affiliates WHERE code = ?').bind(code),
+  ])
+  if (!removed.meta.changes) return c.json({ error: 'This affiliate no longer exists.' }, 404)
+  return c.body(null, 204)
+})
+
+app.delete('/registrations/:id{[0-9]+}', admin, async (c) => {
+  const { meta } = await c.env.DB.prepare('DELETE FROM registrations WHERE id = ? AND event = ?')
+    .bind(Number(c.req.param('id')), EVENT)
+    .run()
+  if (!meta.changes) return c.json({ error: 'This registration no longer exists.' }, 404)
+  return c.body(null, 204)
 })
 
 export default app

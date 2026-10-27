@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import EventPage from "./event-page";
-import RegistrationsDashboard, { type Filters, filterRegistrations, type Registration, summarise } from "./registrations-dashboard";
+import EventPage, { affiliateRef } from "./event-page";
+import RegistrationsDashboard, { affiliateLink, type Filters, filterRegistrations, rankAffiliates, type Registration, summarise } from "./registrations-dashboard";
 
 test("event page ships its details and a complete registration form in HTML", () => {
   const html = renderToStaticMarkup(<EventPage />);
@@ -23,7 +23,7 @@ test("dashboard asks for the access token before showing any registrations", () 
 });
 
 test("dashboard filters combine status, payment and search, and totals skip cancelled seats", () => {
-  const base = { email: null, notes: "", created_at: "2026-10-27T10:00:00Z", updated_at: null };
+  const base = { email: null, notes: "", ref: null, created_at: "2026-10-27T10:00:00Z", updated_at: null };
   const rows: Registration[] = [
     { ...base, id: 1, name: "Arun Kumar", phone: "9876543210", address: "Palayamkottai 627002", passengers: 2, status: "confirmed", payment_status: "paid", notes: "Paid by UPI" },
     { ...base, id: 2, name: "Meena", phone: "9123456780", email: "meena@example.com", address: "Town, Tirunelveli", passengers: 1, status: "new", payment_status: "unpaid" },
@@ -41,4 +41,24 @@ test("dashboard filters combine status, payment and search, and totals skip canc
   expect(ids({ payment: "paid" })).toEqual([1, 3]);
   expect(ids({ payment: "paid", status: "confirmed", query: "tirunelveli" })).toEqual([]);
   expect(summarise(rows)).toEqual({ registrations: 3, seats: 3, confirmed: 1, paid: 1 });
+
+  const affiliates = [
+    { code: "quiet", name: "Quiet", created_at: base.created_at },
+    { code: "selvi", name: "Selvi", created_at: base.created_at },
+  ];
+  const referred = rows.map((row) => ({ ...row, ref: row.id === 2 ? null : "selvi" }));
+  expect(rankAffiliates(affiliates, referred).map(({ code, registrations, seats }) => [code, registrations, seats])).toEqual([
+    ["selvi", 2, 2],
+    ["quiet", 0, 0],
+  ]);
+  expect(affiliateLink("selvi")).toBe("https://www.prebookingpbkworld.com/events/helicopter-ride?ref=selvi");
+});
+
+test("the affiliate ref is remembered for later visits, and a newer link replaces it", () => {
+  const store = new Map<string, string>();
+  globalThis.localStorage = { getItem: (key: string) => store.get(key) ?? null, setItem: (key: string, value: string) => void store.set(key, value) } as unknown as Storage;
+  expect(affiliateRef("")).toBeNull();
+  expect(affiliateRef("?ref=selvi")).toBe("selvi");
+  expect(affiliateRef("?utm=x")).toBe("selvi");
+  expect(affiliateRef("?ref=ravi")).toBe("ravi");
 });

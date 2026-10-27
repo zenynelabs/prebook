@@ -10,6 +10,20 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { eventsApi } from "@/lib/site";
 import { Button } from "./ui/button";
 
+const REF_KEY = "prebook-ref";
+
+// ponytail: last affiliate link wins and never expires, add a timestamp if credit should lapse.
+/** Remembers the affiliate from `?ref=` so a later visit without it still credits them. */
+export function affiliateRef(search: string) {
+  const ref = new URLSearchParams(search).get("ref")?.trim();
+  try {
+    if (ref) localStorage.setItem(REF_KEY, ref);
+    return ref || localStorage.getItem(REF_KEY);
+  } catch {
+    return ref || null;
+  }
+}
+
 const steps = [
   [
     "Pre-register",
@@ -93,6 +107,10 @@ function RegistrationForm() {
   const confirmation = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
+    affiliateRef(window.location.search);
+  }, []);
+
+  useEffect(() => {
     if (done) confirmation.current?.focus();
   }, [done]);
 
@@ -105,7 +123,10 @@ function RegistrationForm() {
       const response = await fetch(`${eventsApi}/registrations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fields),
+        body: JSON.stringify({
+          ...fields,
+          ref: affiliateRef(window.location.search),
+        }),
       });
       if (response.ok)
         return setDone({
