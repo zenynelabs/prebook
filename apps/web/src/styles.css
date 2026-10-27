@@ -385,7 +385,7 @@ svg { flex-shrink: 0; }
 }
 
 /* Events: homepage teaser, event page, registration form and admin table. */
-.event-teaser { background: var(--accent-wash); }
+.event-teaser { padding-block: min(var(--section-space), 72px); background: var(--accent-wash); }
 .event-teaser-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: center; }
 .event-label { margin-bottom: 18px; color: var(--accent-text); font-size: 14px; font-weight: 600; }
 .event-teaser h2 span { color: var(--accent); }
