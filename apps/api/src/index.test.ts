@@ -38,7 +38,8 @@ function env(write: () => Promise<unknown>, binds: unknown[][] = []) {
     ALLOWED_ORIGINS: 'http://localhost:3000',
     LIMITER: allow,
     ADMIN_LIMITER: allow,
-    DB: { prepare: () => ({ all: async () => ({ results: rows }), bind: (...values: unknown[]) => (binds.push(values), { run: write, first: write, all: async () => ({ results: rows }) }) }), batch: async () => [{}, await write()] },
+    // Wrong tokens never match a signed-in admin session.
+    DB: { prepare: (sql: string) => sql.includes('admin_sessions') ? { bind: () => ({ first: async () => null }) } : ({ all: async () => ({ results: rows }), bind: (...values: unknown[]) => (binds.push(values), { run: write, first: write, all: async () => ({ results: rows }) }) }), batch: async () => [{}, await write()] },
   }
 }
 

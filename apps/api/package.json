@@ -7,7 +7,8 @@
     "deploy": "wrangler deploy --minify",
     "migrate": "wrangler d1 migrations apply DB --remote",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "add-admin": "bun scripts/add-admin.ts"
   },
   "dependencies": {
     "hono": "4.13.14"

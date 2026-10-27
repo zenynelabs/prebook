@@ -1,12 +1,14 @@
-import { type Context, Hono } from 'hono'
-import { bearerAuth } from 'hono/bearer-auth'
+import { Hono } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
 import { createMiddleware } from 'hono/factory'
-import { timingSafeEqual } from 'hono/utils/buffer'
+import auth, { admin } from './auth'
+import partners from './partners'
+import shops from './shops'
 
-type Bindings = {
+export type Bindings = {
   DB: D1Database
+  IMAGES: R2Bucket
   LIMITER: RateLimit
   ADMIN_LIMITER: RateLimit
   ADMIN_TOKEN: string
@@ -91,20 +93,31 @@ app.use('*', (c, next) =>
   })(c, next),
 )
 
-// Per-IP limits: a tight one for the public form, a roomier one for admin work and token guesses.
+// Per-IP limits: a tight one for the public form and both sign-ins, a roomier one for admin work and token guesses.
 const limit = createMiddleware<{ Bindings: Bindings }>(async (c, next) => {
   if (c.req.method === 'OPTIONS') return next()
-  const limiter = c.req.method === 'POST' && c.req.path === '/registrations' ? c.env.LIMITER : c.env.ADMIN_LIMITER
+  const tight =
+    c.req.method === 'POST' &&
+    (['/registrations', '/shop-auth/login', '/admin-auth/login', '/partner-auth/login', '/partner-auth/register'].includes(c.req.path) || /^\/shops\/[a-z0-9-]+\/orders$/.test(c.req.path))
+  const limiter = tight ? c.env.LIMITER : c.env.ADMIN_LIMITER
   const { success } = await limiter.limit({ key: c.req.header('cf-connecting-ip') ?? 'unknown' })
   if (!success) return c.json({ error: 'Too many attempts. Please wait a minute and try again.' }, 429)
   return next()
 })
 app.use('/registrations/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
 app.use('/affiliates/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
+app.use('/shop-auth/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
+app.use('/shops/:slug/orders', bodyLimit({ maxSize: 16 * 1024 }), limit)
+app.use('/owner/*', limit)
+app.use('/partner-auth/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
+app.use('/partner/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
 
-const admin = bearerAuth({
-  verifyToken: (token, c: Context<{ Bindings: Bindings }>) => timingSafeEqual(token, c.env.ADMIN_TOKEN),
-})
+app.use('/admin-auth/*', bodyLimit({ maxSize: 8 * 1024 }), limit)
+app.use('/admin/*', bodyLimit({ maxSize: 8 * 1024 }), limit, admin)
+
+app.route('/', auth)
+app.route('/', shops)
+app.route('/', partners)
 
 app.post('/registrations', async (c) => {
   const body = await c.req.json().catch(() => null)
