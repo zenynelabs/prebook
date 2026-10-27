@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { type AdminShop, shopPath, shopSlug } from "@/lib/shops";
+import { mobileInput } from "@/lib/registration";
 import { eventsApi, site } from "@/lib/site";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Button } from "./ui/button";
@@ -321,11 +322,8 @@ function EditPanel({
                 <Input
                   id="edit-owner-phone"
                   name="owner_phone"
-                  type="tel"
-                  inputMode="numeric"
+                  {...mobileInput}
                   required
-                  pattern="[6-9][0-9]{9}"
-                  maxLength={10}
                   defaultValue={row.owner_phone}
                 />
               </Field>
@@ -810,11 +808,8 @@ export default function ShopsPanel({
                       <Input
                         id="shop-phone"
                         name="owner_phone"
-                        type="tel"
-                        inputMode="numeric"
+                        {...mobileInput}
                         required
-                        pattern="[6-9][0-9]{9}"
-                        maxLength={10}
                         placeholder="10-digit mobile number"
                       />
                     </Field>

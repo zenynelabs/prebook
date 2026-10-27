@@ -119,7 +119,8 @@ test("registration validation explains each problem and accepts real Indian deta
 
 test("the mobile field drops letters as they are typed and normalises prefixes", () => {
   expect(phoneKeys("99948dadada")).toBe("99948");
-  expect(phoneKeys("+91 98765-43210 ext")).toBe("+91 98765-43210 ");
+  expect(phoneKeys("+91 98765-43210 ext")).toBe("9876543210");
+  expect(phoneKeys("99946556778099")).toBe("9994655677");
   expect(mobileDigits("+91 98765-43210")).toBe("9876543210");
   expect(mobileDigits("09876543210")).toBe("9876543210");
 });

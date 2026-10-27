@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { mobileInput } from "@/lib/registration";
 import { eventsApi, helicopterRide, site } from "@/lib/site";
 import AdminSignIn, {
   ADMIN_TOKEN_KEY as TOKEN_KEY,
@@ -432,9 +433,8 @@ function EditPanel({
                 <Input
                   id="edit-phone"
                   name="phone"
-                  type="tel"
+                  {...mobileInput}
                   required
-                  pattern="[0-9 +\-]{10,16}"
                   defaultValue={row.phone}
                 />
               </Field>

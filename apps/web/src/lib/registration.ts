@@ -1,5 +1,6 @@
 // Mirrors parseRegistration in apps/api/src/index.ts so people see problems before
 // sending. The API stays the authority and re-checks every field.
+import type { FormEvent } from "react";
 
 export const registrationFields = ["name", "phone", "email", "address", "passengers"] as const;
 export type RegistrationField = (typeof registrationFields)[number];
@@ -9,12 +10,24 @@ export type RegistrationErrors = Partial<Record<RegistrationField, string>>;
 const NAME = /^[\p{L}\p{M}][\p{L}\p{M} .'-]*$/u;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Keeps only what a phone number can contain, so letters never reach the field. */
-export const phoneKeys = (value: string) => value.replace(/[^\d+\s-]/g, "").slice(0, 16);
-
 /** "+91 98765-43210" and "09876543210" both become "9876543210". */
 export const mobileDigits = (value: string) =>
   value.replace(/\D/g, "").replace(/^(91|0)(?=\d{10}$)/, "");
+
+/** What a mobile field may hold: at most 10 digits, so a pasted +91 or 0 is dropped first. */
+export const phoneKeys = (value: string) => mobileDigits(value).slice(0, 10);
+
+/** Shared by every uncontrolled mobile field. No maxLength: it would cut a pasted +91 number before cleaning. */
+export const mobileInput = {
+  type: "tel",
+  inputMode: "numeric",
+  autoComplete: "tel-national",
+  pattern: "[6-9][0-9]{9}",
+  title: "10-digit mobile number",
+  onInput: (event: FormEvent<HTMLInputElement>) => {
+    event.currentTarget.value = phoneKeys(event.currentTarget.value);
+  },
+} as const;
 
 export function validateRegistration(values: RegistrationValues): RegistrationErrors {
   const errors: RegistrationErrors = {};

@@ -308,9 +308,9 @@ function RegistrationForm() {
             <Input
               {...control("phone")}
               type="tel"
-              inputMode="tel"
+              inputMode="numeric"
               autoComplete="tel-national"
-              placeholder="98765 43210"
+              placeholder="9876543210"
               required
             />
             {problem("phone") ?? (
