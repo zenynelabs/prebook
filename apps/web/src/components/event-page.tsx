@@ -3,7 +3,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { ArrowLeft, ArrowRight, Helicopter, Phone, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Helicopter, LoaderCircle, Phone, Plus } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from "react";
@@ -17,7 +17,9 @@ import {
   validateRegistration,
 } from "@/lib/registration";
 import { eventsApi } from "@/lib/site";
+import { Alert, AlertDescription } from "./ui/alert";
 import { Button } from "./ui/button";
+import { Card } from "./ui/card";
 import {
   Dialog,
   DialogClose,
@@ -163,7 +165,11 @@ function RegistrationForm() {
       name: field,
       value: values[field],
       "aria-invalid": problem ? true : undefined,
-      "aria-describedby": problem ? `${field}-error` : undefined,
+      "aria-describedby": problem
+        ? `${field}-error`
+        : field === "phone"
+          ? "phone-description"
+          : undefined,
       onBlur: () => setTouched((current) => ({ ...current, [field]: true })),
       onChange: (
         event: ChangeEvent<
@@ -260,96 +266,111 @@ function RegistrationForm() {
     return (
       <>
         {popup}
-        <motion.div
-          className="register-card register-done"
-          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <Helicopter size={36} aria-hidden="true" />
-          <h3 ref={confirmation} tabIndex={-1}>
-            You’re on the list, {done.name}.
-          </h3>
-          <p>
-            The PreBooking team will call {done.phone} to confirm the date, time
-            slot and fare.
-          </p>
-          <Link className="text-link" href="/">
-            Back to PreBooking <ArrowRight size={18} aria-hidden="true" />
-          </Link>
-        </motion.div>
+        <Card className="register-card register-done shadow-none">
+          <motion.div
+            className="flex flex-col items-start gap-[22px]"
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Helicopter size={36} aria-hidden="true" />
+            <h3 ref={confirmation} tabIndex={-1}>
+              You’re on the list, {done.name}.
+            </h3>
+            <p>
+              The PreBooking team will call {done.phone} to confirm the date, time
+              slot and fare.
+            </p>
+            <Link className="text-link" href="/">
+              Back to PreBooking <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+          </motion.div>
+        </Card>
       </>
     );
 
   return (
-    <form className="register-card" onSubmit={onSubmit} noValidate>
-      <FieldGroup>
-        <Field data-invalid={Boolean(shown("name"))}>
-          <FieldLabel htmlFor="name">Full name</FieldLabel>
-          <Input {...control("name")} autoComplete="name" required maxLength={80} />
-          {problem("name")}
-        </Field>
-        <Field data-invalid={Boolean(shown("phone"))}>
-          <FieldLabel htmlFor="phone">Mobile number</FieldLabel>
-          <Input
-            {...control("phone")}
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel-national"
-            placeholder="98765 43210"
-            required
-          />
-          {problem("phone") ?? (
-            <FieldDescription>10-digit Indian mobile number.</FieldDescription>
-          )}
-        </Field>
-        <Field data-invalid={Boolean(shown("email"))}>
-          <FieldLabel htmlFor="email">
-            Email <span className="font-normal text-muted-foreground">(optional)</span>
-          </FieldLabel>
-          <Input {...control("email")} type="email" autoComplete="email" maxLength={120} />
-          {problem("email")}
-        </Field>
-        <Field data-invalid={Boolean(shown("address"))}>
-          <FieldLabel htmlFor="address">Address</FieldLabel>
-          <Textarea
-            {...control("address")}
-            autoComplete="street-address"
-            rows={3}
-            required
-            maxLength={300}
-            placeholder="House, street, area and pincode"
-          />
-          {problem("address")}
-        </Field>
-        <Field data-invalid={Boolean(shown("passengers"))}>
-          <FieldLabel htmlFor="passengers">Passengers</FieldLabel>
-          <NativeSelect {...control("passengers")}>
-            {[1, 2, 3, 4, 5, 6].map((count) => (
-              <NativeSelectOption key={count} value={count}>
-                {count} {count === 1 ? "person" : "people"}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
-          {problem("passengers")}
-        </Field>
-      </FieldGroup>
-      <p className="form-error" role="alert">
-        {error}
-      </p>
-      <Button
-        type="submit"
-        size="lg"
-        className="register-submit"
-        disabled={sending}
+    <Card className="register-card shadow-none">
+      <form
+        className="flex flex-col gap-[22px]"
+        onSubmit={onSubmit}
+        noValidate
+        aria-busy={sending}
       >
-        {sending ? "Sending…" : "Pre-register"}
-        {!sending && <ArrowRight aria-hidden="true" />}
-      </Button>
-      <p className="form-note">
-        We use these details only to contact you about this ride.
-      </p>
-    </form>
+        <FieldGroup>
+          <Field data-invalid={Boolean(shown("name"))}>
+            <FieldLabel htmlFor="name">Full name</FieldLabel>
+            <Input {...control("name")} autoComplete="name" required maxLength={80} />
+            {problem("name")}
+          </Field>
+          <Field data-invalid={Boolean(shown("phone"))}>
+            <FieldLabel htmlFor="phone">Mobile number</FieldLabel>
+            <Input
+              {...control("phone")}
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel-national"
+              placeholder="98765 43210"
+              required
+            />
+            {problem("phone") ?? (
+              <FieldDescription id="phone-description">10-digit Indian mobile number.</FieldDescription>
+            )}
+          </Field>
+          <Field data-invalid={Boolean(shown("email"))}>
+            <FieldLabel htmlFor="email">
+              Email <span className="font-normal text-muted-foreground">(optional)</span>
+            </FieldLabel>
+            <Input {...control("email")} type="email" autoComplete="email" maxLength={120} />
+            {problem("email")}
+          </Field>
+          <Field data-invalid={Boolean(shown("address"))}>
+            <FieldLabel htmlFor="address">Address</FieldLabel>
+            <Textarea
+              {...control("address")}
+              autoComplete="street-address"
+              rows={3}
+              required
+              maxLength={300}
+              placeholder="House, street, area and pincode"
+            />
+            {problem("address")}
+          </Field>
+          <Field data-invalid={Boolean(shown("passengers"))}>
+            <FieldLabel htmlFor="passengers">Passengers</FieldLabel>
+            <NativeSelect {...control("passengers")}>
+              {[1, 2, 3, 4, 5, 6].map((count) => (
+                <NativeSelectOption key={count} value={count}>
+                  {count} {count === 1 ? "person" : "people"}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+            {problem("passengers")}
+          </Field>
+        </FieldGroup>
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        <Button
+          type="submit"
+          size="lg"
+          className="register-submit"
+          disabled={sending}
+        >
+          {sending ? "Sending…" : "Pre-register"}
+          {sending ? (
+            <LoaderCircle className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
+          ) : (
+            <ArrowRight aria-hidden="true" />
+          )}
+        </Button>
+        <p className="form-note">
+          We use these details only to contact you about this ride.
+        </p>
+      </form>
+    </Card>
   );
 }
 

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import RegistrationsDashboard from '@/components/registrations-dashboard'
 
 export const metadata: Metadata = {
-  title: 'Registrations | PreBooking',
+  title: 'Admin | PreBooking',
   robots: { index: false, follow: false },
 }
 

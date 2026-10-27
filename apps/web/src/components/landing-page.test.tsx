@@ -154,12 +154,13 @@ describe("landing page public contract", () => {
     }
   });
 
-  test("links use on-page navigation, the public contact or the safe provider credit", () => {
+  test("links use on-page navigation, the event and shops pages, the public contact or the safe provider credit", () => {
     for (const anchor of html.matchAll(/<a\b[^>]*\bhref="([^"]+)"[^>]*>/g)) {
       const destination = anchor[1];
       expect(
         destination.startsWith("#") ||
           destination === helicopterRide.path ||
+          destination === "/shops" ||
           destination === "tel:7397167111" ||
           destination === "tel:7397197111" ||
           destination === "mailto:prebookingpbkworld1@gmail.com" ||
@@ -192,6 +193,8 @@ describe("landing page public contract", () => {
     const navigation = header!.match(/<nav\b[^>]*aria-label="Main navigation"[^>]*>(.*?)<\/nav>/s)?.[1];
     const links = [...(navigation ?? "").matchAll(/href="#([^"]+)"/g)].map((match) => match[1]);
     expect(links).toEqual(["community", "why-prebooking", "how-it-works", "events", "questions"]);
+    expect(navigation).toContain('<a href="/shops">Shops</a>');
+    expect(header).not.toContain("coming soon");
     const footer = html.match(/<footer\b[^>]*>.*?<\/footer>/)?.[0];
     const events = html.match(/<section\b[^>]*\bid="events"[^>]*>.*?<\/section>/s)?.[0];
     expect(events).toContain(`href="${helicopterRide.path}"`);

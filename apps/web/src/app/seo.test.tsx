@@ -39,5 +39,5 @@ test('crawl routes share the homepage canonical host and list only the public ro
   expect(new URL(site.url).protocol).toBe('https:')
   expect(robots().rules).toEqual({ userAgent: '*', allow: '/' })
   expect(robots().sitemap).toBe(`${site.url}/sitemap.xml`)
-  expect(sitemap()).toEqual([{ url: `${site.url}/` }, { url: `${site.url}${helicopterRide.path}` }])
+  expect(sitemap()).toEqual([{ url: `${site.url}/` }, { url: `${site.url}${helicopterRide.path}` }, { url: `${site.url}/shops` }])
 })

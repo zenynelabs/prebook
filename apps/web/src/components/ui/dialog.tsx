@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 
 const Dialog = DialogPrimitive.Root
 const DialogClose = DialogPrimitive.Close
+const DialogTrigger = DialogPrimitive.Trigger
 
 function DialogContent({ className, children, ...props }: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
@@ -26,4 +27,4 @@ function DialogDescription({ className, ...props }: React.ComponentProps<typeof 
   return <DialogPrimitive.Description data-slot="dialog-description" className={cn('text-sm text-muted-foreground', className)} {...props} />
 }
 
-export { Dialog, DialogClose, DialogContent, DialogTitle, DialogDescription }
+export { Dialog, DialogClose, DialogTrigger, DialogContent, DialogTitle, DialogDescription }

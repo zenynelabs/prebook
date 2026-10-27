@@ -14,12 +14,33 @@ import {
   Pencil,
   RefreshCw,
   Search,
+  Store,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { eventsApi, helicopterRide, site } from "@/lib/site";
+import AdminSignIn, {
+  ADMIN_TOKEN_KEY as TOKEN_KEY,
+  endAdminSession,
+  SESSION_ENDED,
+} from "./admin-sign-in";
+import ShopsPanel from "./shops-admin";
+import { Alert, AlertDescription } from "./ui/alert";
 import { Button } from "./ui/button";
+import { Card } from "./ui/card";
+import { Field, FieldError, FieldLabel } from "./ui/field";
+import { Input } from "./ui/input";
+import { NativeSelect, NativeSelectOption } from "./ui/native-select";
+import { Textarea } from "./ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
 import {
   Dialog,
   DialogClose,
@@ -57,7 +78,7 @@ export type Registration = {
 
 export type Affiliate = { code: string; name: string; created_at: string };
 
-type View = "registrations" | "affiliates";
+export type View = "registrations" | "affiliates" | "shops";
 
 export type Filters = {
   query: string;
@@ -72,7 +93,6 @@ const statuses: [Status, string][] = [
   ["cancelled", "Cancelled"],
 ];
 
-const TOKEN_KEY = "prebook-admin-token";
 const dateFormat = new Intl.DateTimeFormat("en-IN", {
   dateStyle: "medium",
   timeStyle: "short",
@@ -169,20 +189,24 @@ function Pagination({
         Showing {pager.from}–{pager.to} of {pager.total}
       </p>
       <div className="pagination-controls">
-        <label className="pagination-size">
-          Per page
-          <select
+        <Field orientation="horizontal" className="pagination-size">
+          <FieldLabel htmlFor="page-size">Per page</FieldLabel>
+          <NativeSelect
+            id="page-size"
+            size="sm"
             value={size}
             onChange={(event) => onSize(Number(event.target.value))}
           >
             {PAGE_SIZES.map((option) => (
-              <option key={option} value={option}>
+              <NativeSelectOption key={option} value={option}>
                 {option}
-              </option>
+              </NativeSelectOption>
             ))}
-          </select>
-        </label>
-        <button
+          </NativeSelect>
+        </Field>
+        <Button
+          variant="ghost"
+          size="icon"
           type="button"
           className="admin-icon"
           disabled={pager.page <= 1}
@@ -190,11 +214,13 @@ function Pagination({
         >
           <ChevronLeft aria-hidden="true" />
           <span className="sr-only">Previous page</span>
-        </button>
+        </Button>
         <span className="pagination-page">
           Page {pager.page} of {pager.pages}
         </span>
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           type="button"
           className="admin-icon"
           disabled={pager.page >= pager.pages}
@@ -202,7 +228,7 @@ function Pagination({
         >
           <ChevronRight aria-hidden="true" />
           <span className="sr-only">Next page</span>
-        </button>
+        </Button>
       </div>
     </nav>
   );
@@ -248,36 +274,57 @@ function SidebarNav({
     <>
       <nav className="admin-nav" aria-label="Dashboard">
         <p>Helicopter ride</p>
-        <button
+        <Button
+          variant="ghost"
           type="button"
           aria-current={view === "registrations" ? "page" : undefined}
           onClick={() => onView("registrations")}
         >
           <Helicopter aria-hidden="true" />
           Registrations
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           type="button"
           aria-current={view === "affiliates" ? "page" : undefined}
           onClick={() => onView("affiliates")}
         >
           <Link2 aria-hidden="true" />
           Affiliate links
-        </button>
+        </Button>
+        <p>Shops</p>
+        <Button
+          variant="ghost"
+          type="button"
+          aria-current={view === "shops" ? "page" : undefined}
+          onClick={() => onView("shops")}
+        >
+          <Store aria-hidden="true" />
+          All shops
+        </Button>
         <p>Website</p>
-        <a href={helicopterRide.path} target="_blank" rel="noopener">
-          <ExternalLink aria-hidden="true" />
-          Event page
-        </a>
-        <Link href="/">
-          <Globe aria-hidden="true" />
-          Homepage
-        </Link>
+        <Button variant="ghost" asChild>
+          <a href={helicopterRide.path} target="_blank" rel="noopener">
+            <ExternalLink aria-hidden="true" />
+            Event page
+          </a>
+        </Button>
+        <Button variant="ghost" asChild>
+          <Link href="/">
+            <Globe aria-hidden="true" />
+            Homepage
+          </Link>
+        </Button>
       </nav>
-      <button type="button" className="admin-signout" onClick={onSignOut}>
+      <Button
+        variant="ghost"
+        type="button"
+        className="admin-signout"
+        onClick={onSignOut}
+      >
         <LogOut aria-hidden="true" />
         Sign out
-      </button>
+      </Button>
     </>
   );
 }
@@ -331,35 +378,35 @@ function EditPanel({
               </SheetDescription>
             </SheetHeader>
             <div className="edit-pair">
-              <div className="field">
-                <label htmlFor="edit-status">Status</label>
-                <select
+              <Field className="field">
+                <FieldLabel htmlFor="edit-status">Status</FieldLabel>
+                <NativeSelect
                   id="edit-status"
                   name="status"
                   defaultValue={row.status}
                 >
                   {statuses.map(([value, label]) => (
-                    <option key={value} value={value}>
+                    <NativeSelectOption key={value} value={value}>
                       {label}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="edit-payment">Payment</label>
-                <select
+                </NativeSelect>
+              </Field>
+              <Field className="field">
+                <FieldLabel htmlFor="edit-payment">Payment</FieldLabel>
+                <NativeSelect
                   id="edit-payment"
                   name="payment_status"
                   defaultValue={row.payment_status}
                 >
-                  <option value="unpaid">Unpaid</option>
-                  <option value="paid">Paid</option>
-                </select>
-              </div>
+                  <NativeSelectOption value="unpaid">Unpaid</NativeSelectOption>
+                  <NativeSelectOption value="paid">Paid</NativeSelectOption>
+                </NativeSelect>
+              </Field>
             </div>
-            <div className="field">
-              <label htmlFor="edit-notes">Notes</label>
-              <textarea
+            <Field className="field">
+              <FieldLabel htmlFor="edit-notes">Notes</FieldLabel>
+              <Textarea
                 id="edit-notes"
                 name="notes"
                 rows={3}
@@ -367,10 +414,10 @@ function EditPanel({
                 defaultValue={row.notes}
                 placeholder="Call outcome, payment reference, time slot…"
               />
-            </div>
-            <div className="field">
-              <label htmlFor="edit-name">Full name</label>
-              <input
+            </Field>
+            <Field className="field">
+              <FieldLabel htmlFor="edit-name">Full name</FieldLabel>
+              <Input
                 id="edit-name"
                 name="name"
                 required
@@ -378,11 +425,11 @@ function EditPanel({
                 maxLength={80}
                 defaultValue={row.name}
               />
-            </div>
+            </Field>
             <div className="edit-pair">
-              <div className="field">
-                <label htmlFor="edit-phone">Mobile</label>
-                <input
+              <Field className="field">
+                <FieldLabel htmlFor="edit-phone">Mobile</FieldLabel>
+                <Input
                   id="edit-phone"
                   name="phone"
                   type="tel"
@@ -390,37 +437,37 @@ function EditPanel({
                   pattern="[0-9 +\-]{10,16}"
                   defaultValue={row.phone}
                 />
-              </div>
-              <div className="field">
-                <label htmlFor="edit-passengers">Passengers</label>
-                <select
+              </Field>
+              <Field className="field">
+                <FieldLabel htmlFor="edit-passengers">Passengers</FieldLabel>
+                <NativeSelect
                   id="edit-passengers"
                   name="passengers"
                   defaultValue={row.passengers}
                 >
                   {[1, 2, 3, 4, 5, 6].map((count) => (
-                    <option key={count} value={count}>
+                    <NativeSelectOption key={count} value={count}>
                       {count}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </select>
-              </div>
+                </NativeSelect>
+              </Field>
             </div>
-            <div className="field">
-              <label htmlFor="edit-email">
+            <Field className="field">
+              <FieldLabel htmlFor="edit-email">
                 Email <span>(optional)</span>
-              </label>
-              <input
+              </FieldLabel>
+              <Input
                 id="edit-email"
                 name="email"
                 type="email"
                 maxLength={120}
                 defaultValue={row.email ?? ""}
               />
-            </div>
-            <div className="field">
-              <label htmlFor="edit-address">Address</label>
-              <textarea
+            </Field>
+            <Field className="field">
+              <FieldLabel htmlFor="edit-address">Address</FieldLabel>
+              <Textarea
                 id="edit-address"
                 name="address"
                 rows={3}
@@ -429,10 +476,8 @@ function EditPanel({
                 maxLength={300}
                 defaultValue={row.address}
               />
-            </div>
-            <p className="form-error" role="alert">
-              {error}
-            </p>
+            </Field>
+            <FieldError>{error}</FieldError>
             <div className="edit-actions">
               <Button type="submit" size="lg" disabled={saving}>
                 {saving ? "Saving…" : "Save changes"}
@@ -496,9 +541,7 @@ function DeleteDialog({
               permanently. This can’t be undone. To keep a record, set the
               status to Cancelled instead.
             </DialogDescription>
-            <p className="form-error" role="alert">
-              {error}
-            </p>
+            <FieldError>{error}</FieldError>
             <div className="delete-actions">
               <DialogClose asChild>
                 <Button
@@ -590,9 +633,11 @@ function AffiliateDialog({
                 The shared link stays the same: {helicopterRide.path}?ref=
                 {affiliate.code}
               </DialogDescription>
-              <div className="field">
-                <label htmlFor="rename-affiliate">Affiliate name</label>
-                <input
+              <Field className="field">
+                <FieldLabel htmlFor="rename-affiliate">
+                  Affiliate name
+                </FieldLabel>
+                <Input
                   id="rename-affiliate"
                   name="name"
                   required
@@ -600,10 +645,8 @@ function AffiliateDialog({
                   maxLength={80}
                   defaultValue={affiliate.name}
                 />
-              </div>
-              <p className="form-error" role="alert">
-                {error}
-              </p>
+              </Field>
+              <FieldError>{error}</FieldError>
               <div className="delete-actions">
                 {cancel("Cancel")}
                 <Button type="submit" size="lg" disabled={busy}>
@@ -620,9 +663,7 @@ function AffiliateDialog({
                   `${affiliate.registrations} ${affiliate.registrations === 1 ? "registration stays" : "registrations stay"} on the list but no longer count for this affiliate. `}
                 This can’t be undone.
               </DialogDescription>
-              <p className="form-error" role="alert">
-                {error}
-              </p>
+              <FieldError>{error}</FieldError>
               <div className="delete-actions">
                 {cancel("Keep it")}
                 <Button
@@ -643,11 +684,16 @@ function AffiliateDialog({
   );
 }
 
-export default function RegistrationsDashboard() {
+/** The whole admin panel: helicopter ride registrations, affiliate links and shops. */
+export default function RegistrationsDashboard({
+  initialView = "registrations",
+}: {
+  initialView?: View;
+}) {
   const [token, setToken] = useState<string | null>(null);
   const [rows, setRows] = useState<Registration[]>([]);
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
-  const [view, setView] = useState<View>("registrations");
+  const [view, setView] = useState<View>(initialView);
   const [menuOpen, setMenuOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [affiliateError, setAffiliateError] = useState("");
@@ -692,6 +738,8 @@ export default function RegistrationsDashboard() {
     setError(message);
   }, []);
 
+  const endSession = useCallback(() => signOut(SESSION_ENDED), [signOut]);
+
   const load = useCallback(
     async (value: string) => {
       setLoading(true);
@@ -706,7 +754,7 @@ export default function RegistrationsDashboard() {
           fetch(`${eventsApi}/affiliates`, init),
         ]);
         if (response.status === 401 || response.status === 400)
-          return signOut("That access token isn’t valid.");
+          return signOut(SESSION_ENDED);
         if (!response.ok || !affiliateResponse.ok) throw new Error();
         const body: { registrations: Registration[] } = await response.json();
         const linked: { affiliates: Affiliate[] } =
@@ -740,7 +788,7 @@ export default function RegistrationsDashboard() {
           body: JSON.stringify(next),
         });
         if (response.status === 401) {
-          signOut("Your session has ended. Enter the access token again.");
+          signOut(SESSION_ENDED);
           return null;
         }
         const body = await response.json().catch(() => ({}));
@@ -766,7 +814,7 @@ export default function RegistrationsDashboard() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (response.status === 401) {
-          signOut("Your session has ended. Enter the access token again.");
+          signOut(SESSION_ENDED);
           return null;
         }
         // 404 means someone already deleted it, so drop it here too.
@@ -803,7 +851,7 @@ export default function RegistrationsDashboard() {
         body: JSON.stringify(Object.fromEntries(new FormData(form))),
       });
       if (response.status === 401)
-        return signOut("Your session has ended. Enter the access token again.");
+        return signOut(SESSION_ENDED);
       const body = await response.json().catch(() => ({}));
       if (!response.ok)
         return setAffiliateError(body.error ?? "Couldn’t create the link.");
@@ -830,7 +878,7 @@ export default function RegistrationsDashboard() {
       },
     );
     if (response.status === 401)
-      signOut("Your session has ended. Enter the access token again.");
+      signOut(SESSION_ENDED);
     return response;
   }
 
@@ -910,35 +958,15 @@ export default function RegistrationsDashboard() {
     if (saved) load(saved);
   }, [load]);
 
-  function signIn(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    load(String(new FormData(event.currentTarget).get("token")).trim());
-  }
-
   if (!token)
     return (
-      <main className="admin-gate">
-        <form className="register-card admin-card" onSubmit={signIn}>
-          <Brand />
-          <h1>Registrations</h1>
-          <div className="field">
-            <label htmlFor="token">Access token</label>
-            <input
-              id="token"
-              name="token"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
-          </div>
-          <p className="form-error" role="alert">
-            {error}
-          </p>
-          <Button type="submit" size="lg" disabled={loading}>
-            {loading ? "Opening…" : "Open dashboard"}
-          </Button>
-        </form>
-      </main>
+      <AdminSignIn
+        brand={<Brand />}
+        title="Sign in"
+        error={error}
+        opening={loading}
+        onToken={load}
+      />
     );
 
   const visible = filterRegistrations(rows, filters);
@@ -949,7 +977,10 @@ export default function RegistrationsDashboard() {
   const registrationPager = paginate(visible, registrationPage, pageSize);
   const affiliatePager = paginate(ranked, affiliatePage, pageSize);
   const nav = (
-    <SidebarNav view={view} onView={showView} onSignOut={() => signOut()} />
+    <SidebarNav view={view} onView={showView} onSignOut={() => {
+        endAdminSession(token);
+        signOut();
+      }} />
   );
 
   return (
@@ -975,7 +1006,7 @@ export default function RegistrationsDashboard() {
             >
               <SheetTitle className="sr-only">Dashboard menu</SheetTitle>
               <SheetDescription className="sr-only">
-                Events and website links
+                Events, shops and website links
               </SheetDescription>
               <Brand />
               {nav}
@@ -984,407 +1015,442 @@ export default function RegistrationsDashboard() {
         </header>
 
         <main className="admin-content">
-          <div className="admin-head">
-            <div>
-              <p className="admin-eyebrow">Helicopter ride · Tirunelveli</p>
-              <h1>
-                {view === "registrations" ? "Registrations" : "Affiliate links"}
-              </h1>
-            </div>
-            <Button
-              variant="outline"
-              className="admin-refresh"
-              onClick={() => load(token)}
-              disabled={loading}
-            >
-              <RefreshCw aria-hidden="true" />
-              {loading ? "Refreshing…" : "Refresh"}
-            </Button>
-          </div>
-
-          {view === "affiliates" ? (
-            <>
-              <form className="affiliate-form" onSubmit={createAffiliate}>
-                <div className="field">
-                  <label htmlFor="affiliate-name">Affiliate name</label>
-                  <input
-                    id="affiliate-name"
-                    name="name"
-                    value={affiliateDraft.name}
-                    onChange={(event) => {
-                      const name = event.target.value;
-                      setAffiliateDraft((draft) => ({
-                        ...draft,
-                        name,
-                        code: draft.edited ? draft.code : linkCode(name),
-                      }));
-                    }}
-                    required
-                    minLength={2}
-                    maxLength={80}
-                    placeholder="Selvi Travels"
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="affiliate-code">
-                    Link code <span>(filled from the name)</span>
-                  </label>
-                  <input
-                    id="affiliate-code"
-                    name="code"
-                    value={affiliateDraft.code}
-                    onChange={(event) => {
-                      const code = event.target.value;
-                      // Clearing the field hands it back to the name.
-                      setAffiliateDraft((draft) => ({
-                        ...draft,
-                        code,
-                        edited: code !== "",
-                      }));
-                    }}
-                    maxLength={32}
-                    pattern="[A-Za-z0-9 _\-]*"
-                    placeholder="selvi-travels"
-                  />
-                </div>
-                <Button type="submit" size="lg" disabled={creating}>
-                  {creating ? "Creating…" : "Create link"}
-                </Button>
-              </form>
-              <p className="form-error" role="alert">
-                {affiliateError || error}
-              </p>
-              <div
-                className="admin-table affiliate-table"
-                role="region"
-                tabIndex={0}
-                aria-label="Affiliate leaderboard"
-              >
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Rank</th>
-                      <th scope="col">Affiliate</th>
-                      <th scope="col">Registrations</th>
-                      <th scope="col">Seats</th>
-                      <th scope="col">Confirmed</th>
-                      <th scope="col">Paid</th>
-                      <th scope="col">
-                        <span className="sr-only">Copy link</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {affiliatePager.items.map((affiliate, index) => (
-                      <tr key={affiliate.code}>
-                        <td className="cell-rank">
-                          {affiliatePager.from + index}
-                        </td>
-                        <td className="cell-name">
-                          <span className="admin-name">{affiliate.name}</span>
-                          <span className="admin-sub">
-                            {helicopterRide.path}?ref={affiliate.code}
-                          </span>
-                        </td>
-                        <td data-label="Registrations">
-                          {affiliate.registrations}
-                        </td>
-                        <td data-label="Seats">{affiliate.seats}</td>
-                        <td data-label="Confirmed">{affiliate.confirmed}</td>
-                        <td data-label="Paid">{affiliate.paid}</td>
-                        <td className="cell-copy">
-                          <div className="affiliate-actions">
-                            <Button
-                              variant="outline"
-                              className="admin-refresh"
-                              onClick={() => copyLink(affiliate.code)}
-                              aria-label={`Copy link for ${affiliate.name}`}
-                            >
-                              {copied === affiliate.code ? (
-                                <Check aria-hidden="true" />
-                              ) : (
-                                <Copy aria-hidden="true" />
-                              )}
-                              {copied === affiliate.code
-                                ? "Copied"
-                                : "Copy link"}
-                            </Button>
-                            <button
-                              type="button"
-                              className="admin-icon"
-                              onClick={(event) => {
-                                opener.current = event.currentTarget;
-                                setAffiliateAction({ affiliate, mode: "rename" });
-                              }}
-                            >
-                              <Pencil aria-hidden="true" />
-                              <span className="sr-only">
-                                Rename {affiliate.name}
-                              </span>
-                            </button>
-                            <button
-                              type="button"
-                              className="admin-icon admin-delete"
-                              onClick={(event) => {
-                                opener.current = event.currentTarget;
-                                setAffiliateAction({ affiliate, mode: "delete" });
-                              }}
-                            >
-                              <Trash2 aria-hidden="true" />
-                              <span className="sr-only">
-                                Delete {affiliate.name}
-                              </span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {ranked.length === 0 && (
-                  <p className="admin-empty">
-                    No affiliate links yet. Create one above and share it.
-                  </p>
-                )}
-              </div>
-              <Pagination
-                label="Affiliate links"
-                pager={affiliatePager}
-                size={pageSize}
-                onPage={(page) => turnPage(setAffiliatePage, page)}
-                onSize={resize}
-              />
-              <p className="admin-note">
-                {direct} {direct === 1 ? "registration" : "registrations"} came
-                without an affiliate link.
-              </p>
-            </>
+          {view === "shops" ? (
+            <ShopsPanel token={token} onSessionEnd={endSession} />
           ) : (
             <>
-              <dl className="admin-stats">
-                {[
-                  ["Registrations", totals.registrations],
-                  ["Seats requested", totals.seats],
-                  ["Confirmed", totals.confirmed],
-                  ["Paid", totals.paid],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-
-              <div className="admin-toolbar">
-                <div className="admin-filters">
-                  <div className="field">
-                    <label htmlFor="status-filter" className="sr-only">
-                      Filter by status
-                    </label>
-                    <select
-                      id="status-filter"
-                      value={filters.status}
-                      onChange={(event) =>
-                        filter({
-                          status: event.target.value as Filters["status"],
-                        })
-                      }
-                    >
-                      {[["all", "All statuses"] as const, ...statuses].map(
-                        ([value, label]) => (
-                          <option key={value} value={value}>
-                            {label} (
-                            {value === "all"
-                              ? rows.length
-                              : rows.filter((row) => row.status === value)
-                                  .length}
-                            )
-                          </option>
-                        ),
-                      )}
-                    </select>
-                  </div>
-                  <div className="field">
-                    <label htmlFor="payment-filter" className="sr-only">
-                      Filter by payment
-                    </label>
-                    <select
-                      id="payment-filter"
-                      value={filters.payment}
-                      onChange={(event) =>
-                        filter({
-                          payment: event.target.value as Filters["payment"],
-                        })
-                      }
-                    >
-                      <option value="all">All payments</option>
-                      <option value="paid">Paid</option>
-                      <option value="unpaid">Unpaid</option>
-                    </select>
-                  </div>
-                  <div className="field admin-search">
-                    <label htmlFor="search" className="sr-only">
-                      Search registrations
-                    </label>
-                    <Search size={18} aria-hidden="true" />
-                    <input
-                      id="search"
-                      type="search"
-                      placeholder="Search name, mobile, address or notes"
-                      value={filters.query}
-                      onChange={(event) =>
-                        filter({ query: event.target.value })
-                      }
-                    />
-                  </div>
+              <div className="admin-head">
+                <div>
+                  <p className="admin-eyebrow">Helicopter ride · Tirunelveli</p>
+                  <h1>
+                    {view === "registrations" ? "Registrations" : "Affiliate links"}
+                  </h1>
                 </div>
+                <Button
+                  variant="outline"
+                  className="admin-refresh"
+                  onClick={() => load(token)}
+                  disabled={loading}
+                >
+                  <RefreshCw aria-hidden="true" />
+                  {loading ? "Refreshing…" : "Refresh"}
+                </Button>
               </div>
 
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-
-              <div
-                className="admin-table"
-                role="region"
-                tabIndex={0}
-                aria-label="Registrations table"
-              >
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Name</th>
-                      <th scope="col">Mobile</th>
-                      <th scope="col">Address</th>
-                      <th scope="col">Seats</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Payment</th>
-                      <th scope="col">Registered</th>
-                      <th scope="col">
-                        <span className="sr-only">Actions</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {registrationPager.items.map((row) => {
-                      const saving = savingId === row.id;
-                      const paid = row.payment_status === "paid";
-                      return (
-                        <tr key={row.id} data-status={row.status}>
-                          <td className="cell-name">
-                            <span className="admin-name">{row.name}</span>
-                            {row.email && (
-                              <span className="admin-sub">{row.email}</span>
-                            )}
-                          </td>
-                          <td className="cell-phone">
-                            <a href={`tel:${row.phone}`}>
-                              {formatPhone(row.phone)}
-                            </a>
-                          </td>
-                          <td className="admin-address">{row.address}</td>
-                          <td className="cell-seats">
-                            {row.passengers}
-                            <span className="seats-unit">
-                              {row.passengers === 1 ? " seat" : " seats"}
-                            </span>
-                          </td>
-                          <td className="cell-status">
-                            <span
-                              className="status-select"
-                              data-status={row.status}
-                            >
-                              <select
-                                value={row.status}
-                                disabled={saving}
-                                aria-label={`Status for ${row.name}`}
-                                onChange={(event) =>
-                                  quickSave({
-                                    ...row,
-                                    status: event.target.value as Status,
-                                  })
-                                }
-                              >
-                                {statuses.map(([value, label]) => (
-                                  <option key={value} value={value}>
-                                    {label}
-                                  </option>
-                                ))}
-                              </select>
-                            </span>
-                          </td>
-                          <td className="cell-payment">
-                            <button
-                              type="button"
-                              className="pay-toggle"
-                              aria-pressed={paid}
-                              aria-label={`Paid: ${row.name}`}
-                              disabled={saving}
-                              onClick={() =>
-                                quickSave({
-                                  ...row,
-                                  payment_status: paid ? "unpaid" : "paid",
-                                })
-                              }
-                            >
-                              {paid && <Check aria-hidden="true" />}
-                              {paid ? "Paid" : "Unpaid"}
-                            </button>
-                          </td>
-                          <td className="cell-date">
-                            <span className="admin-day">
-                              {dayFormat.format(new Date(row.created_at))}
-                            </span>
-                            <span className="admin-sub">
-                              {timeFormat.format(new Date(row.created_at))}
-                              {row.ref &&
-                                ` · via ${affiliateNames.get(row.ref) ?? row.ref}`}
-                            </span>
-                          </td>
-                          <td className="cell-actions">
-                            <button
-                              type="button"
-                              className="admin-icon"
-                              onClick={(event) => {
-                                opener.current = event.currentTarget;
-                                setEditing(row);
-                              }}
-                            >
-                              <Pencil aria-hidden="true" />
-                              <span className="sr-only">Edit {row.name}</span>
-                            </button>
-                            <button
-                              type="button"
-                              className="admin-icon admin-delete"
-                              onClick={(event) => {
-                                opener.current = event.currentTarget;
-                                setDeleting(row);
-                              }}
-                            >
-                              <Trash2 aria-hidden="true" />
-                              <span className="sr-only">Delete {row.name}</span>
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                {visible.length === 0 && (
-                  <p className="admin-empty">
-                    {rows.length === 0
-                      ? "No registrations yet."
-                      : "No registrations match these filters."}
+              {view === "affiliates" ? (
+                <>
+                  <Card className="affiliate-card gap-0 py-0 shadow-none">
+                    <form className="affiliate-form" onSubmit={createAffiliate}>
+                      <Field className="field">
+                        <FieldLabel htmlFor="affiliate-name">
+                          Affiliate name
+                        </FieldLabel>
+                        <Input
+                          id="affiliate-name"
+                          name="name"
+                          value={affiliateDraft.name}
+                          onChange={(event) => {
+                            const name = event.target.value;
+                            setAffiliateDraft((draft) => ({
+                              ...draft,
+                              name,
+                              code: draft.edited ? draft.code : linkCode(name),
+                            }));
+                          }}
+                          required
+                          minLength={2}
+                          maxLength={80}
+                          placeholder="Selvi Travels"
+                        />
+                      </Field>
+                      <Field className="field">
+                        <FieldLabel htmlFor="affiliate-code">
+                          Link code <span>(filled from the name)</span>
+                        </FieldLabel>
+                        <Input
+                          id="affiliate-code"
+                          name="code"
+                          value={affiliateDraft.code}
+                          onChange={(event) => {
+                            const code = event.target.value;
+                            // Clearing the field hands it back to the name.
+                            setAffiliateDraft((draft) => ({
+                              ...draft,
+                              code,
+                              edited: code !== "",
+                            }));
+                          }}
+                          maxLength={32}
+                          pattern="[A-Za-z0-9 _\-]*"
+                          placeholder="selvi-travels"
+                        />
+                      </Field>
+                      <Button type="submit" size="lg" disabled={creating}>
+                        {creating ? "Creating…" : "Create link"}
+                      </Button>
+                    </form>
+                  </Card>
+                  {(affiliateError || error) && (
+                    <Alert variant="destructive" className="admin-error">
+                      <AlertDescription>{affiliateError || error}</AlertDescription>
+                    </Alert>
+                  )}
+                  <Card
+                    className="admin-table affiliate-table gap-0 py-0 shadow-none"
+                    role="region"
+                    tabIndex={0}
+                    aria-label="Affiliate leaderboard"
+                  >
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead scope="col">Rank</TableHead>
+                          <TableHead scope="col">Affiliate</TableHead>
+                          <TableHead scope="col">Registrations</TableHead>
+                          <TableHead scope="col">Seats</TableHead>
+                          <TableHead scope="col">Confirmed</TableHead>
+                          <TableHead scope="col">Paid</TableHead>
+                          <TableHead scope="col">
+                            <span className="sr-only">Copy link</span>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {affiliatePager.items.map((affiliate, index) => (
+                          <TableRow key={affiliate.code}>
+                            <TableCell className="cell-rank">
+                              {affiliatePager.from + index}
+                            </TableCell>
+                            <TableCell className="cell-name">
+                              <span className="admin-name">{affiliate.name}</span>
+                              <span className="admin-sub">
+                                {helicopterRide.path}?ref={affiliate.code}
+                              </span>
+                            </TableCell>
+                            <TableCell data-label="Registrations">
+                              {affiliate.registrations}
+                            </TableCell>
+                            <TableCell data-label="Seats">{affiliate.seats}</TableCell>
+                            <TableCell data-label="Confirmed">
+                              {affiliate.confirmed}
+                            </TableCell>
+                            <TableCell data-label="Paid">{affiliate.paid}</TableCell>
+                            <TableCell className="cell-copy">
+                              <div className="affiliate-actions">
+                                <Button
+                                  variant="outline"
+                                  className="admin-refresh"
+                                  onClick={() => copyLink(affiliate.code)}
+                                  aria-label={`Copy link for ${affiliate.name}`}
+                                >
+                                  {copied === affiliate.code ? (
+                                    <Check aria-hidden="true" />
+                                  ) : (
+                                    <Copy aria-hidden="true" />
+                                  )}
+                                  {copied === affiliate.code
+                                    ? "Copied"
+                                    : "Copy link"}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  type="button"
+                                  className="admin-icon"
+                                  onClick={(event) => {
+                                    opener.current = event.currentTarget;
+                                    setAffiliateAction({ affiliate, mode: "rename" });
+                                  }}
+                                >
+                                  <Pencil aria-hidden="true" />
+                                  <span className="sr-only">
+                                    Rename {affiliate.name}
+                                  </span>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  type="button"
+                                  className="admin-icon admin-delete"
+                                  onClick={(event) => {
+                                    opener.current = event.currentTarget;
+                                    setAffiliateAction({ affiliate, mode: "delete" });
+                                  }}
+                                >
+                                  <Trash2 aria-hidden="true" />
+                                  <span className="sr-only">
+                                    Delete {affiliate.name}
+                                  </span>
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    {ranked.length === 0 && (
+                      <p className="admin-empty">
+                        No affiliate links yet. Create one above and share it.
+                      </p>
+                    )}
+                  </Card>
+                  <Pagination
+                    label="Affiliate links"
+                    pager={affiliatePager}
+                    size={pageSize}
+                    onPage={(page) => turnPage(setAffiliatePage, page)}
+                    onSize={resize}
+                  />
+                  <p className="admin-note">
+                    {direct} {direct === 1 ? "registration" : "registrations"} came
+                    without an affiliate link.
                   </p>
-                )}
-              </div>
-              <Pagination
-                label="Registrations"
-                pager={registrationPager}
-                size={pageSize}
-                onPage={(page) => turnPage(setRegistrationPage, page)}
-                onSize={resize}
-              />
+                </>
+              ) : (
+                <>
+                  <Card className="admin-stats-panel gap-0 py-0 shadow-none">
+                    <dl className="admin-stats">
+                      {[
+                        ["Registrations", totals.registrations],
+                        ["Seats requested", totals.seats],
+                        ["Confirmed", totals.confirmed],
+                        ["Paid", totals.paid],
+                      ].map(([label, value]) => (
+                        <div key={label}>
+                          <dt>{label}</dt>
+                          <dd>{value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </Card>
+
+                  <div className="admin-toolbar">
+                    <div className="admin-filters">
+                      <Field className="field">
+                        <FieldLabel htmlFor="status-filter" className="sr-only">
+                          Filter by status
+                        </FieldLabel>
+                        <NativeSelect
+                          id="status-filter"
+                          value={filters.status}
+                          onChange={(event) =>
+                            filter({
+                              status: event.target.value as Filters["status"],
+                            })
+                          }
+                        >
+                          {[["all", "All statuses"] as const, ...statuses].map(
+                            ([value, label]) => (
+                              <NativeSelectOption key={value} value={value}>
+                                {label} (
+                                {value === "all"
+                                  ? rows.length
+                                  : rows.filter((row) => row.status === value)
+                                      .length}
+                                )
+                              </NativeSelectOption>
+                            ),
+                          )}
+                        </NativeSelect>
+                      </Field>
+                      <Field className="field">
+                        <FieldLabel htmlFor="payment-filter" className="sr-only">
+                          Filter by payment
+                        </FieldLabel>
+                        <NativeSelect
+                          id="payment-filter"
+                          value={filters.payment}
+                          onChange={(event) =>
+                            filter({
+                              payment: event.target.value as Filters["payment"],
+                            })
+                          }
+                        >
+                          <NativeSelectOption value="all">
+                            All payments
+                          </NativeSelectOption>
+                          <NativeSelectOption value="paid">Paid</NativeSelectOption>
+                          <NativeSelectOption value="unpaid">
+                            Unpaid
+                          </NativeSelectOption>
+                        </NativeSelect>
+                      </Field>
+                      <Field className="field admin-search">
+                        <FieldLabel htmlFor="search" className="sr-only">
+                          Search registrations
+                        </FieldLabel>
+                        <Search size={18} aria-hidden="true" />
+                        <Input
+                          id="search"
+                          type="search"
+                          placeholder="Search name, mobile, address or notes"
+                          value={filters.query}
+                          onChange={(event) =>
+                            filter({ query: event.target.value })
+                          }
+                        />
+                      </Field>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <Alert variant="destructive" className="admin-error">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Card
+                    className="admin-table gap-0 py-0 shadow-none"
+                    role="region"
+                    tabIndex={0}
+                    aria-label="Registrations table"
+                  >
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead scope="col">Name</TableHead>
+                          <TableHead scope="col">Mobile</TableHead>
+                          <TableHead scope="col">Address</TableHead>
+                          <TableHead scope="col">Seats</TableHead>
+                          <TableHead scope="col">Status</TableHead>
+                          <TableHead scope="col">Payment</TableHead>
+                          <TableHead scope="col">Registered</TableHead>
+                          <TableHead scope="col">
+                            <span className="sr-only">Actions</span>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {registrationPager.items.map((row) => {
+                          const saving = savingId === row.id;
+                          const paid = row.payment_status === "paid";
+                          return (
+                            <TableRow key={row.id} data-status={row.status}>
+                              <TableCell className="cell-name">
+                                <span className="admin-name">{row.name}</span>
+                                {row.email && (
+                                  <span className="admin-sub">{row.email}</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="cell-phone">
+                                <a href={`tel:${row.phone}`}>
+                                  {formatPhone(row.phone)}
+                                </a>
+                              </TableCell>
+                              <TableCell className="admin-address">
+                                {row.address}
+                              </TableCell>
+                              <TableCell className="cell-seats">
+                                {row.passengers}
+                                <span className="seats-unit">
+                                  {row.passengers === 1 ? " seat" : " seats"}
+                                </span>
+                              </TableCell>
+                              <TableCell className="cell-status">
+                                <div
+                                  className="status-select"
+                                  data-status={row.status}
+                                >
+                                  <NativeSelect
+                                    size="sm"
+                                    value={row.status}
+                                    disabled={saving}
+                                    aria-label={`Status for ${row.name}`}
+                                    onChange={(event) =>
+                                      quickSave({
+                                        ...row,
+                                        status: event.target.value as Status,
+                                      })
+                                    }
+                                  >
+                                    {statuses.map(([value, label]) => (
+                                      <NativeSelectOption key={value} value={value}>
+                                        {label}
+                                      </NativeSelectOption>
+                                    ))}
+                                  </NativeSelect>
+                                </div>
+                              </TableCell>
+                              <TableCell className="cell-payment">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  type="button"
+                                  className="pay-toggle"
+                                  aria-pressed={paid}
+                                  aria-label={`Paid: ${row.name}`}
+                                  disabled={saving}
+                                  onClick={() =>
+                                    quickSave({
+                                      ...row,
+                                      payment_status: paid ? "unpaid" : "paid",
+                                    })
+                                  }
+                                >
+                                  {paid && <Check aria-hidden="true" />}
+                                  {paid ? "Paid" : "Unpaid"}
+                                </Button>
+                              </TableCell>
+                              <TableCell className="cell-date">
+                                <span className="admin-day">
+                                  {dayFormat.format(new Date(row.created_at))}
+                                </span>
+                                <span className="admin-sub">
+                                  {timeFormat.format(new Date(row.created_at))}
+                                  {row.ref &&
+                                    ` · via ${affiliateNames.get(row.ref) ?? row.ref}`}
+                                </span>
+                              </TableCell>
+                              <TableCell className="cell-actions">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  type="button"
+                                  className="admin-icon"
+                                  onClick={(event) => {
+                                    opener.current = event.currentTarget;
+                                    setEditing(row);
+                                  }}
+                                >
+                                  <Pencil aria-hidden="true" />
+                                  <span className="sr-only">Edit {row.name}</span>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  type="button"
+                                  className="admin-icon admin-delete"
+                                  onClick={(event) => {
+                                    opener.current = event.currentTarget;
+                                    setDeleting(row);
+                                  }}
+                                >
+                                  <Trash2 aria-hidden="true" />
+                                  <span className="sr-only">Delete {row.name}</span>
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                    {visible.length === 0 && (
+                      <p className="admin-empty">
+                        {rows.length === 0
+                          ? "No registrations yet."
+                          : "No registrations match these filters."}
+                      </p>
+                    )}
+                  </Card>
+                  <Pagination
+                    label="Registrations"
+                    pager={registrationPager}
+                    size={pageSize}
+                    onPage={(page) => turnPage(setRegistrationPage, page)}
+                    onSize={resize}
+                  />
+                </>
+              )}
             </>
           )}
         </main>

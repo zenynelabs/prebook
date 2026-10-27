@@ -17,9 +17,32 @@ test("event page ships its details and a complete registration form in HTML", ()
     expect(["#main", "#register", "/", "/#events", "tel:7397167111", "tel:7397197111", "https://zenyne.com"]).toContain(href);
 });
 
-test("dashboard asks for the access token before showing any registrations", () => {
+test("the helicopter form uses shadcn controls with labels and mobile help", () => {
+  const html = renderToStaticMarkup(<EventPage />);
+  const form = html.match(/<form\b[\s\S]*?<\/form>/)?.[0] ?? "";
+  expect(html).toContain('data-slot="card"');
+  expect(form).toContain('aria-busy="false"');
+  expect(form).toContain('noValidate=""');
+  expect(form.match(/data-slot="field"/g)).toHaveLength(5);
+  expect(form.match(/data-slot="input"/g)).toHaveLength(3);
+  expect(form).toContain('data-slot="textarea"');
+  expect(form).toContain('data-slot="native-select"');
+  expect(form).toContain('data-slot="button"');
+  for (const field of ["name", "phone", "email", "address", "passengers"])
+    expect(form).toContain(`for="${field}"`);
+  expect(form).toMatch(/<input\b[^>]*aria-describedby="phone-description"/);
+  expect(form).toContain('id="phone-description"');
+  expect(form).toContain('name="passengers"');
+  expect(form.match(/<option\b/g)).toHaveLength(6);
+  expect(form).not.toContain('role="alert"');
+});
+
+test("dashboard asks staff to sign in with email and password before showing any registrations", () => {
   const html = renderToStaticMarkup(<RegistrationsDashboard />);
-  expect(html).toContain('type="password"');
+  expect(html).toMatch(/<label\b[^>]*for="admin-email"[^>]*>Email/);
+  expect(html).toMatch(/<input\b[^>]*type="email"[^>]*autoComplete="username"/);
+  expect(html).toMatch(/<input\b[^>]*type="password"[^>]*autoComplete="current-password"/);
+  expect(html).not.toContain("Access token");
   expect(html).not.toContain("<table");
 });
 

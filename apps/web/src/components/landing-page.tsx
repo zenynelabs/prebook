@@ -14,6 +14,7 @@ import {
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { shopsPath } from "@/lib/shops";
 import { helicopterRide } from "@/lib/site";
 import { BoardingPass } from "./event-page";
 import { Button } from "./ui/button";
@@ -419,6 +420,7 @@ export default function LandingPage() {
                 {label}
               </a>
             ))}
+            <Link href={shopsPath}>Shops</Link>
           </nav>
           <Button asChild className="header-cta">
             <a href="tel:7397167111" aria-label="Call PreBooking on 7397167111">
@@ -486,6 +488,12 @@ export default function LandingPage() {
                     </a>
                   </SheetClose>
                 ))}
+                <SheetClose asChild>
+                  <Link href={shopsPath}>
+                    Shops
+                    <ArrowUpRight size={20} aria-hidden="true" />
+                  </Link>
+                </SheetClose>
               </nav>
               <a className="text-link mobile-contact" href="tel:7397167111">
                 <Phone size={18} aria-hidden="true" />
@@ -964,14 +972,14 @@ export default function LandingPage() {
                 in under a minute and the PreBooking team will call to confirm
                 your seat, date and fare.
               </p>
-              <Button asChild size="lg">
-                <Link href={helicopterRide.path}>
-                  Pre-register for the ride{" "}
-                  <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
             </div>
             <BoardingPass />
+            <Button asChild size="lg" className="event-teaser-action">
+              <Link href={helicopterRide.path}>
+                Pre-register for the ride{" "}
+                <ArrowRight aria-hidden="true" />
+              </Link>
+            </Button>
           </div>
         </section>
 
