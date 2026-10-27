@@ -54,7 +54,12 @@ found, so the page says "to be announced" and the team confirms by phone.
 - `/#events` on the homepage links to `/events/helicopter-ride`, which uses
   the same tokens, Lenis and GSAP and has the registration form: name, mobile,
   optional email, address and 1–6 passengers. No payment is taken.
-- `/admin/registrations` is a noindex, token-gated table of registrations.
+- `/admin/registrations` is a noindex, token-gated dashboard with a sidebar,
+  totals, status/payment filters and search. Staff set each registration's
+  status (new, contacted, confirmed, cancelled) and payment (unpaid, paid)
+  inline, and edit contact details and notes in a side panel through the admin
+  `PUT /registrations/:id`. Payment is tracked offline only: there is no
+  gateway, and no amount is stored because the fare is not set yet.
 - `apps/api/` is a Hono Cloudflare Worker, `prebook-api`, deployed to
   `https://prebook-api.programmer-rasla.workers.dev`, backed by the D1 database
   `prebook-events` (APAC). It is deliberately separate from the original

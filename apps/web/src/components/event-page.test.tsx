@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import EventPage from "./event-page";
-import RegistrationsDashboard, { filterRegistrations, type Registration } from "./registrations-dashboard";
+import RegistrationsDashboard, { type Filters, filterRegistrations, type Registration, summarise } from "./registrations-dashboard";
 
 test("event page ships its details and a complete registration form in HTML", () => {
   const html = renderToStaticMarkup(<EventPage />);
@@ -22,16 +22,23 @@ test("dashboard asks for the access token before showing any registrations", () 
   expect(html).not.toContain("<table");
 });
 
-test("dashboard search matches text fields and formatted mobile numbers", () => {
+test("dashboard filters combine status, payment and search, and totals skip cancelled seats", () => {
+  const base = { email: null, notes: "", created_at: "2026-10-27T10:00:00Z", updated_at: null };
   const rows: Registration[] = [
-    { id: 1, name: "Arun Kumar", phone: "9876543210", email: null, address: "Palayamkottai 627002", passengers: 2, created_at: "2026-10-27T10:00:00Z" },
-    { id: 2, name: "Meena", phone: "9123456780", email: "meena@example.com", address: "Town, Tirunelveli", passengers: 1, created_at: "2026-10-27T11:00:00Z" },
+    { ...base, id: 1, name: "Arun Kumar", phone: "9876543210", address: "Palayamkottai 627002", passengers: 2, status: "confirmed", payment_status: "paid", notes: "Paid by UPI" },
+    { ...base, id: 2, name: "Meena", phone: "9123456780", email: "meena@example.com", address: "Town, Tirunelveli", passengers: 1, status: "new", payment_status: "unpaid" },
+    { ...base, id: 3, name: "Ravi", phone: "9000000003", address: "Junction, Tirunelveli", passengers: 4, status: "cancelled", payment_status: "paid" },
   ];
-  expect(filterRegistrations(rows, "")).toHaveLength(2);
-  expect(filterRegistrations(rows, "  arun ").map((row) => row.id)).toEqual([1]);
-  expect(filterRegistrations(rows, "98765 43210").map((row) => row.id)).toEqual([1]);
-  expect(filterRegistrations(rows, "example.com").map((row) => row.id)).toEqual([2]);
-  expect(filterRegistrations(rows, "Palayam").map((row) => row.id)).toEqual([1]);
-  expect(filterRegistrations(rows, "zzz")).toHaveLength(0);
-  expect(filterRegistrations(rows, "Town 98")).toHaveLength(0);
+  const all: Filters = { query: "", status: "all", payment: "all" };
+  const ids = (filters: Partial<Filters>) => filterRegistrations(rows, { ...all, ...filters }).map((row) => row.id);
+  expect(ids({})).toEqual([1, 2, 3]);
+  expect(ids({ query: "  arun " })).toEqual([1]);
+  expect(ids({ query: "98765 43210" })).toEqual([1]);
+  expect(ids({ query: "example.com" })).toEqual([2]);
+  expect(ids({ query: "upi" })).toEqual([1]);
+  expect(ids({ query: "Town 98" })).toEqual([]);
+  expect(ids({ status: "new" })).toEqual([2]);
+  expect(ids({ payment: "paid" })).toEqual([1, 3]);
+  expect(ids({ payment: "paid", status: "confirmed", query: "tirunelveli" })).toEqual([]);
+  expect(summarise(rows)).toEqual({ registrations: 3, seats: 3, confirmed: 1, paid: 1 });
 });

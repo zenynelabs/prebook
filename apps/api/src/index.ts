@@ -7,11 +7,15 @@ import { timingSafeEqual } from 'hono/utils/buffer'
 type Bindings = {
   DB: D1Database
   LIMITER: RateLimit
+  ADMIN_LIMITER: RateLimit
   ADMIN_TOKEN: string
   ALLOWED_ORIGINS: string
 }
 
 const EVENT = 'helicopter-ride'
+const COLUMNS = 'id, name, phone, email, address, passengers, status, payment_status, notes, created_at, updated_at'
+export const STATUSES = ['new', 'contacted', 'confirmed', 'cancelled'] as const
+export const PAYMENT_STATUSES = ['unpaid', 'paid'] as const
 
 export type Registration = {
   name: string
@@ -39,23 +43,48 @@ export function parseRegistration(input: unknown): Registration | string {
   return { name, phone, email, address, passengers }
 }
 
+export type RegistrationUpdate = Registration & {
+  status: (typeof STATUSES)[number]
+  payment_status: (typeof PAYMENT_STATUSES)[number]
+  notes: string
+}
+
+/** Admin edits re-check the contact fields so the team can correct details by phone. */
+export function parseUpdate(input: unknown): RegistrationUpdate | string {
+  const registration = parseRegistration(input)
+  if (typeof registration === 'string') return registration
+  const body = input as Record<string, unknown>
+  const status = STATUSES.find((value) => value === body.status)
+  const payment_status = PAYMENT_STATUSES.find((value) => value === body.payment_status)
+  const notes = typeof body.notes === 'string' ? body.notes.trim() : ''
+  if (!status) return 'Choose a valid status.'
+  if (!payment_status) return 'Choose a valid payment status.'
+  if (notes.length > 1000) return 'Keep notes under 1,000 characters.'
+  return { ...registration, status, payment_status, notes }
+}
+
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('*', (c, next) =>
   cors({
     origin: c.env.ALLOWED_ORIGINS.split(','),
-    allowMethods: ['GET', 'POST'],
+    allowMethods: ['GET', 'POST', 'PUT'],
     allowHeaders: ['Content-Type', 'Authorization'],
     maxAge: 86400,
   })(c, next),
 )
 
-// Per-IP limit covers both the public form and admin token guesses.
-app.use('/registrations', bodyLimit({ maxSize: 8 * 1024 }), async (c, next) => {
+// Per-IP limits: a tight one for the public form, a roomier one for admin work and token guesses.
+app.use('/registrations/*', bodyLimit({ maxSize: 8 * 1024 }), async (c, next) => {
   if (c.req.method === 'OPTIONS') return next()
-  const { success } = await c.env.LIMITER.limit({ key: c.req.header('cf-connecting-ip') ?? 'unknown' })
+  const limiter = c.req.method === 'POST' ? c.env.LIMITER : c.env.ADMIN_LIMITER
+  const { success } = await limiter.limit({ key: c.req.header('cf-connecting-ip') ?? 'unknown' })
   if (!success) return c.json({ error: 'Too many attempts. Please wait a minute and try again.' }, 429)
   return next()
+})
+
+const admin = bearerAuth({
+  verifyToken: (token, c: Context<{ Bindings: Bindings }>) => timingSafeEqual(token, c.env.ADMIN_TOKEN),
 })
 
 app.post('/registrations', async (c) => {
@@ -75,18 +104,35 @@ app.post('/registrations', async (c) => {
   return c.json({ ok: true }, 201)
 })
 
-app.get(
-  '/registrations',
-  bearerAuth({ verifyToken: (token, c: Context<{ Bindings: Bindings }>) => timingSafeEqual(token, c.env.ADMIN_TOKEN) }),
-  async (c) => {
-    // ponytail: one unpaginated read, add cursor paging past a few thousand rows.
-    const { results } = await c.env.DB.prepare(
-      'SELECT id, name, phone, email, address, passengers, created_at FROM registrations WHERE event = ? ORDER BY id DESC LIMIT 5000',
+app.get('/registrations', admin, async (c) => {
+  // ponytail: one unpaginated read, add cursor paging past a few thousand rows.
+  const { results } = await c.env.DB.prepare(
+    `SELECT ${COLUMNS} FROM registrations WHERE event = ? ORDER BY id DESC LIMIT 5000`,
+  )
+    .bind(EVENT)
+    .all()
+  return c.json({ registrations: results })
+})
+
+// ponytail: last write wins between two staff editing one row, add a version check if that bites.
+app.put('/registrations/:id{[0-9]+}', admin, async (c) => {
+  const update = parseUpdate(await c.req.json().catch(() => null))
+  if (typeof update === 'string') return c.json({ error: update }, 400)
+  const { name, phone, email, address, passengers, status, payment_status, notes } = update
+  try {
+    const registration = await c.env.DB.prepare(
+      `UPDATE registrations SET name = ?, phone = ?, email = ?, address = ?, passengers = ?, status = ?,
+        payment_status = ?, notes = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+       WHERE id = ? AND event = ? RETURNING ${COLUMNS}`,
     )
-      .bind(EVENT)
-      .all()
-    return c.json({ registrations: results })
-  },
-)
+      .bind(name, phone, email, address, passengers, status, payment_status, notes, Number(c.req.param('id')), EVENT)
+      .first()
+    if (!registration) return c.json({ error: 'This registration no longer exists.' }, 404)
+    return c.json({ registration })
+  } catch (error) {
+    if (String(error).includes('UNIQUE')) return c.json({ error: 'Another registration already uses this mobile number.' }, 409)
+    throw error
+  }
+})
 
 export default app
