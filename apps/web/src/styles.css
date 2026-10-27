@@ -612,6 +612,16 @@ svg { flex-shrink: 0; }
   .admin-table .pay-toggle { min-height: 44px; }
   .admin-table .cell-date { grid-area: date; color: var(--text-2); font-size: 13px; }
   .admin-table .cell-date::before { content: 'Registered '; }
+  .admin-table.shop-orders-table tbody tr { grid-template-areas: 'name edit' 'customer customer' 'phone total' 'items items' 'status status'; }
+  .admin-table.shop-orders-table .shop-order-customer { grid-area: customer; max-width: none; }
+  .admin-table.shop-orders-table .shop-order-customer .admin-sub { white-space: normal; }
+  .admin-table.shop-orders-table .shop-order-items { grid-area: items; max-width: none; color: var(--text-2); font-size: 14px; }
+  .admin-table.shop-orders-table .shop-order-total { grid-area: total; text-align: right; }
+  .admin-table.shop-orders-table .status-select { width: 100%; }
+  .admin-table.shop-orders-table .cell-actions { justify-self: end; }
+  .admin-table.shop-orders-table .cell-phone { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; }
+  .admin-table.shop-orders-table .cell-phone a { display: inline-flex; }
+  .admin-table.shop-orders-table .shop-order-chat { margin: 0; font-size: 15px; }
   .edit-sheet { padding: 28px 22px; }
   .delete-dialog { padding: 28px 22px; }
   .admin-head h1 { font-size: 30px; }
@@ -980,6 +990,22 @@ svg { flex-shrink: 0; }
 .affiliate-products .shop-url { flex-basis: 100%; }
 .affiliate-products input { width: 100%; }
 .affiliate-section-title { margin: 40px 0 16px; font-size: 20px; letter-spacing: -0.02em; }
+.shop-orders-table .shop-order-customer { min-width: 180px; max-width: 280px; white-space: normal; }
+.shop-orders-table .shop-order-customer .admin-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shop-orders-table .cell-phone a { display: block; }
+.shop-orders-table .shop-order-chat { margin-top: 2px; font-size: 13px; }
+.shop-orders-table .shop-order-items { min-width: 160px; max-width: 240px; white-space: normal; }
+.shop-orders-table .shop-order-total { font-variant-numeric: tabular-nums; }
+.shop-orders-table .status-select { min-width: 140px; }
+.shop-order-sheet section { display: flex; flex-direction: column; gap: 4px; padding-top: 20px; border-top: 1px solid var(--border); }
+.shop-order-sheet h3 { margin-bottom: 4px; color: var(--text-2); font-size: 13px; font-weight: 600; }
+.shop-order-contact { display: flex; flex-wrap: wrap; gap: 0 20px; }
+.shop-order-contact a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent-text); font-weight: 550; font-variant-numeric: tabular-nums; }
+.shop-order-text { color: var(--text-2); white-space: pre-line; }
+.shop-order-lines { margin: 0; padding: 0; list-style: none; }
+.shop-order-lines li { display: flex; justify-content: space-between; gap: 16px; padding-block: 10px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.shop-order-lines .shop-order-sum { font-weight: 650; border-bottom: 0; }
+.shop-order-sum .admin-sub { font-weight: 400; }
 .affiliate-orders { border-radius: var(--radius-button); }
 .affiliate-orders table { width: 100%; font-size: 15px; }
 .affiliate-orders :is(th, td) { padding: 14px 12px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }

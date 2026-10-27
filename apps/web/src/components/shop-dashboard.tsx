@@ -6,6 +6,7 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
+  Eye,
   ImageOff,
   Layers,
   LogOut,
@@ -862,6 +863,10 @@ function OrdersView({
 }) {
   const [filter, setFilter] = useState("all");
   const visible = filterOrders(orders ?? [], filter);
+  const [viewingId, setViewingId] = useState<number | null>(null);
+  // Looked up by id so the panel shows status changes made while it's open.
+  const viewing = orders?.find((order) => order.id === viewingId);
+  const opener = useRef<HTMLElement | null>(null);
   return (
     <>
       <div className="admin-toolbar">
@@ -895,109 +900,208 @@ function OrdersView({
           {loading ? "Refreshing…" : "Refresh"}
         </Button>
       </div>
-      <div className="flex flex-col gap-4">
-        {visible.map((order) => {
-          const chat = whatsappLink(order.customer_phone);
-          return (
-            <Card
-              key={order.id}
-              className="gap-4 p-5 shadow-none sm:p-6"
-              data-status={order.status}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-1">
-                <div>
-                  <h2 className="text-lg font-semibold">Order #{order.id}</h2>
-                  <p className="admin-sub">
-                    {orderDate.format(new Date(order.created_at))}
-                  </p>
-                  {affiliateNote(order) && (
-                    <p className="admin-sub">{affiliateNote(order)}</p>
-                  )}
-                </div>
-                <p className="text-xl font-semibold tabular-nums">
-                  {formatRupees(order.total_paise)}
-                </p>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="flex flex-col gap-1">
-                  <p className="font-medium">{order.customer_name}</p>
-                  <div className="flex flex-wrap gap-x-5 gap-y-1">
-                    <a
-                      className="inline-flex min-h-11 items-center font-medium tabular-nums text-(--accent-text)"
-                      href={`tel:${order.customer_phone}`}
-                    >
-                      {order.customer_phone}
-                    </a>
-                    {chat && (
-                      <a
-                        className="inline-flex min-h-11 items-center font-medium text-(--accent-text)"
-                        href={chat}
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        WhatsApp
+      {visible.length > 0 && (
+        <Card
+          className="admin-table shop-orders-table gap-0 py-0 shadow-none"
+          role="region"
+          tabIndex={0}
+          aria-label="Orders table"
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead scope="col">Order</TableHead>
+                <TableHead scope="col">Customer</TableHead>
+                <TableHead scope="col">Mobile</TableHead>
+                <TableHead scope="col">Items</TableHead>
+                <TableHead scope="col">Total</TableHead>
+                <TableHead scope="col">Status</TableHead>
+                <TableHead scope="col">
+                  <span className="sr-only">Details</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {visible.map((order) => {
+                const chat = whatsappLink(order.customer_phone);
+                const [first, ...rest] = order.items;
+                return (
+                  <TableRow key={order.id} data-status={order.status}>
+                    <TableCell className="cell-name">
+                      <span className="admin-name">#{order.id}</span>
+                      <span className="admin-sub">
+                        {orderDate.format(new Date(order.created_at))}
+                      </span>
+                      {affiliateNote(order) && (
+                        <span className="admin-sub">{affiliateNote(order)}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="shop-order-customer">
+                      <span className="admin-name">{order.customer_name}</span>
+                      <span className="admin-sub">{order.address}</span>
+                    </TableCell>
+                    <TableCell className="cell-phone">
+                      <a href={`tel:${order.customer_phone}`}>
+                        {order.customer_phone}
                       </a>
-                    )}
-                  </div>
-                  <p className="whitespace-pre-line text-(--text-2)">
-                    {order.address}
-                  </p>
-                  {order.note && (
-                    <p className="whitespace-pre-line text-(--text-2)">
-                      Note: {order.note}
-                    </p>
-                  )}
-                </div>
-                <ul className="flex flex-col gap-2">
-                  {order.items.map((line, index) => (
-                    <li
-                      key={`${line.id}-${index}`}
-                      className="flex justify-between gap-4"
+                      {chat && (
+                        <a
+                          className="shop-order-chat"
+                          href={chat}
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          WhatsApp
+                        </a>
+                      )}
+                    </TableCell>
+                    <TableCell className="shop-order-items">
+                      {first && (
+                        <span>
+                          {first.qty} × {first.name}
+                        </span>
+                      )}
+                      {rest.length > 0 && (
+                        <span className="admin-sub">+{rest.length} more</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="shop-order-total">
+                      <span className="admin-name">
+                        {formatRupees(order.total_paise)}
+                      </span>
+                      <span className="admin-sub">
+                        COD · {order.payment_status === "paid" ? "paid" : "pending"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="cell-status">
+                      <div className="status-select" data-status={order.status}>
+                        <NativeSelect
+                          size="sm"
+                          value={order.status}
+                          disabled={savingId === order.id}
+                          aria-label={`Status of order #${order.id}`}
+                          onChange={(event) =>
+                            onStatus(order, event.target.value as OrderStatus)
+                          }
+                        >
+                          {(Object.keys(orderStatuses) as OrderStatus[]).map((key) => (
+                        <NativeSelectOption key={key} value={key}>
+                          {orderStatuses[key]}
+                        </NativeSelectOption>
+                      ))}
+                        </NativeSelect>
+                      </div>
+                    </TableCell>
+                    <TableCell className="cell-actions">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        type="button"
+                        className="admin-icon"
+                        onClick={(event) => {
+                          opener.current = event.currentTarget;
+                          setViewingId(order.id);
+                        }}
+                      >
+                        <Eye aria-hidden="true" />
+                        <span className="sr-only">View order #{order.id}</span>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
+      <Sheet
+        open={viewing !== undefined}
+        onOpenChange={(open) => !open && setViewingId(null)}
+      >
+        <SheetContent
+          className="edit-sheet"
+          closeLabel="Close order"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            opener.current?.focus();
+          }}
+        >
+          {viewing && (
+            <div className="edit-form shop-order-sheet">
+              <SheetHeader>
+                <SheetTitle>Order #{viewing.id}</SheetTitle>
+                <SheetDescription>
+                  {orderDate.format(new Date(viewing.created_at))}
+                  {affiliateNote(viewing) && ` · ${affiliateNote(viewing)}`}
+                </SheetDescription>
+              </SheetHeader>
+              <section>
+                <h3>Customer</h3>
+                <p className="admin-name">{viewing.customer_name}</p>
+                <p className="shop-order-contact">
+                  <a href={`tel:${viewing.customer_phone}`}>
+                    {viewing.customer_phone}
+                  </a>
+                  {whatsappLink(viewing.customer_phone) && (
+                    <a
+                      href={whatsappLink(viewing.customer_phone)!}
+                      target="_blank"
+                      rel="noopener"
                     >
+                      WhatsApp
+                    </a>
+                  )}
+                </p>
+                <p className="shop-order-text">{viewing.address}</p>
+                {viewing.note && (
+                  <p className="shop-order-text">Note: {viewing.note}</p>
+                )}
+              </section>
+              <section>
+                <h3>Items</h3>
+                <ul className="shop-order-lines">
+                  {viewing.items.map((line, index) => (
+                    <li key={`${line.id}-${index}`}>
                       <span>
                         {line.qty} × {line.name}
-                        {line.size && (
-                          <span className="admin-sub">{line.size}</span>
-                        )}
+                        {line.size && <span className="admin-sub">{line.size}</span>}
                       </span>
-                      <span className="tabular-nums">
-                        {formatRupees(line.price_paise * line.qty)}
-                      </span>
+                      <span>{formatRupees(line.price_paise * line.qty)}</span>
                     </li>
                   ))}
+                  <li className="shop-order-sum">
+                    <span>
+                      Total
+                      <span className="admin-sub">
+                        Cash on delivery ·{" "}
+                        {viewing.payment_status === "paid" ? "paid" : "pending"}
+                      </span>
+                    </span>
+                    <span>{formatRupees(viewing.total_paise)}</span>
+                  </li>
                 </ul>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-(--border) pt-4">
-                <p className="text-(--text-2)">
-                  Cash on delivery ·{" "}
-                  {order.payment_status === "paid" ? "paid" : "pending"}
-                </p>
-                <Field className="field w-full sm:w-52">
-                  <FieldLabel htmlFor={`order-status-${order.id}`} className="sr-only">
-                    Status of order #{order.id}
-                  </FieldLabel>
-                  <NativeSelect
-                    id={`order-status-${order.id}`}
-                    value={order.status}
-                    disabled={savingId === order.id}
-                    onChange={(event) =>
-                      onStatus(order, event.target.value as OrderStatus)
-                    }
-                  >
-                    {(Object.keys(orderStatuses) as OrderStatus[]).map((key) => (
-                      <NativeSelectOption key={key} value={key}>
-                        {orderStatuses[key]}
-                      </NativeSelectOption>
-                    ))}
-                  </NativeSelect>
-                </Field>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+              </section>
+              <Field className="field">
+                <FieldLabel htmlFor="order-sheet-status">Status</FieldLabel>
+                <NativeSelect
+                  id="order-sheet-status"
+                  value={viewing.status}
+                  disabled={savingId === viewing.id}
+                  onChange={(event) =>
+                    onStatus(viewing, event.target.value as OrderStatus)
+                  }
+                >
+                  {(Object.keys(orderStatuses) as OrderStatus[]).map((key) => (
+                        <NativeSelectOption key={key} value={key}>
+                          {orderStatuses[key]}
+                        </NativeSelectOption>
+                      ))}
+                </NativeSelect>
+              </Field>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
       {orders && visible.length === 0 && (
         <Card className="gap-0 py-0 shadow-none">
           <p className="admin-empty">
