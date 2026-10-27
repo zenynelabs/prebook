@@ -1,4 +1,4 @@
-import { Banknote, PhoneCall, ShoppingBasket } from 'lucide-react'
+import { ArrowRight, Banknote, Handshake, Layers, LockKeyhole, PhoneCall, ShoppingBasket, Store, Tag } from 'lucide-react'
 import Link from 'next/link'
 import { AddToCart, BannerCarousel, CartButton, CartProvider } from './storefront-cart'
 import { affiliatePath, comboSavings, discountPercent, type Faq, formatRupees, imageUrl, type Product, type Shop, shopPath, shopSlug, themeStyle } from '@/lib/shops'
@@ -29,37 +29,157 @@ function Logo({ shop }: { shop: Shop }) {
   )
 }
 
+const reasons = [
+  { Icon: Store, title: 'Local storefronts', text: 'Every grocery, oil and essentials store has its own page, products and photos.' },
+  { Icon: Tag, title: 'The shop’s own prices', text: 'Prices come from the shop’s list and are checked again when you place the order.' },
+  { Icon: Layers, title: 'Combos that save', text: 'Shops bundle products into combos that show exactly how much you save.' },
+  { Icon: LockKeyhole, title: 'Details stay with the shop', text: 'Your name, mobile and address go only to the shop you order from.' },
+]
+
+const directoryFaqs: Faq[] = [
+  { question: 'How do I pay?', answer: 'Cash on delivery. Pay when your order reaches you; there is no online payment.' },
+  {
+    question: 'Is there a delivery charge?',
+    answer: 'Each shop sets its own. The shop tells you any delivery charge when it calls to confirm your order.',
+  },
+  {
+    question: 'Can I order from more than one shop?',
+    answer: 'Yes. Each shop has its own cart and checkout, so place one order with each shop.',
+  },
+  {
+    question: 'How do I add my shop?',
+    answer: 'Contact the PreBooking team. They create your shop and share the login so you can add products, combos and banners.',
+  },
+]
+
 /** /shops: every active shop, each card in its own theme colour. */
 export function ShopsDirectory({ shops }: { shops: Shop[] }) {
   return (
     <div className="store">
       <header className="store-header">
         <div className="container store-header-inner">
-          <div className="store-title">
-            <h1>Shops</h1>
-            <p>Local shops on PreBooking</p>
-          </div>
+          <Link className="brand" href="/" aria-label="PreBooking home">
+            <img src="/brand/navbar-logo-transparent.png" alt="" width="192" height="192" />
+            <span className="brand-copy">
+              <strong>PreBooking</strong>
+              <span>Shops</span>
+            </span>
+          </Link>
           <Link className="store-platform" href="/">PreBooking home</Link>
         </div>
       </header>
-      <main className="container store-body">
-        {shops.length === 0 ? (
-          <p className="store-empty">Shops are coming soon.</p>
-        ) : (
-          <ul className="store-directory">
-            {shops.map((shop) => (
-              <li key={shop.slug} style={themeStyle(shop.theme)}>
-                <Link href={shopPath(shop.slug)}>
-                  <Logo shop={shop} />
+      <main>
+        <section className="shops-hero">
+          <div className="container">
+            <p className="shops-eyebrow">PreBooking Shops</p>
+            <h1>Nearby shops, ordered from home.</h1>
+            <p className="shops-lede">
+              Groceries, oils and everyday essentials from shops on PreBooking. Order online and pay cash when it’s
+              delivered.
+            </p>
+            <ol className="shops-steps">
+              {steps.map(({ Icon, title, text }) => (
+                <li key={title}>
+                  <Icon aria-hidden="true" />
                   <span>
-                    <strong>{shop.name}</strong>
-                    {shop.tagline && <span>{shop.tagline}</span>}
+                    <strong>{title}</strong>
+                    {text}
                   </span>
-                </Link>
-              </li>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+        <section className="container shops-list" aria-labelledby="shops-heading">
+          <div className="shops-list-head">
+            <h2 id="shops-heading">All shops</h2>
+            {shops.length > 0 && (
+              <p>
+                {shops.length} {shops.length === 1 ? 'shop' : 'shops'}
+              </p>
+            )}
+          </div>
+          {shops.length === 0 ? (
+            <div className="shops-empty">
+              <Store aria-hidden="true" />
+              <p className="store-empty">Shops are coming soon.</p>
+            </div>
+          ) : (
+            <ul className="store-directory">
+              {shops.map((shop) => (
+                <li key={shop.slug} style={themeStyle(shop.theme)}>
+                  <Link href={shopPath(shop.slug)}>
+                    <span className="shop-card-cover">
+                      {shop.banners[0] && <img src={imageUrl(shop.banners[0].image)} alt="" loading="lazy" />}
+                    </span>
+                    <span className="shop-card-body">
+                      <Logo shop={shop} />
+                      <strong>{shop.name}</strong>
+                      {shop.tagline && <span className="shop-card-tagline">{shop.tagline}</span>}
+                      <span className="shop-card-cta">
+                        Visit shop <ArrowRight aria-hidden="true" />
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="shops-reasons" aria-labelledby="reasons-title">
+          <div className="container">
+            <h2 id="reasons-title">Why order on PreBooking</h2>
+            <ul>
+              {reasons.map(({ Icon, title, text }) => (
+                <li key={title}>
+                  <Icon aria-hidden="true" />
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="container shops-join" aria-labelledby="join-title">
+          <h2 id="join-title">Grow with PreBooking</h2>
+          <div>
+            <article>
+              <Store aria-hidden="true" />
+              <h3>Own a shop?</h3>
+              <p>
+                Get your own storefront with products, combos, banners and Cash-on-Delivery orders. The PreBooking team
+                sets it up and shares your login.
+              </p>
+              <Link className="shop-card-cta" href="/#connect">
+                Talk to PreBooking <ArrowRight aria-hidden="true" />
+              </Link>
+            </article>
+            <article>
+              <Handshake aria-hidden="true" />
+              <h3>Earn as an affiliate</h3>
+              <p>
+                Join a shop, share your product links and earn the commission that shop sets on every delivered order.
+              </p>
+              <Link className="shop-card-cta" href={affiliatePath}>
+                Become an affiliate <ArrowRight aria-hidden="true" />
+              </Link>
+            </article>
+          </div>
+        </section>
+
+        <section className="container store-faq" aria-labelledby="directory-faq-title">
+          <h2 id="directory-faq-title">Questions</h2>
+          <div>
+            {directoryFaqs.map((faq) => (
+              <details key={faq.question}>
+                <summary>{faq.question}</summary>
+                <p>{faq.answer}</p>
+              </details>
             ))}
-          </ul>
-        )}
+          </div>
+        </section>
       </main>
       <footer className="store-footer">
         <div className="container">
