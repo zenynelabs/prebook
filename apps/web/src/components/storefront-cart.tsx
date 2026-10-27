@@ -7,11 +7,14 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
+import { mobileInput } from '@/lib/registration'
 import { eventsApi } from '@/lib/site'
 import { type Banner, type CartLine, formatRupees, imageUrl, type OrderInput, type OrderLine, type Product, type Shop } from '@/lib/shops'
 
 const MAX_QTY = 99
 const REF_DAYS = 30
+/** Name, phone and address from the last order, shared by every shop, to prefill checkout. */
+const CUSTOMER_KEY = 'prebook-customer'
 
 /** An affiliate code from ?ref=, kept per shop for 30 days; the last link clicked wins. */
 export function freshRef(saved: unknown, now = Date.now()) {
@@ -179,6 +182,7 @@ function CartSheet({ shop }: { shop: Shop }) {
   const [placed, setPlaced] = useState<Placed | null>(null)
   const byId = new Map(products.map((product) => [product.id, product]))
   const total = cartTotal(lines, products)
+  const customer = step === 'details' ? (storage((store) => JSON.parse(store.getItem(CUSTOMER_KEY) ?? '{}')) ?? {}) : {}
 
   function close(next: boolean) {
     setOpen(next)
@@ -206,6 +210,7 @@ function CartSheet({ shop }: { shop: Shop }) {
       const body = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(body.error ?? 'Your order didn’t go through. Please try again.')
       setPlaced({ ...body.order, phone: order.phone })
+      storage((store) => store.setItem(CUSTOMER_KEY, JSON.stringify({ name: order.name, phone: order.phone, address: order.address })))
       clear()
     } catch (problem) {
       setError(problem instanceof TypeError ? 'You seem to be offline. Check your connection and try again.' : String((problem as Error).message))
@@ -306,15 +311,15 @@ function CartSheet({ shop }: { shop: Shop }) {
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="order-name">Full name</FieldLabel>
-                <Input id="order-name" name="name" autoComplete="name" required minLength={2} maxLength={80} />
+                <Input id="order-name" name="name" defaultValue={String(customer.name ?? '')} autoComplete="name" required minLength={2} maxLength={80} />
               </Field>
               <Field>
                 <FieldLabel htmlFor="order-phone">Mobile number</FieldLabel>
-                <Input id="order-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel-national" required minLength={10} maxLength={16} />
+                <Input id="order-phone" name="phone" {...mobileInput} defaultValue={String(customer.phone ?? '')} required />
               </Field>
               <Field>
                 <FieldLabel htmlFor="order-address">Delivery address</FieldLabel>
-                <Textarea id="order-address" name="address" autoComplete="street-address" required minLength={10} maxLength={500} rows={3} />
+                <Textarea id="order-address" name="address" defaultValue={String(customer.address ?? '')} autoComplete="street-address" required minLength={10} maxLength={500} rows={3} />
               </Field>
               <Field>
                 <FieldLabel htmlFor="order-note">Note for the shop (optional)</FieldLabel>
