@@ -9,6 +9,13 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { eventsApi } from "@/lib/site";
 import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "./ui/dialog";
 
 const REF_KEY = "prebook-ref";
 
@@ -104,15 +111,12 @@ function RegistrationForm() {
   const [done, setDone] = useState<{ name: string; phone: string } | null>(
     null,
   );
+  const [celebrate, setCelebrate] = useState(false);
   const confirmation = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     affiliateRef(window.location.search);
   }, []);
-
-  useEffect(() => {
-    if (done) confirmation.current?.focus();
-  }, [done]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -128,11 +132,13 @@ function RegistrationForm() {
           ref: affiliateRef(window.location.search),
         }),
       });
-      if (response.ok)
-        return setDone({
+      if (response.ok) {
+        setDone({
           name: String(fields.name).trim().split(/\s+/)[0],
           phone: String(fields.phone),
         });
+        return setCelebrate(true);
+      }
       const body = await response.json().catch(() => ({}));
       setError(body.error ?? "Something went wrong. Please try again.");
     } catch {
@@ -144,26 +150,57 @@ function RegistrationForm() {
     }
   }
 
+  const popup = (
+    <Dialog open={celebrate} onOpenChange={setCelebrate}>
+      <DialogContent
+        className="items-center gap-4 rounded-(--radius-button) text-center shadow-2xl"
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          confirmation.current?.focus();
+        }}
+      >
+        <span className="grid size-16 place-items-center rounded-full bg-(--accent-wash) text-(--accent)">
+          <Helicopter size={30} aria-hidden="true" />
+        </span>
+        <DialogTitle className="text-2xl leading-tight tracking-tight">
+          You’re on the list, {done?.name}!
+        </DialogTitle>
+        <DialogDescription className="text-base leading-relaxed text-(--text-2)">
+          Registration received. The PreBooking team will call {done?.phone} to
+          confirm the date, time slot and fare.
+        </DialogDescription>
+        <DialogClose asChild>
+          <Button size="lg" className="mt-2 w-full">
+            Done
+          </Button>
+        </DialogClose>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (done)
     return (
-      <motion.div
-        className="register-card register-done"
-        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Helicopter size={36} aria-hidden="true" />
-        <h3 ref={confirmation} tabIndex={-1}>
-          You’re on the list, {done.name}.
-        </h3>
-        <p>
-          The PreBooking team will call {done.phone} to confirm the date, time
-          slot and fare.
-        </p>
-        <Link className="text-link" href="/">
-          Back to PreBooking <ArrowRight size={18} aria-hidden="true" />
-        </Link>
-      </motion.div>
+      <>
+        {popup}
+        <motion.div
+          className="register-card register-done"
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Helicopter size={36} aria-hidden="true" />
+          <h3 ref={confirmation} tabIndex={-1}>
+            You’re on the list, {done.name}.
+          </h3>
+          <p>
+            The PreBooking team will call {done.phone} to confirm the date, time
+            slot and fare.
+          </p>
+          <Link className="text-link" href="/">
+            Back to PreBooking <ArrowRight size={18} aria-hidden="true" />
+          </Link>
+        </motion.div>
+      </>
     );
 
   return (
@@ -231,7 +268,12 @@ function RegistrationForm() {
       <p className="form-error" role="alert">
         {error}
       </p>
-      <Button type="submit" size="lg" className="register-submit" disabled={sending}>
+      <Button
+        type="submit"
+        size="lg"
+        className="register-submit"
+        disabled={sending}
+      >
         {sending ? "Sending…" : "Pre-register"}
         {!sending && <ArrowRight aria-hidden="true" />}
       </Button>
@@ -253,6 +295,11 @@ export default function EventPage() {
     updateHeader();
     window.addEventListener("scroll", updateHeader, { passive: true });
 
+    // Affiliate links (?ref=) land people here to register, so take them to the form.
+    const toForm = new URLSearchParams(window.location.search).has("ref");
+    if (toForm && matchMedia("(prefers-reduced-motion: reduce)").matches)
+      document.getElementById("register")?.scrollIntoView();
+
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
     media.add(
@@ -266,6 +313,10 @@ export default function EventPage() {
         const tick = (time: number) => lenis.raf(time * 1000);
         lenis.on("scroll", ScrollTrigger.update);
         gsap.ticker.add(tick);
+        if (toForm)
+          gsap.delayedCall(0.5, () =>
+            lenis.scrollTo("#register", { offset: -96, duration: 1.4 }),
+          );
 
         const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
         intro
@@ -276,7 +327,13 @@ export default function EventPage() {
           })
           .from(
             "[data-hero-copy]",
-            { y: 22, opacity: 0, duration: 0.8, stagger: 0.09, clearProps: "all" },
+            {
+              y: 22,
+              opacity: 0,
+              duration: 0.8,
+              stagger: 0.09,
+              clearProps: "all",
+            },
             0.1,
           )
           .from(
@@ -490,7 +547,11 @@ export default function EventPage() {
           <Link href="/">
             Back to PreBooking <ArrowRight size={13} aria-hidden="true" />
           </Link>
-          <a href="https://zenyne.com" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://zenyne.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Made with care by Zenyne Labs
           </a>
         </div>

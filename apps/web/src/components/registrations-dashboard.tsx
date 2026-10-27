@@ -2,6 +2,8 @@
 
 import {
   Check,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   ExternalLink,
   Globe,
@@ -76,6 +78,14 @@ const dateFormat = new Intl.DateTimeFormat("en-IN", {
   timeStyle: "short",
   timeZone: "Asia/Kolkata",
 });
+const dayFormat = new Intl.DateTimeFormat("en-IN", {
+  dateStyle: "medium",
+  timeZone: "Asia/Kolkata",
+});
+const timeFormat = new Intl.DateTimeFormat("en-IN", {
+  timeStyle: "short",
+  timeZone: "Asia/Kolkata",
+});
 
 export function filterRegistrations(rows: Registration[], filters: Filters) {
   const needle = filters.query.trim().toLowerCase();
@@ -114,6 +124,89 @@ export function rankAffiliates(affiliates: Affiliate[], rows: Registration[]) {
 
 export const affiliateLink = (code: string) =>
   `${site.url}${helicopterRide.path}?ref=${encodeURIComponent(code)}`;
+
+/** Same rule the API applies, so the form shows the code that will be saved. */
+export const linkCode = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 32);
+
+const PAGE_SIZES = [10, 25, 50];
+
+export function paginate<T>(items: T[], page: number, size: number) {
+  const pages = Math.max(1, Math.ceil(items.length / size));
+  const current = Math.min(Math.max(page, 1), pages);
+  const start = (current - 1) * size;
+  return {
+    items: items.slice(start, start + size),
+    page: current,
+    pages,
+    from: items.length ? start + 1 : 0,
+    to: Math.min(start + size, items.length),
+    total: items.length,
+  };
+}
+
+function Pagination({
+  label,
+  pager,
+  size,
+  onPage,
+  onSize,
+}: {
+  label: string;
+  pager: ReturnType<typeof paginate>;
+  size: number;
+  onPage: (page: number) => void;
+  onSize: (size: number) => void;
+}) {
+  if (pager.total === 0) return null;
+  return (
+    <nav className="admin-pagination" aria-label={`${label} pages`}>
+      <p aria-live="polite">
+        Showing {pager.from}–{pager.to} of {pager.total}
+      </p>
+      <div className="pagination-controls">
+        <label className="pagination-size">
+          Per page
+          <select
+            value={size}
+            onChange={(event) => onSize(Number(event.target.value))}
+          >
+            {PAGE_SIZES.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          className="admin-icon"
+          disabled={pager.page <= 1}
+          onClick={() => onPage(pager.page - 1)}
+        >
+          <ChevronLeft aria-hidden="true" />
+          <span className="sr-only">Previous page</span>
+        </button>
+        <span className="pagination-page">
+          Page {pager.page} of {pager.pages}
+        </span>
+        <button
+          type="button"
+          className="admin-icon"
+          disabled={pager.page >= pager.pages}
+          onClick={() => onPage(pager.page + 1)}
+        >
+          <ChevronRight aria-hidden="true" />
+          <span className="sr-only">Next page</span>
+        </button>
+      </div>
+    </nav>
+  );
+}
 
 function storage(action: (store: Storage) => string | null | void) {
   try {
@@ -575,6 +668,14 @@ export default function RegistrationsDashboard() {
       : document.querySelector<HTMLElement>(".admin-table");
     target?.focus();
   };
+  const [pageSize, setPageSize] = useState(25);
+  const [registrationPage, setRegistrationPage] = useState(1);
+  const [affiliatePage, setAffiliatePage] = useState(1);
+  const [affiliateDraft, setAffiliateDraft] = useState({
+    name: "",
+    code: "",
+    edited: false,
+  });
   const [filters, setFilters] = useState<Filters>({
     query: "",
     status: "all",
@@ -707,7 +808,7 @@ export default function RegistrationsDashboard() {
       if (!response.ok)
         return setAffiliateError(body.error ?? "Couldn’t create the link.");
       setAffiliates((current) => [...current, body.affiliate]);
-      form.reset();
+      setAffiliateDraft({ name: "", code: "", edited: false });
     } catch {
       setAffiliateError(
         "Couldn’t reach the server. Check your connection and retry.",
@@ -779,6 +880,26 @@ export default function RegistrationsDashboard() {
     }
   }
 
+  function filter(change: Partial<Filters>) {
+    setFilters({ ...filters, ...change });
+    setRegistrationPage(1);
+  }
+
+  function turnPage(setPage: (page: number) => void, page: number) {
+    setPage(page);
+    requestAnimationFrame(() => {
+      const table = document.querySelector<HTMLElement>(".admin-table");
+      if (table && table.getBoundingClientRect().top < 0)
+        table.scrollIntoView({ block: "start" });
+    });
+  }
+
+  function resize(size: number) {
+    setPageSize(size);
+    setRegistrationPage(1);
+    setAffiliatePage(1);
+  }
+
   function showView(next: View) {
     setView(next);
     setMenuOpen(false);
@@ -825,6 +946,8 @@ export default function RegistrationsDashboard() {
   const affiliateNames = new Map(affiliates.map((a) => [a.code, a.name]));
   const ranked = rankAffiliates(affiliates, rows);
   const direct = rows.filter((row) => !row.ref).length;
+  const registrationPager = paginate(visible, registrationPage, pageSize);
+  const affiliatePager = paginate(ranked, affiliatePage, pageSize);
   const nav = (
     <SidebarNav view={view} onView={showView} onSignOut={() => signOut()} />
   );
@@ -887,6 +1010,15 @@ export default function RegistrationsDashboard() {
                   <input
                     id="affiliate-name"
                     name="name"
+                    value={affiliateDraft.name}
+                    onChange={(event) => {
+                      const name = event.target.value;
+                      setAffiliateDraft((draft) => ({
+                        ...draft,
+                        name,
+                        code: draft.edited ? draft.code : linkCode(name),
+                      }));
+                    }}
                     required
                     minLength={2}
                     maxLength={80}
@@ -895,11 +1027,21 @@ export default function RegistrationsDashboard() {
                 </div>
                 <div className="field">
                   <label htmlFor="affiliate-code">
-                    Link code <span>(optional)</span>
+                    Link code <span>(filled from the name)</span>
                   </label>
                   <input
                     id="affiliate-code"
                     name="code"
+                    value={affiliateDraft.code}
+                    onChange={(event) => {
+                      const code = event.target.value;
+                      // Clearing the field hands it back to the name.
+                      setAffiliateDraft((draft) => ({
+                        ...draft,
+                        code,
+                        edited: code !== "",
+                      }));
+                    }}
                     maxLength={32}
                     pattern="[A-Za-z0-9 _\-]*"
                     placeholder="selvi-travels"
@@ -933,9 +1075,11 @@ export default function RegistrationsDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {ranked.map((affiliate, index) => (
+                    {affiliatePager.items.map((affiliate, index) => (
                       <tr key={affiliate.code}>
-                        <td className="cell-rank">{index + 1}</td>
+                        <td className="cell-rank">
+                          {affiliatePager.from + index}
+                        </td>
                         <td className="cell-name">
                           <span className="admin-name">{affiliate.name}</span>
                           <span className="admin-sub">
@@ -1003,6 +1147,13 @@ export default function RegistrationsDashboard() {
                   </p>
                 )}
               </div>
+              <Pagination
+                label="Affiliate links"
+                pager={affiliatePager}
+                size={pageSize}
+                onPage={(page) => turnPage(setAffiliatePage, page)}
+                onSize={resize}
+              />
               <p className="admin-note">
                 {direct} {direct === 1 ? "registration" : "registrations"} came
                 without an affiliate link.
@@ -1025,32 +1176,34 @@ export default function RegistrationsDashboard() {
               </dl>
 
               <div className="admin-toolbar">
-                <div
-                  className="admin-segments"
-                  role="group"
-                  aria-label="Filter by status"
-                >
-                  {[["all", "All"] as const, ...statuses].map(
-                    ([value, label]) => (
-                      <button
-                        key={value}
-                        type="button"
-                        aria-pressed={filters.status === value}
-                        onClick={() =>
-                          setFilters({ ...filters, status: value })
-                        }
-                      >
-                        {label}
-                        <span>
-                          {value === "all"
-                            ? rows.length
-                            : rows.filter((row) => row.status === value).length}
-                        </span>
-                      </button>
-                    ),
-                  )}
-                </div>
                 <div className="admin-filters">
+                  <div className="field">
+                    <label htmlFor="status-filter" className="sr-only">
+                      Filter by status
+                    </label>
+                    <select
+                      id="status-filter"
+                      value={filters.status}
+                      onChange={(event) =>
+                        filter({
+                          status: event.target.value as Filters["status"],
+                        })
+                      }
+                    >
+                      {[["all", "All statuses"] as const, ...statuses].map(
+                        ([value, label]) => (
+                          <option key={value} value={value}>
+                            {label} (
+                            {value === "all"
+                              ? rows.length
+                              : rows.filter((row) => row.status === value)
+                                  .length}
+                            )
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </div>
                   <div className="field">
                     <label htmlFor="payment-filter" className="sr-only">
                       Filter by payment
@@ -1059,8 +1212,7 @@ export default function RegistrationsDashboard() {
                       id="payment-filter"
                       value={filters.payment}
                       onChange={(event) =>
-                        setFilters({
-                          ...filters,
+                        filter({
                           payment: event.target.value as Filters["payment"],
                         })
                       }
@@ -1081,7 +1233,7 @@ export default function RegistrationsDashboard() {
                       placeholder="Search name, mobile, address or notes"
                       value={filters.query}
                       onChange={(event) =>
-                        setFilters({ ...filters, query: event.target.value })
+                        filter({ query: event.target.value })
                       }
                     />
                   </div>
@@ -1114,7 +1266,7 @@ export default function RegistrationsDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visible.map((row) => {
+                    {registrationPager.items.map((row) => {
                       const saving = savingId === row.id;
                       const paid = row.payment_status === "paid";
                       return (
@@ -1131,7 +1283,12 @@ export default function RegistrationsDashboard() {
                             </a>
                           </td>
                           <td className="admin-address">{row.address}</td>
-                          <td className="cell-seats">{row.passengers}</td>
+                          <td className="cell-seats">
+                            {row.passengers}
+                            <span className="seats-unit">
+                              {row.passengers === 1 ? " seat" : " seats"}
+                            </span>
+                          </td>
                           <td className="cell-status">
                             <span
                               className="status-select"
@@ -1175,12 +1332,14 @@ export default function RegistrationsDashboard() {
                             </button>
                           </td>
                           <td className="cell-date">
-                            {dateFormat.format(new Date(row.created_at))}
-                            {row.ref && (
-                              <span className="admin-sub">
-                                via {affiliateNames.get(row.ref) ?? row.ref}
-                              </span>
-                            )}
+                            <span className="admin-day">
+                              {dayFormat.format(new Date(row.created_at))}
+                            </span>
+                            <span className="admin-sub">
+                              {timeFormat.format(new Date(row.created_at))}
+                              {row.ref &&
+                                ` · via ${affiliateNames.get(row.ref) ?? row.ref}`}
+                            </span>
                           </td>
                           <td className="cell-actions">
                             <button
@@ -1219,6 +1378,13 @@ export default function RegistrationsDashboard() {
                   </p>
                 )}
               </div>
+              <Pagination
+                label="Registrations"
+                pager={registrationPager}
+                size={pageSize}
+                onPage={(page) => turnPage(setRegistrationPage, page)}
+                onSize={resize}
+              />
             </>
           )}
         </main>

@@ -568,36 +568,6 @@ export default function LandingPage() {
         </div>
 
         <section
-          id="events"
-          tabIndex={-1}
-          className="event-teaser section-space"
-          aria-labelledby="events-title"
-        >
-          <div className="container event-teaser-layout">
-            <div className="event-teaser-copy">
-              <p className="event-label">Upcoming event</p>
-              <h2 id="events-title">
-                See Tirunelveli
-                <br />
-                <span>from the sky.</span>
-              </h2>
-              <p>
-                Pre-book a helicopter ride over Nellai. Register your interest
-                in under a minute and the PreBooking team will call to confirm
-                your seat, date and fare.
-              </p>
-              <Button asChild size="lg">
-                <Link href={helicopterRide.path}>
-                  Pre-register for the ride{" "}
-                  <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-            <BoardingPass />
-          </div>
-        </section>
-
-        <section
           id="community"
           tabIndex={-1}
           className="community-section section-space"
@@ -972,6 +942,36 @@ export default function LandingPage() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section
+          id="events"
+          tabIndex={-1}
+          className="event-teaser section-space"
+          aria-labelledby="events-title"
+        >
+          <div className="container event-teaser-layout">
+            <div className="event-teaser-copy">
+              <p className="event-label">Upcoming event</p>
+              <h2 id="events-title">
+                See Tirunelveli
+                <br />
+                <span>from the sky.</span>
+              </h2>
+              <p>
+                Pre-book a helicopter ride over Nellai. Register your interest
+                in under a minute and the PreBooking team will call to confirm
+                your seat, date and fare.
+              </p>
+              <Button asChild size="lg">
+                <Link href={helicopterRide.path}>
+                  Pre-register for the ride{" "}
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+            <BoardingPass />
           </div>
         </section>
 

@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import EventPage, { affiliateRef } from "./event-page";
-import RegistrationsDashboard, { affiliateLink, type Filters, filterRegistrations, rankAffiliates, type Registration, summarise } from "./registrations-dashboard";
+import RegistrationsDashboard, { affiliateLink, type Filters, filterRegistrations, linkCode, paginate, rankAffiliates, type Registration, summarise } from "./registrations-dashboard";
 
 test("event page ships its details and a complete registration form in HTML", () => {
   const html = renderToStaticMarkup(<EventPage />);
@@ -61,4 +61,20 @@ test("the affiliate ref is remembered for later visits, and a newer link replace
   expect(affiliateRef("?ref=selvi")).toBe("selvi");
   expect(affiliateRef("?utm=x")).toBe("selvi");
   expect(affiliateRef("?ref=ravi")).toBe("ravi");
+});
+
+test("affiliate link codes are filled from the name the way the API saves them", () => {
+  expect(linkCode("Selvi Travels")).toBe("selvi-travels");
+  expect(linkCode("  Nambi & Sons, Nellai! ")).toBe("nambi-sons-nellai");
+  expect(linkCode("தமிழ்")).toBe("");
+  expect(linkCode("x".repeat(40))).toHaveLength(32);
+});
+
+test("pagination slices pages, clamps out-of-range pages and reports the visible range", () => {
+  const items = Array.from({ length: 57 }, (_, index) => index + 1);
+  expect(paginate(items, 1, 25)).toMatchObject({ page: 1, pages: 3, from: 1, to: 25, total: 57 });
+  expect(paginate(items, 3, 25)).toMatchObject({ page: 3, from: 51, to: 57, items: [51, 52, 53, 54, 55, 56, 57] });
+  expect(paginate(items, 9, 25).page).toBe(3);
+  expect(paginate(items, 0, 25).page).toBe(1);
+  expect(paginate([], 1, 25)).toMatchObject({ page: 1, pages: 1, from: 0, to: 0, items: [] });
 });

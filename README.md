@@ -55,7 +55,8 @@ found, so the page says "to be announced" and the team confirms by phone.
   the same tokens, Lenis and GSAP and has the registration form: name, mobile,
   optional email, address and 1–6 passengers. No payment is taken.
 - `/admin/registrations` is a noindex, token-gated dashboard with a sidebar,
-  totals, status/payment filters and search. Staff set each registration's
+  totals, status/payment dropdown filters, search and client-side pagination
+  (10/25/50 per page) on the registrations and affiliate tables. Staff set each registration's
   status (new, contacted, confirmed, cancelled) and payment (unpaid, paid)
   inline, and edit contact details and notes in a side panel through the admin
   `PUT /registrations/:id`. Payment is tracked offline only: there is no
