@@ -54,7 +54,7 @@ found, so the page says "to be announced" and the team confirms by phone.
 - `/#events` on the homepage links to `/events/helicopter-ride`, which uses
   the same tokens, Lenis and GSAP and has the registration form: name, mobile,
   optional email, address and 1–6 passengers. No payment is taken.
-- `/admin/registrations` is a noindex, token-gated dashboard with a sidebar,
+- `/admin` is a noindex dashboard, behind staff email and password sign-in, with a sidebar,
   totals, status/payment dropdown filters, search and client-side pagination
   (10/25/50 per page) on the registrations and affiliate tables. Staff set each registration's
   status (new, contacted, confirmed, cancelled) and payment (unpaid, paid)
@@ -75,7 +75,15 @@ found, so the page says "to be announced" and the team confirms by phone.
   affiliates by registrations, seats, confirmed and paid; staff can rename an
   affiliate (the code and link stay fixed) or delete one, which keeps its
   registrations but unattributes them. Also outside the agreed scope.
-- The dashboard token is the Worker secret `ADMIN_TOKEN`. Locally it is in the
+- Staff accounts live in the D1 `admins` table (`migrations/0005_admins.sql`)
+  with PBKDF2-SHA256 password hashes. There is no account screen: create a
+  login, or reset its password and sign it out everywhere, with
+  `bun run add-admin <email> "<name>" --remote` from `apps/api` (omit
+  `--remote` for local D1). The password is typed hidden. Sessions are random
+  tokens stored hashed in D1 for 7 days and kept in the browser tab's
+  sessionStorage; sign-in shares the public form's 10/minute limit.
+- The Worker secret `ADMIN_TOKEN` is still accepted as a bearer token for
+  scripts, but the dashboards no longer ask for it. Locally it is in the
   gitignored `apps/api/.dev.vars`. Rotate it with `wrangler secret put ADMIN_TOKEN`.
 - The web app reads the API URL from `NEXT_PUBLIC_EVENTS_API` and falls back to
   the workers.dev URL above.
@@ -86,6 +94,64 @@ bun run test
 bun run migrate    # apply D1 migrations remotely
 bun run deploy
 ```
+
+### Shops
+
+Added at the user's request on 27 October 2026. Multi-vendor shops are
+explicitly outside the agreed scope below; quote or confirm them separately
+with the client. Products focus on groceries, oils and bottled goods. There is
+no online payment: orders are Cash on Delivery only.
+
+- The Shops view of the `/admin` dashboard (also opened directly by
+  `/admin/shops`) creates a shop with a
+  permanent link name (slug), owner name, owner mobile and a password, shown
+  once to share. Staff can switch a shop off, reset its password (which signs
+  the owner out everywhere) or delete it with its products and images.
+- `/shop-admin` is the owner's dashboard: sign in with the shop link name and
+  password, then manage products, combos (bundles of the shop's own products
+  that show their saving), logo, up to five banners, one of five colour themes
+  and the password. Photos are downscaled in the browser to WebP and stored in
+  the R2 bucket `prebook-shop-images`.
+- `/shops/<slug>` is the public, server-rendered storefront for active shops.
+  `/shops` lists every active shop, each card in its shop's theme colour, and
+  is linked as "Shops" from the homepage navbar and mobile menu.
+  The owner's mobile number never leaves the admin API.
+- API: `apps/api/src/shops.ts` in the same Worker and D1 database
+  (`migrations/0004_shops.sql`). Passwords are PBKDF2-SHA256 hashes; owner
+  sessions are random tokens stored hashed in D1 for 30 days. Prices are
+  integer paise. Shop sign-in shares the public form's 10/minute limit.
+- Before first deploy: `wrangler r2 bucket create prebook-shop-images`, then
+  `bun run migrate` and `bun run deploy` from `apps/api`.
+
+### Shop affiliates
+
+Added at the user's request on 27 October 2026, on top of Shops; equally
+outside the agreed scope, so quote or confirm it separately.
+
+- `/affiliate`: anyone registers once with name, mobile and password, then
+  applies to a shop through its storefront footer link (`/affiliate?shop=<slug>`).
+  The dashboard shows each shop's status and commission %, a link per product
+  to share (`/shops/<slug>?ref=<code>#p-<id>`), totals and recent orders. It
+  never shows customer details or the owner's mobile.
+- The shop owner's Affiliates view approves, rejects or revokes applicants,
+  shows each one's mobile and totals, and sets one whole-number commission
+  (0–50%) for the shop. Orders show which affiliate brought them.
+- The storefront keeps a `?ref=` for 30 days per shop (last click wins) and
+  sends it with the order. The API credits the order only for an affiliate
+  that shop approved, never for the affiliate's own mobile, and fixes the
+  commission in paise (rounded down) at checkout. It counts as earned once the
+  order is delivered; cancelled orders don't count. Payout is settled offline.
+- API: `apps/api/src/partners.ts` (tables are `partners*` so they don't clash
+  with the event's `affiliates`), owner routes in `shops.ts`,
+  `migrations/0007_shop_affiliates.sql`. Run `bun run migrate` before deploying.
+- Storefront cart and Cash-on-Delivery checkout: `POST /shops/<slug>/orders`
+  prices every line from the shop's own products (never the browser), snapshots
+  it into an `orders` row in integer paise and shares the tight 10/minute limit.
+- The owner's Orders view (`/owner/orders`) lists the newest 200 orders and moves
+  each through new, confirmed, delivered or cancelled; delivered marks it paid.
+- Owners add up to 10 FAQs, shown on their storefront.
+- `migrations/0006_shop_orders.sql` adds FAQs and orders: run `bun run migrate`
+  (`wrangler d1 migrations apply DB --remote`) before deploying this API.
 
 ## Agreed product scope
 
@@ -224,8 +290,8 @@ background for platform rendering. Open Graph and Twitter use the
 across borders.”, the PreBooking emblem and the confirmed website address. Organization structured
 data uses the emblem. Browser icons and logo consumers retain the
 `transparent-1` asset revision to refresh cached opaque logos.
-`/robots.txt` and `/sitemap.xml` expose the single
-public landing route using the confirmed `https://www.prebookingpbkworld.com` canonical host.
+`/robots.txt` and `/sitemap.xml` expose the homepage, the helicopter ride
+page and `/shops` using the confirmed `https://www.prebookingpbkworld.com` canonical host.
 
 SEO titles and descriptions focus on global business networking.
 The canonical host and metadata share `apps/web/src/lib/site.ts`. The homepage renders `Organization` and
