@@ -1,6 +1,16 @@
 "use client";
 
-import { Check, Copy, LogOut } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Globe,
+  LogOut,
+  Menu,
+  Search,
+  ShoppingBag,
+  Store,
+  Wallet,
+} from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -10,18 +20,27 @@ import {
   affiliatePath,
   affiliateStatuses,
   formatRupees,
+  imageUrl,
   orderStatuses,
   shopPath,
   shopSlug,
   shopsPath,
   themeStyle,
 } from "@/lib/shops";
+import { mobileInput } from "@/lib/registration";
 import { eventsApi } from "@/lib/site";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Field, FieldError, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 import {
   Table,
   TableBody,
@@ -48,6 +67,13 @@ function storage(action: (store: Storage) => string | null | void) {
   }
 }
 
+type View = "shops" | "earnings";
+
+const views: [View, string, typeof Store][] = [
+  ["shops", "My shops", Store],
+  ["earnings", "Earnings", Wallet],
+];
+
 /** Totals across every shop the affiliate has applied to. */
 export function totals(shops: Dashboard["shops"]) {
   return shops.reduce(
@@ -57,6 +83,58 @@ export function totals(shops: Dashboard["shops"]) {
       pending_paise: sum.pending_paise + shop.pending_paise,
     }),
     { orders: 0, earned_paise: 0, pending_paise: 0 },
+  );
+}
+
+function SidebarNav({
+  view,
+  onView,
+  onSignOut,
+}: {
+  view: View;
+  onView: (view: View) => void;
+  onSignOut: () => void;
+}) {
+  return (
+    <>
+      <nav className="admin-nav" aria-label="Dashboard">
+        <p>Affiliate</p>
+        {views.map(([value, label, Icon]) => (
+          <Button
+            key={value}
+            variant="ghost"
+            type="button"
+            aria-current={view === value ? "page" : undefined}
+            onClick={() => onView(value)}
+          >
+            <Icon aria-hidden="true" />
+            {label}
+          </Button>
+        ))}
+        <p>Website</p>
+        <Button variant="ghost" asChild>
+          <Link href={shopsPath}>
+            <ShoppingBag aria-hidden="true" />
+            Browse shops
+          </Link>
+        </Button>
+        <Button variant="ghost" asChild>
+          <Link href="/">
+            <Globe aria-hidden="true" />
+            Homepage
+          </Link>
+        </Button>
+      </nav>
+      <Button
+        variant="ghost"
+        type="button"
+        className="admin-signout"
+        onClick={onSignOut}
+      >
+        <LogOut aria-hidden="true" />
+        Sign out
+      </Button>
+    </>
   );
 }
 
@@ -78,7 +156,7 @@ function Brand() {
 }
 
 /** Copies on click; if the clipboard is blocked, shows the link selected so it can be copied by hand. */
-function CopyLink({ link }: { link: string }) {
+function CopyLink({ link, label }: { link: string; label?: string }) {
   const [state, setState] = useState<"idle" | "copied" | "manual">("idle");
   const field = useRef<HTMLInputElement>(null);
 
@@ -100,13 +178,27 @@ function CopyLink({ link }: { link: string }) {
 
   return (
     <>
-      <Button variant="outline" size="sm" type="button" onClick={copy}>
+      <Button
+        variant="outline"
+        size={label ? "icon" : "sm"}
+        type="button"
+        className={label ? "affiliate-copy-icon" : undefined}
+        onClick={copy}
+      >
         {state === "copied" ? (
           <Check aria-hidden="true" />
         ) : (
           <Copy aria-hidden="true" />
         )}
-        {state === "copied" ? "Copied" : "Copy link"}
+        {label ? (
+          <span className="sr-only">
+            {state === "copied" ? "Copied" : label}
+          </span>
+        ) : state === "copied" ? (
+          "Copied"
+        ) : (
+          "Copy link"
+        )}
       </Button>
       {state === "manual" && (
         <Input
@@ -121,6 +213,138 @@ function CopyLink({ link }: { link: string }) {
   );
 }
 
+const PREVIEW = 6;
+
+type DashboardShop = Dashboard["shops"][number];
+
+function ShopCard({ shop, code }: { shop: DashboardShop; code: string }) {
+  const [query, setQuery] = useState("");
+  const [all, setAll] = useState(false);
+  const link = (id?: number) =>
+    affiliateLink(location.origin, shop.slug, code, id);
+  const wanted = query.trim().toLowerCase();
+  const matches = wanted
+    ? shop.products.filter((product) =>
+        product.name.toLowerCase().includes(wanted),
+      )
+    : shop.products;
+  const shown = all || wanted ? matches : matches.slice(0, PREVIEW);
+
+  return (
+    <Card
+      className="affiliate-shop gap-0 py-0 shadow-none"
+      style={themeStyle(shop.theme)}
+    >
+      <div className="affiliate-shop-head">
+        {shop.logo ? (
+          <img className="store-logo" src={imageUrl(shop.logo)} alt="" width={48} height={48} />
+        ) : (
+          <span className="store-logo" aria-hidden="true">
+            {shop.name.trim().charAt(0).toUpperCase()}
+          </span>
+        )}
+        <div>
+          <h2>
+            <Link href={shopPath(shop.slug)}>{shop.name}</Link>
+          </h2>
+          <p>
+            {shop.commission_percent}% commission · {shop.orders}{" "}
+            {shop.orders === 1 ? "order" : "orders"} ·{" "}
+            {formatRupees(shop.earned_paise)} earned ·{" "}
+            {formatRupees(shop.pending_paise)} pending
+          </p>
+        </div>
+        <span className="affiliate-status" data-status={shop.status}>
+          {affiliateStatuses[shop.status]}
+        </span>
+      </div>
+
+      {shop.status !== "approved" ? (
+        <p className="affiliate-hint affiliate-shop-note">
+          {shop.status === "pending"
+            ? "The shop owner hasn’t approved you yet. Your links appear here once they do."
+            : "The shop owner didn’t approve your application."}
+        </p>
+      ) : (
+        <>
+          <div className="affiliate-shop-link">
+            <span>Shop link</span>
+            <code>{link()}</code>
+            <CopyLink link={link()} />
+          </div>
+
+          {shop.products.length > 0 && (
+            <div className="affiliate-products-block">
+              <div className="affiliate-products-head">
+                <h3>
+                  Product links <span>{shop.products.length}</span>
+                </h3>
+                {shop.products.length > PREVIEW && (
+                  <label className="affiliate-search">
+                    <Search aria-hidden="true" />
+                    <span className="sr-only">Search {shop.name} products</span>
+                    <Input
+                      type="search"
+                      placeholder="Search products"
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                    />
+                  </label>
+                )}
+              </div>
+              {shown.length === 0 ? (
+                <p className="affiliate-hint">No products match “{query.trim()}”.</p>
+              ) : (
+                <ul className="affiliate-products">
+                  {shown.map((product) => (
+                    <li key={product.id} data-stock={product.in_stock ? undefined : "out"}>
+                      <span className="affiliate-thumb">
+                        {product.image ? (
+                          <img src={imageUrl(product.image)} alt="" width={48} height={48} loading="lazy" />
+                        ) : (
+                          <span aria-hidden="true">
+                            {product.name.trim().charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+                      <span className="affiliate-product-copy">
+                        <strong>{product.name}</strong>
+                        <span>
+                          {product.in_stock
+                            ? [product.size, formatRupees(product.price_paise)]
+                                .filter(Boolean)
+                                .join(" · ")
+                            : "Out of stock"}
+                        </span>
+                      </span>
+                      {product.in_stock && (
+                        <CopyLink
+                          link={link(product.id)}
+                          label={`Copy link for ${product.name}`}
+                        />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {!wanted && matches.length > PREVIEW && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="affiliate-more"
+                  onClick={() => setAll(!all)}
+                >
+                  {all ? "Show fewer" : `Show all ${matches.length} products`}
+                </Button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </Card>
+  );
+}
+
 export default function AffiliateDashboard() {
   const [token, setToken] = useState<string | null>(null);
   const [data, setData] = useState<Dashboard | null>(null);
@@ -128,6 +352,8 @@ export default function AffiliateDashboard() {
   const [apply, setApply] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState<View>("shops");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const signOut = useCallback((message = "") => {
     storage((store) => store.removeItem(AFFILIATE_TOKEN_KEY));
@@ -250,9 +476,7 @@ export default function AffiliateDashboard() {
               <Input
                 id="affiliate-phone"
                 name="phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
+                {...mobileInput}
                 required
               />
             </Field>
@@ -288,154 +512,136 @@ export default function AffiliateDashboard() {
   }
 
   const sum = totals(data.shops);
+  const nav = (
+    <SidebarNav
+      view={view}
+      onView={(next) => {
+        setView(next);
+        setMenuOpen(false);
+      }}
+      onSignOut={logout}
+    />
+  );
   return (
-    <>
-      <header className="affiliate-bar">
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
         <Brand />
-        <Button variant="outline" size="sm" type="button" onClick={logout}>
-          <LogOut aria-hidden="true" />
-          Sign out
-        </Button>
-      </header>
+        {nav}
+      </aside>
 
-      <main className="admin-content affiliate-content">
-        <div className="admin-head">
-          <div>
-            <p className="admin-eyebrow">{data.affiliate.name}</p>
-            <h1>Affiliate dashboard</h1>
-          </div>
-        </div>
-
-        {error && (
-          <Alert variant="destructive" className="admin-error">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <dl className="affiliate-totals">
-          <div>
-            <dt>Earned</dt>
-            <dd>{formatRupees(sum.earned_paise)}</dd>
-          </div>
-          <div>
-            <dt>Pending</dt>
-            <dd>{formatRupees(sum.pending_paise)}</dd>
-          </div>
-          <div>
-            <dt>Orders</dt>
-            <dd>{sum.orders}</dd>
-          </div>
-        </dl>
-
-        {data.shops.length === 0 && (
-          <p className="affiliate-hint">
-            Open a shop’s page and use “Become an affiliate” to apply.{" "}
-            <Link className="text-(--accent-text) font-medium" href={shopsPath}>
-              Browse shops
-            </Link>
-          </p>
-        )}
-
-        {data.shops.map((shop) => {
-          const link = (id?: number) =>
-            affiliateLink(location.origin, shop.slug, data.affiliate.code, id);
-          return (
-            <Card
-              key={shop.slug}
-              className="shop-section affiliate-shop gap-0 py-0 shadow-none"
-              style={themeStyle(shop.theme)}
+      <div className="admin-main">
+        <header className="admin-topbar">
+          <Brand />
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu size={24} aria-hidden="true" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="left"
+              className="admin-sidebar admin-menu-sheet"
+              closeLabel="Close menu"
             >
-              <div className="affiliate-shop-head">
-                <h2>
-                  <Link href={shopPath(shop.slug)}>{shop.name}</Link>
-                </h2>
-                <p>
-                  {affiliateStatuses[shop.status]} · {shop.commission_percent}%
-                  commission
-                </p>
-              </div>
+              <SheetTitle className="sr-only">Dashboard menu</SheetTitle>
+              <SheetDescription className="sr-only">
+                Affiliate sections and links
+              </SheetDescription>
+              <Brand />
+              {nav}
+            </SheetContent>
+          </Sheet>
+        </header>
+
+        <main className="admin-content affiliate-content">
+          <div className="admin-head">
+            <div>
+              <p className="admin-eyebrow">{data.affiliate.name}</p>
+              <h1>{view === "shops" ? "My shops" : "Earnings"}</h1>
+            </div>
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="admin-error">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {view === "shops" ? (
+            data.shops.length === 0 ? (
               <p className="affiliate-hint">
-                {shop.orders} {shop.orders === 1 ? "order" : "orders"} · Earned{" "}
-                {formatRupees(shop.earned_paise)} · Pending{" "}
-                {formatRupees(shop.pending_paise)}
+                Open a shop’s page and use “Become an affiliate” to apply.{" "}
+                <Link className="text-(--accent-text) font-medium" href={shopsPath}>
+                  Browse shops
+                </Link>
               </p>
-
-              {shop.status === "approved" ? (
-                <>
-                  <div className="shop-link">
-                    <span className="shop-url">{link()}</span>
-                    <CopyLink link={link()} />
-                  </div>
-                  <ul className="affiliate-products">
-                    {shop.products.map((product) => (
-                      <li key={product.id}>
-                        <div>
-                          <strong className="admin-name">{product.name}</strong>
-                          <span className="admin-sub">
-                            {[product.size, formatRupees(product.price_paise)]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </span>
-                        </div>
-                        {product.in_stock ? (
-                          <CopyLink link={link(product.id)} />
-                        ) : (
-                          <span className="admin-sub">Out of stock</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <p className="affiliate-hint">
-                  {shop.status === "pending"
-                    ? "The shop owner hasn’t approved you yet. Your links appear here once they do."
-                    : "The shop owner didn’t approve your application."}
-                </p>
-              )}
-            </Card>
-          );
-        })}
-
-        <h2 className="affiliate-section-title">Recent orders</h2>
-        {data.orders.length === 0 ? (
-          <p className="affiliate-hint">No orders through your links yet.</p>
-        ) : (
-          <Card
-            className="affiliate-orders gap-0 py-0 shadow-none"
-            role="region"
-            tabIndex={0}
-            aria-label="Recent orders"
-          >
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead scope="col">Date</TableHead>
-                  <TableHead scope="col">Shop</TableHead>
-                  <TableHead scope="col">Order total</TableHead>
-                  <TableHead scope="col">Commission</TableHead>
-                  <TableHead scope="col">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.orders.map((order) => (
-                  <TableRow key={order.id} data-status={order.status}>
-                    <TableCell>{orderDate.format(new Date(order.created_at))}</TableCell>
-                    <TableCell>{order.shop}</TableCell>
-                    <TableCell>{formatRupees(order.total_paise)}</TableCell>
-                    <TableCell>
-                      {order.status === "cancelled"
-                        ? "—"
-                        : formatRupees(order.commission_paise)}
-                    </TableCell>
-                    <TableCell>{orderStatuses[order.status]}</TableCell>
-                  </TableRow>
+            ) : (
+              <div className="affiliate-shops">
+                {data.shops.map((shop) => (
+                  <ShopCard key={shop.slug} shop={shop} code={data.affiliate.code} />
                 ))}
-              </TableBody>
-            </Table>
-          </Card>
-        )}
-      </main>
-    </>
+              </div>
+            )
+          ) : (
+            <>
+              <Card className="admin-stats-panel gap-0 py-0 shadow-none">
+                <dl className="admin-stats">
+                  {[
+                    ["Earned", formatRupees(sum.earned_paise)],
+                    ["Pending", formatRupees(sum.pending_paise)],
+                    ["Orders", sum.orders],
+                    ["Approved shops", data.shops.filter((shop) => shop.status === "approved").length],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Card>
+
+              <h2 className="affiliate-section-title">Recent orders</h2>
+              {data.orders.length === 0 ? (
+                <p className="affiliate-hint">No orders through your links yet.</p>
+              ) : (
+                <Card
+                  className="affiliate-orders gap-0 py-0 shadow-none"
+                  role="region"
+                  tabIndex={0}
+                  aria-label="Recent orders"
+                >
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead scope="col">Date</TableHead>
+                        <TableHead scope="col">Shop</TableHead>
+                        <TableHead scope="col">Order total</TableHead>
+                        <TableHead scope="col">Commission</TableHead>
+                        <TableHead scope="col">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {data.orders.map((order) => (
+                        <TableRow key={order.id} data-status={order.status}>
+                          <TableCell>{orderDate.format(new Date(order.created_at))}</TableCell>
+                          <TableCell>{order.shop}</TableCell>
+                          <TableCell>{formatRupees(order.total_paise)}</TableCell>
+                          <TableCell>
+                            {order.status === "cancelled"
+                              ? "—"
+                              : formatRupees(order.commission_paise)}
+                          </TableCell>
+                          <TableCell>{orderStatuses[order.status]}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
+              )}
+            </>
+          )}
+        </main>
+      </div>
+    </div>
   );
 }
