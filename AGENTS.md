@@ -43,6 +43,9 @@ The landing page lives in `apps/web/` as a Next.js App Router application,
 switched from TanStack Start at the user's request on 12 October 2026.
 `bun run dev`, `build`, `typecheck` and `test` target that workspace.
 `apps/app/` is an unrelated Flutter starter and is preserved.
+`apps/api/` is the Hono + D1 Cloudflare Worker for event pre-registration
+(helicopter ride). It is outside the original scope; see README's "Helicopter
+ride pre-registration". Never expose `ADMIN_TOKEN` or registrant data publicly.
 The legacy `docs/` preview and its images were deleted at the user's request;
 a pre-cleanup backup is at `/private/tmp/prebook-cleanup-2026-10-12.zip`.
 Do not overwrite unrelated work or delete native platform icons.

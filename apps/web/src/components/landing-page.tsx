@@ -12,7 +12,10 @@ import {
   Plus,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { helicopterRide } from "@/lib/site";
+import { BoardingPass } from "./event-page";
 import { Button } from "./ui/button";
 import {
   Sheet,
@@ -28,6 +31,7 @@ const navigation = [
   ["The community", "#community"],
   ["Why PreBooking", "#why-prebooking"],
   ["How to connect", "#how-it-works"],
+  ["Events", "#events"],
   ["FAQs", "#questions"],
 ];
 
@@ -193,6 +197,19 @@ export default function LandingPage() {
           clearProps: "all",
           scrollTrigger: {
             trigger: ".community-layout",
+            start: "top 85%",
+            once: true,
+          },
+        });
+        gsap.from(".event-teaser-layout > *", {
+          y: 24,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: "expo.out",
+          clearProps: "all",
+          scrollTrigger: {
+            trigger: ".event-teaser-layout",
             start: "top 85%",
             once: true,
           },
@@ -551,6 +568,36 @@ export default function LandingPage() {
         </div>
 
         <section
+          id="events"
+          tabIndex={-1}
+          className="event-teaser section-space"
+          aria-labelledby="events-title"
+        >
+          <div className="container event-teaser-layout">
+            <div className="event-teaser-copy">
+              <p className="event-label">Upcoming event</p>
+              <h2 id="events-title">
+                See Tirunelveli
+                <br />
+                <span>from the sky.</span>
+              </h2>
+              <p>
+                Pre-book a helicopter ride over Nellai. Register your interest
+                in under a minute and the PreBooking team will call to confirm
+                your seat, date and fare.
+              </p>
+              <Button asChild size="lg">
+                <Link href={helicopterRide.path}>
+                  Pre-register for the ride{" "}
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+            <BoardingPass />
+          </div>
+        </section>
+
+        <section
           id="community"
           tabIndex={-1}
           className="community-section section-space"
@@ -570,9 +617,9 @@ export default function LandingPage() {
                 small wins. It helps to have people around you who understand.
               </p>
               <p>
-                PreBooking is a global business community. Meet
-                people beyond your usual circle, learn from their experience and
-                understand where a thoughtful referral could help. Begin with a
+                PreBooking is a global business community. Meet people beyond
+                your usual circle, learn from their experience and understand
+                where a thoughtful referral could help. Begin with a
                 conversation and explore what you can do together.
               </p>
               <a className="text-link" href="#how-it-works">
@@ -1001,7 +1048,8 @@ export default function LandingPage() {
                   aria-label="Call PreBooking on 7397167111"
                 >
                   <Phone size={20} aria-hidden="true" />
-                  Talk to PreBooking <ArrowUpRight size={18} aria-hidden="true" />
+                  Talk to PreBooking{" "}
+                  <ArrowUpRight size={18} aria-hidden="true" />
                 </a>
               </Button>
             </motion.div>

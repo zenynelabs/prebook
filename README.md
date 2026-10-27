@@ -44,6 +44,35 @@ Catalogues, checkout, accounts, seller submissions and admin functions are
 These public business numbers are separate from private property seller contacts.
 No credentials or database are needed to run this landing page.
 
+### Helicopter ride pre-registration
+
+Added at the user's request on 27 October 2026. It sits outside the agreed
+product scope below; quote or confirm it separately with the client. The ride's
+date, fare and boarding point were not supplied and no public listing was
+found, so the page says "to be announced" and the team confirms by phone.
+
+- `/#events` on the homepage links to `/events/helicopter-ride`, which uses
+  the same tokens, Lenis and GSAP and has the registration form: name, mobile,
+  optional email, address and 1–6 passengers. No payment is taken.
+- `/admin/registrations` is a noindex, token-gated table of registrations.
+- `apps/api/` is a Hono Cloudflare Worker, `prebook-api`, deployed to
+  `https://prebook-api.programmer-rasla.workers.dev`, backed by the D1 database
+  `prebook-events` (APAC). It is deliberately separate from the original
+  MongoDB/Prisma plan. One mobile number registers once per event. Public POSTs
+  are rate-limited per IP, and CORS allows only `ALLOWED_ORIGINS` in
+  `apps/api/wrangler.jsonc`.
+- The dashboard token is the Worker secret `ADMIN_TOKEN`. Locally it is in the
+  gitignored `apps/api/.dev.vars`. Rotate it with `wrangler secret put ADMIN_TOKEN`.
+- The web app reads the API URL from `NEXT_PUBLIC_EVENTS_API` and falls back to
+  the workers.dev URL above.
+
+```sh
+cd apps/api
+bun run test
+bun run migrate    # apply D1 migrations remotely
+bun run deploy
+```
+
 ## Agreed product scope
 
 The original invoice summary was read before the user-requested cleanup on

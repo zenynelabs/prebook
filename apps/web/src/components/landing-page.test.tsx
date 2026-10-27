@@ -3,6 +3,7 @@ import type Lenis from "lenis";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
+import { helicopterRide } from "@/lib/site";
 import LandingPage, { formatStatNumber, navigateToSection } from "./landing-page";
 
 const html = renderToStaticMarkup(<LandingPage />);
@@ -65,6 +66,7 @@ describe("landing page public contract", () => {
     for (const anchor of anchors) expect(ids.has(anchor)).toBe(true);
     for (const section of [
       "main",
+      "events",
       "community",
       "why-prebooking",
       "who-its-for",
@@ -84,7 +86,7 @@ describe("landing page public contract", () => {
     const images = [
       ...html.matchAll(/(?:src|srcSet|srcset)="(\/images\/[^" ]+)"/g),
     ].map((match) => match[1]);
-    expect(new Set(images).size).toBe(5);
+    expect(new Set(images).size).toBe(6);
     for (const image of images)
       expect(
         existsSync(resolve(import.meta.dir, "../../public", `.${image}`)),
@@ -108,7 +110,7 @@ describe("landing page public contract", () => {
 
   test("section destinations can receive keyboard focus after navigation", () => {
     for (const destination of html.matchAll(
-      /<(?:main|section)\b[^>]*\bid="(?:main|community|why-prebooking|who-its-for|referrals|shared-learning|community-values|how-it-works|questions|connect)"[^>]*>/g,
+      /<(?:main|section)\b[^>]*\bid="(?:main|events|community|why-prebooking|who-its-for|referrals|shared-learning|community-values|how-it-works|questions|connect)"[^>]*>/g,
     )) {
       expect(destination[0]).toContain('tabindex="-1"');
     }
@@ -157,6 +159,7 @@ describe("landing page public contract", () => {
       const destination = anchor[1];
       expect(
         destination.startsWith("#") ||
+          destination === helicopterRide.path ||
           destination === "tel:7397167111" ||
           destination === "tel:7397197111" ||
           destination === "mailto:prebookingpbkworld1@gmail.com" ||
@@ -188,9 +191,11 @@ describe("landing page public contract", () => {
     expect(header).not.toContain('href="mailto:prebookingpbkworld1@gmail.com"');
     const navigation = header!.match(/<nav\b[^>]*aria-label="Main navigation"[^>]*>(.*?)<\/nav>/s)?.[1];
     const links = [...(navigation ?? "").matchAll(/href="#([^"]+)"/g)].map((match) => match[1]);
-    expect(links).toEqual(["community", "why-prebooking", "how-it-works", "questions"]);
+    expect(links).toEqual(["community", "why-prebooking", "how-it-works", "events", "questions"]);
     const footer = html.match(/<footer\b[^>]*>.*?<\/footer>/)?.[0];
-    expect(html).not.toMatch(/Tirunelveli|Tamil Nadu/i);
+    const events = html.match(/<section\b[^>]*\bid="events"[^>]*>.*?<\/section>/s)?.[0];
+    expect(events).toContain(`href="${helicopterRide.path}"`);
+    expect(html.replace(events!, "")).not.toMatch(/Tirunelveli|Tamil Nadu/i);
     expect(html).toContain("global business community");
     expect(footer).toContain('href="tel:7397167111"');
     expect(footer).toContain("73971 67111");

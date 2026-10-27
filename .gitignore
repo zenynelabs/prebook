@@ -40,3 +40,6 @@ test-results/
 
 # Prisma
 apps/api/prisma/*.db
+
+# Cloudflare Workers local secrets
+.dev.vars*

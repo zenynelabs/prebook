@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { site } from '@/lib/site'
+import { helicopterRide, site } from '@/lib/site'
 import HomePage from './page'
 import robots from './robots'
 import sitemap from './sitemap'
@@ -35,9 +35,9 @@ test('homepage ships linked organization and website data without JavaScript', (
   expect(scripts[0][1]).not.toMatch(/review|rating|member|chapter|referralCount/i)
 })
 
-test('crawl routes share the homepage canonical host and list only the public route', () => {
+test('crawl routes share the homepage canonical host and list only the public routes', () => {
   expect(new URL(site.url).protocol).toBe('https:')
   expect(robots().rules).toEqual({ userAgent: '*', allow: '/' })
   expect(robots().sitemap).toBe(`${site.url}/sitemap.xml`)
-  expect(sitemap()).toEqual([{ url: `${site.url}/` }])
+  expect(sitemap()).toEqual([{ url: `${site.url}/` }, { url: `${site.url}${helicopterRide.path}` }])
 })
