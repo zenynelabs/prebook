@@ -6,7 +6,16 @@ import Lenis from "lenis";
 import { ArrowLeft, ArrowRight, Helicopter, Phone, Plus } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type FormEvent, useEffect, useRef, useState } from "react";
+import {
+  mobileDigits,
+  phoneKeys,
+  type RegistrationErrors,
+  type RegistrationField,
+  registrationFields,
+  type RegistrationValues,
+  validateRegistration,
+} from "@/lib/registration";
 import { eventsApi } from "@/lib/site";
 import { Button } from "./ui/button";
 import {
@@ -16,6 +25,16 @@ import {
   DialogDescription,
   DialogTitle,
 } from "./ui/dialog";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "./ui/field";
+import { Input } from "./ui/input";
+import { NativeSelect, NativeSelectOption } from "./ui/native-select";
+import { Textarea } from "./ui/textarea";
 
 const REF_KEY = "prebook-ref";
 
@@ -104,8 +123,22 @@ export function BoardingPass() {
   );
 }
 
+const emptyRegistration: RegistrationValues = {
+  name: "",
+  phone: "",
+  email: "",
+  address: "",
+  passengers: "1",
+};
+
 function RegistrationForm() {
   const reduceMotion = useReducedMotion();
+  const [values, setValues] = useState(emptyRegistration);
+  const [touched, setTouched] = useState<
+    Partial<Record<RegistrationField, boolean>>
+  >({});
+  const [submitted, setSubmitted] = useState(false);
+  const [serverErrors, setServerErrors] = useState<RegistrationErrors>({});
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState<{ name: string; phone: string } | null>(
@@ -118,9 +151,48 @@ function RegistrationForm() {
     affiliateRef(window.location.search);
   }, []);
 
+  // Client checks win; a server error (like a duplicate number) shows once they pass.
+  const errors = { ...serverErrors, ...validateRegistration(values) };
+  const shown = (field: RegistrationField) =>
+    submitted || touched[field] ? errors[field] : undefined;
+
+  function control(field: RegistrationField) {
+    const problem = shown(field);
+    return {
+      id: field,
+      name: field,
+      value: values[field],
+      "aria-invalid": problem ? true : undefined,
+      "aria-describedby": problem ? `${field}-error` : undefined,
+      onBlur: () => setTouched((current) => ({ ...current, [field]: true })),
+      onChange: (
+        event: ChangeEvent<
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >,
+      ) => {
+        const value =
+          field === "phone" ? phoneKeys(event.target.value) : event.target.value;
+        setValues((current) => ({ ...current, [field]: value }));
+        setServerErrors(({ [field]: _, ...rest }) => rest);
+      },
+    };
+  }
+
+  function problem(field: RegistrationField) {
+    const message = shown(field);
+    return message ? (
+      <FieldError id={`${field}-error`}>{message}</FieldError>
+    ) : null;
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const fields = Object.fromEntries(new FormData(event.currentTarget));
+    setSubmitted(true);
+    const first = registrationFields.find(
+      (field) => validateRegistration(values)[field],
+    );
+    if (first) return document.getElementById(first)?.focus();
+    const phone = mobileDigits(values.phone);
     setSending(true);
     setError("");
     try {
@@ -128,19 +200,25 @@ function RegistrationForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...fields,
+          ...values,
+          phone,
           ref: affiliateRef(window.location.search),
         }),
       });
       if (response.ok) {
         setDone({
-          name: String(fields.name).trim().split(/\s+/)[0],
-          phone: String(fields.phone),
+          name: values.name.trim().split(/\s+/)[0],
+          phone: `${phone.slice(0, 5)} ${phone.slice(5)}`,
         });
         return setCelebrate(true);
       }
       const body = await response.json().catch(() => ({}));
-      setError(body.error ?? "Something went wrong. Please try again.");
+      if (response.status === 409) {
+        setServerErrors({
+          phone: body.error ?? "This mobile number is already registered.",
+        });
+        document.getElementById("phone")?.focus();
+      } else setError(body.error ?? "Something went wrong. Please try again.");
     } catch {
       setError(
         "We couldn’t reach the server. Check your connection and try again.",
@@ -204,67 +282,58 @@ function RegistrationForm() {
     );
 
   return (
-    <form className="register-card" onSubmit={onSubmit}>
-      <div className="field">
-        <label htmlFor="name">Full name</label>
-        <input
-          id="name"
-          name="name"
-          autoComplete="name"
-          required
-          minLength={2}
-          maxLength={80}
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="phone">Mobile number</label>
-        <input
-          id="phone"
-          name="phone"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel-national"
-          placeholder="98765 43210"
-          required
-          pattern="[0-9 +\-]{10,16}"
-          title="A 10-digit Indian mobile number"
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="email">
-          Email <span>(optional)</span>
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          maxLength={120}
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="address">Address</label>
-        <textarea
-          id="address"
-          name="address"
-          autoComplete="street-address"
-          rows={3}
-          required
-          minLength={10}
-          maxLength={300}
-          placeholder="House, street, area and pincode"
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="passengers">Passengers</label>
-        <select id="passengers" name="passengers" defaultValue="1">
-          {[1, 2, 3, 4, 5, 6].map((count) => (
-            <option key={count} value={count}>
-              {count} {count === 1 ? "person" : "people"}
-            </option>
-          ))}
-        </select>
-      </div>
+    <form className="register-card" onSubmit={onSubmit} noValidate>
+      <FieldGroup>
+        <Field data-invalid={Boolean(shown("name"))}>
+          <FieldLabel htmlFor="name">Full name</FieldLabel>
+          <Input {...control("name")} autoComplete="name" required maxLength={80} />
+          {problem("name")}
+        </Field>
+        <Field data-invalid={Boolean(shown("phone"))}>
+          <FieldLabel htmlFor="phone">Mobile number</FieldLabel>
+          <Input
+            {...control("phone")}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            placeholder="98765 43210"
+            required
+          />
+          {problem("phone") ?? (
+            <FieldDescription>10-digit Indian mobile number.</FieldDescription>
+          )}
+        </Field>
+        <Field data-invalid={Boolean(shown("email"))}>
+          <FieldLabel htmlFor="email">
+            Email <span className="font-normal text-muted-foreground">(optional)</span>
+          </FieldLabel>
+          <Input {...control("email")} type="email" autoComplete="email" maxLength={120} />
+          {problem("email")}
+        </Field>
+        <Field data-invalid={Boolean(shown("address"))}>
+          <FieldLabel htmlFor="address">Address</FieldLabel>
+          <Textarea
+            {...control("address")}
+            autoComplete="street-address"
+            rows={3}
+            required
+            maxLength={300}
+            placeholder="House, street, area and pincode"
+          />
+          {problem("address")}
+        </Field>
+        <Field data-invalid={Boolean(shown("passengers"))}>
+          <FieldLabel htmlFor="passengers">Passengers</FieldLabel>
+          <NativeSelect {...control("passengers")}>
+            {[1, 2, 3, 4, 5, 6].map((count) => (
+              <NativeSelectOption key={count} value={count}>
+                {count} {count === 1 ? "person" : "people"}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          {problem("passengers")}
+        </Field>
+      </FieldGroup>
       <p className="form-error" role="alert">
         {error}
       </p>

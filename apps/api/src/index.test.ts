@@ -18,6 +18,13 @@ test('registration input is normalised and validated at the boundary', () => {
   expect(parseRegistration({ ...valid, phone: '5876543210' })).toBeString()
   expect(parseRegistration({ ...valid, email: 'not-an-email' })).toBeString()
   expect(parseRegistration({ ...valid, address: 'short' })).toBeString()
+  expect(parseRegistration({ ...valid, name: 'Rasla 99' })).toBeString()
+  expect(parseRegistration({ ...valid, name: 'R@sla' })).toBeString()
+  expect(parseRegistration({ ...valid, name: "S. O'Neil-Kumar" })).toMatchObject({ name: "S. O'Neil-Kumar" })
+  expect(parseRegistration({ ...valid, name: 'முருகன்' })).toMatchObject({ name: 'முருகன்' })
+  expect(parseRegistration({ ...valid, address: '123456 7890 12' })).toBeString()
+  expect(parseRegistration({ ...valid, phone: '99948dadada' })).toBeString()
+  expect(parseRegistration({ ...valid, ref: 'nambi', extra: true })).toMatchObject({ name: 'Arun Kumar' })
   for (const passengers of [0, 7, 1.5, 'two']) expect(parseRegistration({ ...valid, passengers })).toBeString()
 })
 

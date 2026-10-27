@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { mobileDigits, phoneKeys, validateRegistration } from "@/lib/registration";
 import EventPage, { affiliateRef } from "./event-page";
 import RegistrationsDashboard, { affiliateLink, type Filters, filterRegistrations, linkCode, paginate, rankAffiliates, type Registration, summarise } from "./registrations-dashboard";
 
@@ -77,4 +78,25 @@ test("pagination slices pages, clamps out-of-range pages and reports the visible
   expect(paginate(items, 9, 25).page).toBe(3);
   expect(paginate(items, 0, 25).page).toBe(1);
   expect(paginate([], 1, 25)).toMatchObject({ page: 1, pages: 1, from: 0, to: 0, items: [] });
+});
+
+test("registration validation explains each problem and accepts real Indian details", () => {
+  const ok = { name: "Arun Kumar", phone: "98765 43210", email: "", address: "12 North Car Street, Tirunelveli 627006", passengers: "2" };
+  expect(validateRegistration(ok)).toEqual({});
+  expect(validateRegistration({ ...ok, name: "முருகன்", phone: "+91 98765-43210", email: "arun@example.com" })).toEqual({});
+  expect(validateRegistration({ ...ok, phone: "09876543210" })).toEqual({});
+  expect(Object.keys(validateRegistration({ name: "", phone: "", email: "", address: "", passengers: "1" }))).toEqual(["name", "phone", "address"]);
+  expect(validateRegistration({ ...ok, name: "Rasla 99" }).name).toMatch(/letters only/);
+  expect(validateRegistration({ ...ok, phone: "99948" }).phone).toMatch(/10-digit/);
+  expect(validateRegistration({ ...ok, phone: "5876543210" }).phone).toMatch(/start with 6, 7, 8 or 9/);
+  expect(validateRegistration({ ...ok, email: "arun@" }).email).toMatch(/valid email/);
+  expect(validateRegistration({ ...ok, address: "1234567890 12" }).address).toMatch(/street and area/);
+  expect(validateRegistration({ ...ok, passengers: "7" }).passengers).toMatch(/1 and 6/);
+});
+
+test("the mobile field drops letters as they are typed and normalises prefixes", () => {
+  expect(phoneKeys("99948dadada")).toBe("99948");
+  expect(phoneKeys("+91 98765-43210 ext")).toBe("+91 98765-43210 ");
+  expect(mobileDigits("+91 98765-43210")).toBe("9876543210");
+  expect(mobileDigits("09876543210")).toBe("9876543210");
 });

@@ -36,10 +36,12 @@ export function parseRegistration(input: unknown): Registration | string {
   const address = text('address')
   const passengers = Number(body.passengers)
   if (name.length < 2 || name.length > 80) return 'Enter your full name.'
+  if (!/^[\p{L}\p{M}][\p{L}\p{M} .'-]*$/u.test(name)) return 'Use letters only in the name, without numbers or symbols.'
   if (!/^[6-9]\d{9}$/.test(phone)) return 'Enter a 10-digit Indian mobile number.'
   if (email && (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)))
     return 'Enter a valid email address, or leave it blank.'
   if (address.length < 10 || address.length > 300) return 'Enter your full address with area and pincode.'
+  if (!/\p{L}/u.test(address)) return 'Include the street and area in the address, not just numbers.'
   if (!Number.isInteger(passengers) || passengers < 1 || passengers > 6) return 'Choose between 1 and 6 passengers.'
   return { name, phone, email, address, passengers }
 }

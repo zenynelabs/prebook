@@ -13,6 +13,7 @@
   --color-input: var(--border-strong);
   --color-ring: var(--accent);
   --color-muted-foreground: var(--text-2);
+  --color-destructive: var(--danger);
 }
 
 :root {
