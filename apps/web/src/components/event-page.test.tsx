@@ -1,8 +1,15 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { mobileDigits, phoneKeys, validateRegistration } from "@/lib/registration";
-import EventPage, { affiliateRef } from "./event-page";
+import EventPage, { affiliateRef, BoardingPass } from "./event-page";
 import RegistrationsDashboard, { affiliateLink, type Filters, filterRegistrations, linkCode, paginate, rankAffiliates, type Registration, summarise } from "./registrations-dashboard";
+
+test("the event card heading has its label without an icon", () => {
+  const html = renderToStaticMarkup(<BoardingPass />);
+  const heading = html.match(/<div class="pass-head">(.*?)<\/div>/s)?.[1];
+  expect(heading).toContain("Helicopter ride");
+  expect(heading).not.toContain("<svg");
+});
 
 test("event page ships its details and a complete registration form in HTML", () => {
   const html = renderToStaticMarkup(<EventPage />);

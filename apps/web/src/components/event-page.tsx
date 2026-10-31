@@ -16,6 +16,7 @@ import {
   type RegistrationValues,
   validateRegistration,
 } from "@/lib/registration";
+import { onPageReveal } from "@/lib/page-reveal";
 import { eventsApi } from "@/lib/site";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Button } from "./ui/button";
@@ -89,17 +90,7 @@ const questions = [
 export function BoardingPass() {
   return (
     <aside className="boarding-pass" aria-label="Event summary">
-      <img
-        className="pass-photo"
-        src="/images/helicopter-ride.webp"
-        alt="A helicopter in flight above a forested ridge"
-        width="1200"
-        height="675"
-        loading="lazy"
-        decoding="async"
-      />
       <div className="pass-head">
-        <Helicopter size={22} aria-hidden="true" />
         <span>Helicopter ride</span>
       </div>
       <dl className="pass-details">
@@ -408,7 +399,11 @@ export default function EventPage() {
             lenis.scrollTo("#register", { offset: -96, duration: 1.4 }),
           );
 
-        const intro = gsap.timeline({ defaults: { ease: "expo.out" } });
+        const intro = gsap.timeline({
+          paused: true,
+          defaults: { ease: "expo.out" },
+        });
+        const stopWaiting = onPageReveal(() => intro.play());
         intro
           .from(".flight-path path", {
             strokeDashoffset: 1,
@@ -437,13 +432,6 @@ export default function EventPage() {
             },
             0.35,
           );
-        gsap.to(".event-hero .pass-head svg", {
-          y: -4,
-          duration: 1.6,
-          ease: "sine.inOut",
-          repeat: -1,
-          yoyo: true,
-        });
         for (const [targets, trigger] of [
           [".step", ".steps"],
           [".register-layout > *", ".register-layout"],
@@ -459,6 +447,7 @@ export default function EventPage() {
             scrollTrigger: { trigger, start: "top 85%", once: true },
           });
         return () => {
+          stopWaiting();
           gsap.ticker.remove(tick);
           lenis.off("scroll", ScrollTrigger.update);
           lenis.destroy();
@@ -499,6 +488,24 @@ export default function EventPage() {
 
       <main id="main" tabIndex={-1} ref={page}>
         <section className="event-hero" aria-labelledby="event-title">
+          {/* Mixkit free stock clip 6926; it stays on its poster under reduced motion. */}
+          <video
+            className="event-hero-video"
+            src="/videos/helicopter-ride.mp4"
+            poster="/videos/helicopter-ride.jpg"
+            aria-hidden="true"
+            autoPlay
+            muted
+            loop
+            playsInline
+            ref={(video) => {
+              if (
+                video &&
+                matchMedia("(prefers-reduced-motion: reduce)").matches
+              )
+                video.pause();
+            }}
+          />
           <svg
             className="flight-path"
             viewBox="0 0 1200 600"

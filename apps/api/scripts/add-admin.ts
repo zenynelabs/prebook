@@ -1,12 +1,16 @@
 // Creates a staff login for the admin panel, or resets its password and signs it out everywhere.
-//   bun run add-admin <email> "<name>"            local D1 (wrangler dev)
-//   bun run add-admin <email> "<name>" --remote   production D1
+//   bun run add-admin <email> "<name>"              local D1 (wrangler dev)
+//   bun run add-admin <email> "<name>" --remote     production D1
+//   add --no-shops for a login that can't see or open the Shops area
 import { hashPassword } from '../src/auth'
 
-const [email = '', name = '', target] = process.argv.slice(2)
+const args = process.argv.slice(2)
+const [email = '', name = ''] = args.filter((arg: string) => !arg.startsWith('--'))
+const remote = args.includes('--remote')
+const shops = args.includes('--no-shops') ? 0 : 1
 const address = email.trim().toLowerCase()
 if (!/^[^\s@']+@[^\s@']+\.[^\s@']+$/.test(address) || name.trim().length < 2) {
-  console.error('Usage: bun run add-admin <email> "<name>" [--remote]')
+  console.error('Usage: bun run add-admin <email> "<name>" [--remote] [--no-shops]')
   process.exit(1)
 }
 
@@ -50,15 +54,15 @@ if ((await hidden('Repeat password: ')) !== password) {
 }
 
 const quote = (value: string) => `'${value.replaceAll("'", "''")}'`
-const sql = `INSERT INTO admins (email, name, password_hash)
-  VALUES (${quote(address)}, ${quote(name.trim())}, ${quote(await hashPassword(password))})
-  ON CONFLICT (email) DO UPDATE SET name = excluded.name, password_hash = excluded.password_hash;
+const sql = `INSERT INTO admins (email, name, password_hash, shops)
+  VALUES (${quote(address)}, ${quote(name.trim())}, ${quote(await hashPassword(password))}, ${shops})
+  ON CONFLICT (email) DO UPDATE SET name = excluded.name, password_hash = excluded.password_hash, shops = excluded.shops;
 DELETE FROM admin_sessions WHERE admin_id = (SELECT id FROM admins WHERE email = ${quote(address)});`
 
 const { exitCode } = Bun.spawnSync(
-  ['wrangler', 'd1', 'execute', 'DB', target === '--remote' ? '--remote' : '--local', '--command', sql],
+  ['wrangler', 'd1', 'execute', 'DB', remote ? '--remote' : '--local', '--command', sql],
   { stdio: ['inherit', 'inherit', 'inherit'] },
 )
 if (exitCode === 0) console.log(`${address} can now sign in to the admin panel.`)
-else console.error(`\nIf it says “no such table”, apply the migrations first: bun run migrate${target === '--remote' ? '' : ' (or wrangler d1 migrations apply DB --local)'}`)
+else console.error(`\nIf it says “no such table”, apply the migrations first: bun run migrate${remote ? '' : ' (or wrangler d1 migrations apply DB --local)'}`)
 process.exit(exitCode)

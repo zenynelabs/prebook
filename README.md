@@ -79,7 +79,9 @@ found, so the page says "to be announced" and the team confirms by phone.
   with PBKDF2-SHA256 password hashes. There is no account screen: create a
   login, or reset its password and sign it out everywhere, with
   `bun run add-admin <email> "<name>" --remote` from `apps/api` (omit
-  `--remote` for local D1). The password is typed hidden. Sessions are random
+  `--remote` for local D1). The password is typed hidden. Add `--no-shops`
+  for a login without the Shops area: its sidebar hides Shops and the API
+  refuses everything under `/admin/` with 403 (`migrations/0008_admin_shops.sql`). Sessions are random
   tokens stored hashed in D1 for 7 days and kept in the browser tab's
   sessionStorage; sign-in shares the public form's 10/minute limit.
 - The Worker secret `ADMIN_TOKEN` is still accepted as a bearer token for

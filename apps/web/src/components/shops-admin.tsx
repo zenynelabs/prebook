@@ -8,7 +8,6 @@ import {
   MessageCircle,
   Pencil,
   Plus,
-  RefreshCw,
   Trash2,
 } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -695,15 +694,6 @@ export default function ShopsPanel({
       <div className="admin-head">
         <h1>Shops</h1>
         <div className="admin-head-actions">
-          <Button
-            variant="outline"
-            className="admin-refresh"
-            onClick={load}
-            disabled={loading}
-          >
-            <RefreshCw aria-hidden="true" />
-            {loading ? "Refreshing…" : "Refresh"}
-          </Button>
           <Dialog
             open={createOpen}
             onOpenChange={(open) => {

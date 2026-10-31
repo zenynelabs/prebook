@@ -12,7 +12,6 @@ import {
   LogOut,
   Menu,
   Pencil,
-  RefreshCw,
   Search,
   Store,
   Trash2,
@@ -264,10 +263,12 @@ function Brand() {
 
 function SidebarNav({
   view,
+  shops,
   onView,
   onSignOut,
 }: {
   view: View;
+  shops: boolean;
   onView: (view: View) => void;
   onSignOut: () => void;
 }) {
@@ -293,16 +294,20 @@ function SidebarNav({
           <Link2 aria-hidden="true" />
           Affiliate links
         </Button>
-        <p>Shops</p>
-        <Button
-          variant="ghost"
-          type="button"
-          aria-current={view === "shops" ? "page" : undefined}
-          onClick={() => onView("shops")}
-        >
-          <Store aria-hidden="true" />
-          All shops
-        </Button>
+        {shops && (
+          <>
+            <p>Shops</p>
+            <Button
+              variant="ghost"
+              type="button"
+              aria-current={view === "shops" ? "page" : undefined}
+              onClick={() => onView("shops")}
+            >
+              <Store aria-hidden="true" />
+              All shops
+            </Button>
+          </>
+        )}
         <p>Website</p>
         <Button variant="ghost" asChild>
           <a href={helicopterRide.path} target="_blank" rel="noopener">
@@ -694,6 +699,7 @@ export default function RegistrationsDashboard({
   const [rows, setRows] = useState<Registration[]>([]);
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [view, setView] = useState<View>(initialView);
+  const [shops, setShops] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [affiliateError, setAffiliateError] = useState("");
@@ -749,16 +755,25 @@ export default function RegistrationsDashboard({
           headers: { Authorization: `Bearer ${value}` },
           cache: "no-store" as const,
         };
-        const [response, affiliateResponse] = await Promise.all([
+        const [response, affiliateResponse, meResponse] = await Promise.all([
           fetch(`${eventsApi}/registrations`, init),
           fetch(`${eventsApi}/affiliates`, init),
+          fetch(`${eventsApi}/admin-auth/me`, init),
         ]);
         if (response.status === 401 || response.status === 400)
           return signOut(SESSION_ENDED);
-        if (!response.ok || !affiliateResponse.ok) throw new Error();
+        if (!response.ok || !affiliateResponse.ok || !meResponse.ok)
+          throw new Error();
         const body: { registrations: Registration[] } = await response.json();
         const linked: { affiliates: Affiliate[] } =
           await affiliateResponse.json();
+        const me: { shops: boolean } = await meResponse.json();
+        setShops(me.shops);
+        // /admin/shops opens on Registrations for accounts without Shops.
+        if (!me.shops)
+          setView((current) =>
+            current === "shops" ? "registrations" : current,
+          );
         storage((store) => store.setItem(TOKEN_KEY, value));
         setToken(value);
         setRows(body.registrations);
@@ -977,7 +992,7 @@ export default function RegistrationsDashboard({
   const registrationPager = paginate(visible, registrationPage, pageSize);
   const affiliatePager = paginate(ranked, affiliatePage, pageSize);
   const nav = (
-    <SidebarNav view={view} onView={showView} onSignOut={() => {
+    <SidebarNav view={view} shops={shops} onView={showView} onSignOut={() => {
         endAdminSession(token);
         signOut();
       }} />
@@ -1015,7 +1030,7 @@ export default function RegistrationsDashboard({
         </header>
 
         <main className="admin-content">
-          {view === "shops" ? (
+          {view === "shops" && shops ? (
             <ShopsPanel token={token} onSessionEnd={endSession} />
           ) : (
             <>
@@ -1026,15 +1041,6 @@ export default function RegistrationsDashboard({
                     {view === "registrations" ? "Registrations" : "Affiliate links"}
                   </h1>
                 </div>
-                <Button
-                  variant="outline"
-                  className="admin-refresh"
-                  onClick={() => load(token)}
-                  disabled={loading}
-                >
-                  <RefreshCw aria-hidden="true" />
-                  {loading ? "Refreshing…" : "Refresh"}
-                </Button>
               </div>
 
               {view === "affiliates" ? (

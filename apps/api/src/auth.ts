@@ -32,21 +32,27 @@ export async function verifyPassword(password: string, stored: string) {
   return timingSafeEqual(await pbkdf2(password, saltBytes, Number(iterations)), hash)
 }
 
-type Env = { Bindings: Bindings }
+type Env = { Bindings: Bindings; Variables: { shops: boolean } }
 
 /** Staff sign in with email and password; ADMIN_TOKEN still works for scripts. */
 export const admin = createMiddleware<Env>(async (c, next) => {
   const token = bearer(c)
-  if (token && c.env.ADMIN_TOKEN && (await timingSafeEqual(token, c.env.ADMIN_TOKEN))) return next()
+  if (token && c.env.ADMIN_TOKEN && (await timingSafeEqual(token, c.env.ADMIN_TOKEN))) {
+    c.set('shops', true)
+    return next()
+  }
   const session =
     token &&
     (await c.env.DB.prepare(
-      `SELECT admins.id FROM admin_sessions JOIN admins ON admins.id = admin_sessions.admin_id
+      `SELECT admins.id, admins.shops FROM admin_sessions JOIN admins ON admins.id = admin_sessions.admin_id
        WHERE token_hash = ? AND expires_at > ?`,
     )
       .bind(await sha256(token), now())
-      .first())
+      .first<{ id: number; shops: number }>())
   if (!session) return c.json({ error: 'Your session has ended. Sign in again.' }, 401)
+  // Everything under /admin/ is the Shops area.
+  if (!session.shops && c.req.path.startsWith('/admin/')) return c.json({ error: 'This account can’t open shops.' }, 403)
+  c.set('shops', Boolean(session.shops))
   return next()
 })
 
@@ -72,6 +78,9 @@ auth.post('/admin-auth/login', async (c) => {
   ])
   return c.json({ token, admin: { name: account.name, email: account.email } })
 })
+
+/** What the dashboard may show this account. */
+auth.get('/admin-auth/me', admin, (c) => c.json({ shops: c.get('shops') }))
 
 auth.post('/admin-auth/logout', async (c) => {
   const token = bearer(c)

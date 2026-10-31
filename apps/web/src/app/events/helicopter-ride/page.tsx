@@ -2,6 +2,13 @@ import type { Metadata } from 'next'
 import EventPage from '@/components/event-page'
 import { helicopterRide } from '@/lib/site'
 
+const socialImage = {
+  url: '/brand/og-helicopter-ride.jpg',
+  width: 1200,
+  height: 630,
+  alt: 'PreBooking — See Tirunelveli from the sky. Helicopter ride pre-registration.',
+}
+
 export const metadata: Metadata = {
   title: helicopterRide.title,
   description: helicopterRide.description,
@@ -13,7 +20,13 @@ export const metadata: Metadata = {
     siteName: 'PreBooking',
     locale: 'en_IN',
     url: helicopterRide.path,
-    images: [{ url: '/brand/og-prebooking-global.png', width: 1730, height: 909, alt: 'PreBooking' }],
+    images: [socialImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: helicopterRide.title,
+    description: helicopterRide.description,
+    images: [socialImage],
   },
 }
 

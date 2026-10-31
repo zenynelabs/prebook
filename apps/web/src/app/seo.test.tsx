@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { helicopterRide, site } from '@/lib/site'
 import HomePage from './page'
+import { metadata as eventMetadata } from './events/helicopter-ride/page'
 import robots from './robots'
 import sitemap from './sitemap'
 
@@ -40,4 +41,24 @@ test('crawl routes share the homepage canonical host and list only the public ro
   expect(robots().rules).toEqual({ userAgent: '*', allow: '/' })
   expect(robots().sitemap).toBe(`${site.url}/sitemap.xml`)
   expect(sitemap()).toEqual([{ url: `${site.url}/` }, { url: `${site.url}${helicopterRide.path}` }, { url: `${site.url}/shops` }])
+})
+
+test('helicopter sharing uses its own image and event copy on Open Graph and Twitter', () => {
+  const image = { url: '/brand/og-helicopter-ride.jpg', width: 1200, height: 630 }
+  expect(eventMetadata).toMatchObject({
+    alternates: { canonical: helicopterRide.path },
+    openGraph: {
+      url: helicopterRide.path,
+      title: helicopterRide.title,
+      description: helicopterRide.description,
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: helicopterRide.title,
+      description: helicopterRide.description,
+      images: [image],
+    },
+  })
+  expect(existsSync(resolve(import.meta.dir, '../../public', `.${image.url}`))).toBe(true)
 })

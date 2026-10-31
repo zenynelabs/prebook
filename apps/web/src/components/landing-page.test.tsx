@@ -48,6 +48,15 @@ test("section scrolling preserves history and focus, with native and instant fal
 });
 
 describe("landing page public contract", () => {
+  test("scroll reveals leave all sections and the footer visible without JavaScript", () => {
+    const sections = [...html.matchAll(/<(?:section|footer)\b[^>]*>[\s\S]*?<\/(?:section|footer)>/g)];
+    expect(sections.length).toBeGreaterThan(10);
+    for (const [section] of sections) {
+      expect(section).not.toMatch(/style="[^"]*(?:opacity:\s*0(?:;|$)|visibility:\s*hidden|clip-path:)/);
+      expect(section).not.toContain('aria-hidden="true" style="opacity:0');
+    }
+  });
+
   test("uses the corrected PreBooking name while preserving the supplied email", () => {
     expect(html).toContain('<strong>PreBooking</strong>');
     expect(html).not.toMatch(/\b(?:Prebook|Prebooking)\b|World 1|PBK1/);
@@ -86,7 +95,7 @@ describe("landing page public contract", () => {
     const images = [
       ...html.matchAll(/(?:src|srcSet|srcset)="(\/images\/[^" ]+)"/g),
     ].map((match) => match[1]);
-    expect(new Set(images).size).toBe(6);
+    expect(new Set(images).size).toBe(5);
     for (const image of images)
       expect(
         existsSync(resolve(import.meta.dir, "../../public", `.${image}`)),

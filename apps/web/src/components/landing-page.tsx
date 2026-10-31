@@ -14,6 +14,7 @@ import {
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { onPageReveal } from "@/lib/page-reveal";
 import { shopsPath } from "@/lib/shops";
 import { helicopterRide } from "@/lib/site";
 import { BoardingPass } from "./event-page";
@@ -150,6 +151,7 @@ export function formatStatNumber(value: number, decimals = 0) {
 
 export default function LandingPage() {
   const page = useRef<HTMLElement>(null);
+  const footer = useRef<HTMLElement>(null);
   const header = useRef<HTMLElement>(null);
   const scroll = useRef<Lenis | null>(null);
   const navigationFrame = useRef<number | null>(null);
@@ -175,58 +177,78 @@ export default function LandingPage() {
         gsap.ticker.add(tick);
         if (document.querySelector("[data-slot='sheet-content']")) lenis.stop();
 
-        gsap.from(".hero-background", {
-          scale: 1.055,
-          duration: 1.6,
-          ease: "power2.out",
-          clearProps: "transform",
+        const intro = gsap
+          .timeline({ paused: true })
+          .from(".hero-background", {
+            scale: 1.055,
+            duration: 1.6,
+            ease: "power2.out",
+            clearProps: "transform",
+          })
+          .from(
+            "[data-hero-copy]",
+            {
+              y: 18,
+              opacity: 0,
+              duration: 0.75,
+              stagger: 0.09,
+              ease: "expo.out",
+              clearProps: "all",
+            },
+            0,
+          );
+        const stopWaiting = onPageReveal(() => intro.play());
+        const revealGroups = [
+          ".hero-invitation", ".principles-inner", ".principles-values",
+          ".community-copy", ".statistics-copy", ".section-heading",
+          ".benefits-list", ".audience-list", ".referral-layout",
+          ".referral-path", ".learning-copy", ".steps", ".values-list",
+          ".event-teaser-copy", ".faq-layout > div:first-child", ".faq-list",
+          ".closing-inner", ".footer-top", ".footer-bottom",
+        ].join(", ");
+        for (const root of [page.current!, footer.current!]) {
+          root.querySelectorAll<HTMLElement>(revealGroups).forEach((group) => {
+            group.querySelectorAll<HTMLElement>(":scope > *").forEach((element, index) => {
+              if (element.matches(".principles-values")) return;
+              gsap.from(element, {
+                y: 32,
+                opacity: 0,
+                duration: 0.8,
+                delay: Math.min(index * 0.07, 0.21),
+                ease: "expo.out",
+                clearProps: "transform,opacity",
+                scrollTrigger: {
+                  trigger: group.matches(".footer-bottom") ? root : element,
+                  start: "top 92%",
+                  once: true,
+                },
+              });
+            });
+          });
+        }
+        page.current!.querySelectorAll<HTMLElement>(
+          ".community-layout > h2, .relationships-copy > h2, .learning-prompt, .referral-example > h3, .event-teaser-action, .event-teaser-layout > .boarding-pass",
+        ).forEach((element) => {
+          gsap.from(element, {
+            y: 36,
+            opacity: 0,
+            duration: 0.9,
+            ease: "expo.out",
+            clearProps: "transform,opacity",
+            scrollTrigger: { trigger: element, start: "top 90%", once: true },
+          });
         });
-        gsap.from("[data-hero-copy]", {
-          y: 18,
-          opacity: 0,
-          duration: 0.75,
-          stagger: 0.09,
-          ease: "expo.out",
-          clearProps: "all",
-        });
-        gsap.from(".community-layout > *", {
-          y: 24,
-          opacity: 0,
-          duration: 0.7,
-          stagger: 0.12,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".community-layout",
-            start: "top 85%",
-            once: true,
-          },
-        });
-        gsap.from(".event-teaser-layout > *", {
-          y: 24,
-          opacity: 0,
-          duration: 0.7,
-          stagger: 0.12,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".event-teaser-layout",
-            start: "top 85%",
-            once: true,
-          },
-        });
-        gsap.from(".relationships-layout > *", {
-          y: 24,
-          opacity: 0,
-          duration: 0.7,
-          stagger: 0.12,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".relationships-layout",
-            start: "top 85%",
-            once: true,
-          },
+        page.current!.querySelectorAll<HTMLImageElement>(
+          ".community-photo img, .conversation-figure img, .learning-photo",
+        ).forEach((image) => {
+          gsap.from(image, {
+            clipPath: "inset(12% 0% 12% 0%)",
+            opacity: 0,
+            duration: 1.1,
+            ease: "power3.out",
+            clearProps: "clipPath,opacity",
+            scrollTrigger: { trigger: image, start: "top 90%", once: true },
+          });
         });
         const statNumbers = Array.from(
           page.current!.querySelectorAll<HTMLElement>("[data-stat-number]"),
@@ -280,55 +302,10 @@ export default function LandingPage() {
             },
             0,
           );
-        gsap.from(".step", {
-          y: 18,
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.12,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: { trigger: ".steps", start: "top 85%", once: true },
-        });
-        gsap.from(".referral-path li", {
-          y: 18,
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".referral-path",
-            start: "top 85%",
-            once: true,
-          },
-        });
-        gsap.from(".learning-question", {
-          y: 18,
-          opacity: 0,
-          duration: 0.7,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".learning-prompt",
-            start: "top 85%",
-            once: true,
-          },
-        });
-        gsap.from(".closing-inner", {
-          y: 18,
-          opacity: 0,
-          duration: 0.6,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".closing-inner",
-            start: "top 90%",
-            once: true,
-          },
-        });
         return () => {
           for (const number of statNumbers)
             number.textContent = number.dataset.statFinal!;
+          stopWaiting();
           gsap.ticker.remove(tick);
           lenis.off("scroll", ScrollTrigger.update);
           lenis.destroy();
@@ -1065,7 +1042,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="site-footer">
+      <footer className="site-footer" ref={footer}>
         <div className="container">
           <div className="footer-top">
             <div className="footer-brand">

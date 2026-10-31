@@ -6,14 +6,14 @@ const allow = { limit: async () => ({ success: true }) }
 const deny = { limit: async () => ({ success: false }) }
 
 /** Just enough D1 for sign-in: one admin, and sessions kept in a Map. */
-async function env() {
-  const account = { id: 1, name: 'Nambi', email: 'nambi@example.com', password_hash: await hashPassword('correct horse') }
+async function env(shops = 1) {
+  const account = { id: 1, name: 'Nambi', email: 'nambi@example.com', password_hash: await hashPassword('correct horse'), shops }
   const sessions = new Map<string, number>()
   const statement = (sql: string, values: unknown[] = []) => ({
     bind: (...next: unknown[]) => statement(sql, next),
     first: async () => {
       if (sql.includes('FROM admins WHERE email')) return values[0] === account.email ? account : null
-      if (sql.includes('FROM admin_sessions')) return sessions.has(values[0] as string) ? { id: 1 } : null
+      if (sql.includes('FROM admin_sessions')) return sessions.has(values[0] as string) ? { id: 1, shops } : null
       return { results: [] }
     },
     run: async () => {
@@ -50,10 +50,20 @@ test('staff sign in with email and password, and the session opens admin routes 
   expect((await app.request('/registrations', auth, bindings)).status).toBe(200)
   expect((await app.request('/admin/shops', auth, bindings)).status).toBe(200)
   expect((await app.request('/admin/shops', { headers: { Authorization: 'Bearer secret-token' } }, bindings)).status).toBe(200)
+  expect(await (await app.request('/admin-auth/me', auth, bindings)).json<object>()).toEqual({ shops: true })
 
   expect((await app.request('/admin-auth/logout', { method: 'POST', ...auth }, bindings)).status).toBe(204)
   expect((await app.request('/registrations', auth, bindings)).status).toBe(401)
   expect((await app.request('/admin/shops', {}, bindings)).status).toBe(401)
+})
+
+test('an account made with --no-shops keeps registrations but is refused the Shops area', async () => {
+  const { env: bindings } = await env(0)
+  const { token } = (await (await app.request('/admin-auth/login', login('nambi@example.com', 'correct horse'), bindings)).json()) as { token: string }
+  const auth = { headers: { Authorization: `Bearer ${token}` } }
+  expect((await app.request('/registrations', auth, bindings)).status).toBe(200)
+  expect((await app.request('/admin/shops', auth, bindings)).status).toBe(403)
+  expect(await (await app.request('/admin-auth/me', auth, bindings)).json<object>()).toEqual({ shops: false })
 })
 
 test('admin sign-in shares the tight per-IP limit', async () => {
