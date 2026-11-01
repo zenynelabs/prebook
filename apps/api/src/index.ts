@@ -16,7 +16,7 @@ export type Bindings = {
 }
 
 const EVENT = 'helicopter-ride'
-const COLUMNS = 'id, name, phone, email, address, passengers, status, payment_status, notes, ref, created_at, updated_at'
+const COLUMNS = 'id, name, phone, email, address, passengers, ride_date, ride_time, status, payment_status, notes, ref, created_at, updated_at'
 export const STATUSES = ['new', 'contacted', 'confirmed', 'cancelled'] as const
 export const PAYMENT_STATUSES = ['unpaid', 'paid'] as const
 
@@ -26,6 +26,8 @@ export type Registration = {
   email: string | null
   address: string
   passengers: number
+  ride_date: string | null
+  ride_time: string | null
 }
 
 export function parseRegistration(input: unknown): Registration | string {
@@ -45,7 +47,12 @@ export function parseRegistration(input: unknown): Registration | string {
   if (address.length < 10 || address.length > 300) return 'Enter your full address with area and pincode.'
   if (!/\p{L}/u.test(address)) return 'Include the street and area in the address, not just numbers.'
   if (!Number.isInteger(passengers) || passengers < 1 || passengers > 6) return 'Choose between 1 and 6 passengers.'
-  return { name, phone, email, address, passengers }
+  const scheduled = body.ride_date != null || body.ride_time != null
+  const ride_time = typeof body.ride_time === 'string' ? body.ride_time : null
+  if (scheduled && body.ride_date !== '2026-11-06') return 'Choose November 6, 2026 for your ride.'
+  if (scheduled && (!ride_time || !/^([01]\d|2[0-3]):[0-5]\d$/.test(ride_time)))
+    return 'Choose a preferred ride time.'
+  return { name, phone, email, address, passengers, ride_date: scheduled ? '2026-11-06' : null, ride_time }
 }
 
 export type RegistrationUpdate = Registration & {
@@ -123,15 +130,15 @@ app.post('/registrations', async (c) => {
   const body = await c.req.json().catch(() => null)
   const registration = parseRegistration(body)
   if (typeof registration === 'string') return c.json({ error: registration }, 400)
-  const { name, phone, email, address, passengers } = registration
+  const { name, phone, email, address, passengers, ride_date, ride_time } = registration
   // An unknown or missing ?ref= still registers, just without an affiliate.
   const ref = typeof body.ref === 'string' ? body.ref.trim().toLowerCase() : ''
   try {
     await c.env.DB.prepare(
-      `INSERT INTO registrations (event, name, phone, email, address, passengers, ref)
-       VALUES (?, ?, ?, ?, ?, ?, (SELECT code FROM affiliates WHERE code = ?))`,
+      `INSERT INTO registrations (event, name, phone, email, address, passengers, ride_date, ride_time, ref)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT code FROM affiliates WHERE code = ?))`,
     )
-      .bind(EVENT, name, phone, email, address, passengers, ref)
+      .bind(EVENT, name, phone, email, address, passengers, ride_date, ride_time, ref)
       .run()
   } catch (error) {
     if (String(error).includes('UNIQUE')) return c.json({ error: 'This mobile number is already registered.' }, 409)
@@ -154,14 +161,15 @@ app.get('/registrations', admin, async (c) => {
 app.put('/registrations/:id{[0-9]+}', admin, async (c) => {
   const update = parseUpdate(await c.req.json().catch(() => null))
   if (typeof update === 'string') return c.json({ error: update }, 400)
-  const { name, phone, email, address, passengers, status, payment_status, notes } = update
+  const { name, phone, email, address, passengers, ride_date, ride_time, status, payment_status, notes } = update
   try {
     const registration = await c.env.DB.prepare(
       `UPDATE registrations SET name = ?, phone = ?, email = ?, address = ?, passengers = ?, status = ?,
-        payment_status = ?, notes = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
+        payment_status = ?, notes = ?, ride_date = COALESCE(?, ride_date), ride_time = COALESCE(?, ride_time),
+        updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')
        WHERE id = ? AND event = ? RETURNING ${COLUMNS}`,
     )
-      .bind(name, phone, email, address, passengers, status, payment_status, notes, Number(c.req.param('id')), EVENT)
+      .bind(name, phone, email, address, passengers, status, payment_status, notes, ride_date, ride_time, Number(c.req.param('id')), EVENT)
       .first()
     if (!registration) return c.json({ error: 'This registration no longer exists.' }, 404)
     return c.json({ registration })

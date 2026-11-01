@@ -48,12 +48,15 @@ No credentials or database are needed to run this landing page.
 
 Added at the user's request on 27 October 2026. It sits outside the agreed
 product scope below; quote or confirm it separately with the client. The ride's
-date, fare and boarding point were not supplied and no public listing was
-found, so the page says "to be announced" and the team confirms by phone.
+date is November 6, 2026 (supplied on November 1). The form has this date
+preselected and collects a preferred ride time in IST. Staff confirm time
+availability, fare and boarding point by phone.
 
 - `/#events` on the homepage links to `/events/helicopter-ride`, which uses
   the same tokens, Lenis and GSAP and has the registration form: name, mobile,
-  optional email, address and 1–6 passengers. No payment is taken.
+  optional email, address, 1–6 passengers, ride date and preferred ride time. No payment is taken.
+  Apply `apps/api/migrations/0009_registration_schedule.sql` and deploy the API
+  before deploying the updated form so ride preferences are saved.
 - `/admin` is a noindex dashboard, behind staff email and password sign-in, with a sidebar,
   totals, status/payment dropdown filters, search and client-side pagination
   (10/25/50 per page) on the registrations and affiliate tables. Staff set each registration's

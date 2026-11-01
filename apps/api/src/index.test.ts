@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test'
+import { Database } from 'bun:sqlite'
 import app, { parseAffiliate, parseRegistration, parseUpdate } from './index'
 
 const valid = { name: '  Arun  Kumar ', phone: '+91 98765-43210', email: '', address: '12 North Car Street, Tirunelveli 627006', passengers: '2' }
@@ -10,6 +11,8 @@ test('registration input is normalised and validated at the boundary', () => {
     email: null,
     address: '12 North Car Street, Tirunelveli 627006',
     passengers: 2,
+    ride_date: null,
+    ride_time: null,
   })
   expect(parseRegistration({ ...valid, phone: '09876543210' })).toMatchObject({ phone: '9876543210' })
   expect(parseRegistration(null)).toBeString()
@@ -28,10 +31,20 @@ test('registration input is normalised and validated at the boundary', () => {
   for (const passengers of [0, 7, 1.5, 'two']) expect(parseRegistration({ ...valid, passengers })).toBeString()
 })
 
+test('ride preferences use November 6 and a complete valid local time, while legacy registrations remain accepted', () => {
+  for (const ride_time of ['00:00', '09:30', '23:59'])
+    expect(parseRegistration({ ...valid, ride_date: '2026-11-06', ride_time })).toMatchObject({ ride_date: '2026-11-06', ride_time })
+  for (const ride_time of ['', '9:30', '24:00', '12:60', '09:30:00', 930, null])
+    expect(parseRegistration({ ...valid, ride_date: '2026-11-06', ride_time })).toBeString()
+  expect(parseRegistration({ ...valid, ride_date: '2026-11-04', ride_time: '09:30' })).toBeString()
+  expect(parseRegistration({ ...valid, ride_time: '09:30' })).toBeString()
+  expect(parseRegistration({ ...valid, ride_date: null, ride_time: null })).toMatchObject({ ride_date: null, ride_time: null })
+})
+
 const allow = { limit: async () => ({ success: true }) }
 const deny = { limit: async () => ({ success: false }) }
 
-function env(write: () => Promise<unknown>, binds: unknown[][] = []) {
+function env(write: () => Promise<unknown>, binds: unknown[][] = [], queries: string[] = []) {
   const rows: unknown[] = [{ id: 1, name: 'Arun Kumar' }]
   return {
     ADMIN_TOKEN: 'secret-token',
@@ -39,7 +52,7 @@ function env(write: () => Promise<unknown>, binds: unknown[][] = []) {
     LIMITER: allow,
     ADMIN_LIMITER: allow,
     // Wrong tokens never match a signed-in admin session.
-    DB: { prepare: (sql: string) => sql.includes('admin_sessions') ? { bind: () => ({ first: async () => null }) } : ({ all: async () => ({ results: rows }), bind: (...values: unknown[]) => (binds.push(values), { run: write, first: write, all: async () => ({ results: rows }) }) }), batch: async () => [{}, await write()] },
+    DB: { prepare: (sql: string) => sql.includes('admin_sessions') ? { bind: () => ({ first: async () => null }) } : (queries.push(sql), { all: async () => ({ results: rows }), bind: (...values: unknown[]) => (binds.push(values), { run: write, first: write, all: async () => ({ results: rows }) }) }), batch: async () => [{}, await write()] },
   }
 }
 
@@ -64,6 +77,35 @@ test('registrations are stored, duplicates rejected and the list stays admin-onl
 })
 
 const update = { ...valid, status: 'confirmed', payment_status: 'paid', notes: '  Paid by UPI  ' }
+
+test('ride preferences are saved and legacy admin updates preserve them in SQLite', async () => {
+  const db = new Database(':memory:')
+  try {
+    for (const migration of ['0001_registrations.sql', '0002_registration_tracking.sql', '0003_affiliates.sql', '0009_registration_schedule.sql'])
+      db.exec(await Bun.file(`${import.meta.dir}/../migrations/${migration}`).text())
+    const binds: unknown[][] = []
+    const queries: string[] = []
+    const scheduled = { ...valid, ride_date: '2026-11-06', ride_time: '09:30' }
+    expect((await app.request('/registrations', post(scheduled), env(async () => ({}), binds, queries))).status).toBe(201)
+    expect(binds[0]).toEqual(['helicopter-ride', 'Arun Kumar', '9876543210', null, valid.address, 2, '2026-11-06', '09:30', ''])
+    db.query(queries[0]).run('helicopter-ride', 'Arun Kumar', '9876543210', null, valid.address, 2, '2026-11-06', '09:30', '')
+    queries.length = 0
+    binds.length = 0
+    const response = await app.request('/registrations/1', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer secret-token' }, body: JSON.stringify(update),
+    }, env(async () => ({ id: 1 }), binds, queries))
+    expect(response.status).toBe(200)
+    expect(binds[0].slice(8, 10)).toEqual([null, null])
+    const saved = db.query(queries[0]).get('Arun Kumar', '9876543210', null, valid.address, 2, 'confirmed', 'paid', 'Paid by UPI', null, null, 1, 'helicopter-ride')
+    expect(saved).toMatchObject({ ride_date: '2026-11-06', ride_time: '09:30' })
+    for (const [date, time] of [['2026-11-04', '09:30'], ['2026-11-06', '24:00'], ['2026-11-06', '12:60'], ['2026-11-06', null], [null, '09:30']])
+      expect(() => db.query('UPDATE registrations SET ride_date = ?, ride_time = ? WHERE id = 1').run(date, time)).toThrow()
+    db.query('UPDATE registrations SET ride_date = NULL, ride_time = NULL WHERE id = 1').run()
+    expect(db.query('SELECT ride_date, ride_time FROM registrations WHERE id = 1').get()).toEqual({ ride_date: null, ride_time: null })
+  } finally {
+    db.close()
+  }
+})
 
 test('admin updates validate status, payment and notes alongside the contact fields', () => {
   expect(parseUpdate(update)).toEqual({ ...(parseRegistration(valid) as object), status: 'confirmed', payment_status: 'paid', notes: 'Paid by UPI' } as never)

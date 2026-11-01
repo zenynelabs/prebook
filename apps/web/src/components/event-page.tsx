@@ -13,11 +13,13 @@ import {
   type RegistrationErrors,
   type RegistrationField,
   registrationFields,
+  RIDE_DATE,
   type RegistrationValues,
   validateRegistration,
 } from "@/lib/registration";
 import { onPageReveal } from "@/lib/page-reveal";
 import { eventsApi } from "@/lib/site";
+import { TimePicker } from "./ui/time-picker";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -104,14 +106,14 @@ export function BoardingPass() {
         </div>
         <div>
           <dt>Date</dt>
-          <dd>To be announced</dd>
+          <dd>Nov 6</dd>
         </div>
         <div>
           <dt>Per registration</dt>
           <dd>Up to 6 seats</dd>
         </div>
       </dl>
-      <p className="pass-stub">Pre-register now. Confirmed by phone.</p>
+      <p className="pass-stub">Pre-book now. Confirmed by phone.</p>
     </aside>
   );
 }
@@ -122,6 +124,8 @@ const emptyRegistration: RegistrationValues = {
   email: "",
   address: "",
   passengers: "1",
+  ride_date: RIDE_DATE,
+  ride_time: "",
 };
 
 function RegistrationForm() {
@@ -338,6 +342,30 @@ function RegistrationForm() {
             </NativeSelect>
             {problem("passengers")}
           </Field>
+          <Field data-invalid={Boolean(shown("ride_date"))}>
+            <FieldLabel htmlFor="ride_date">Ride date</FieldLabel>
+            <input type="hidden" name="ride_date" value={values.ride_date} />
+            <Input id="ride_date" value="November 6, 2026" readOnly />
+            {problem("ride_date")}
+          </Field>
+          <Field data-invalid={Boolean(shown("ride_time"))}>
+            <FieldLabel htmlFor="ride_time">Preferred ride time (IST)</FieldLabel>
+            <input type="hidden" name="ride_time" value={values.ride_time} />
+            <TimePicker
+              id="ride_time"
+              invalid={Boolean(shown("ride_time"))}
+              describedBy={shown("ride_time") ? "ride_time-error ride-time-description" : "ride-time-description"}
+              onBlur={() => setTouched((current) => ({ ...current, ride_time: true }))}
+              onChange={(ride_time) => {
+                setValues((current) => ({ ...current, ride_time }));
+                setServerErrors(({ ride_time: _, ...rest }) => rest);
+              }}
+            />
+            <FieldDescription id="ride-time-description">
+              Choose your preferred time. The team will call to confirm availability.
+            </FieldDescription>
+            {problem("ride_time")}
+          </Field>
         </FieldGroup>
         {error && (
           <Alert variant="destructive">
@@ -535,7 +563,7 @@ export default function EventPage() {
               <div className="hero-actions" data-hero-copy>
                 <Button asChild size="lg">
                   <a href="#register">
-                    Pre-register now <ArrowRight aria-hidden="true" />
+                    Pre-book now <ArrowRight aria-hidden="true" />
                   </a>
                 </Button>
                 <Button

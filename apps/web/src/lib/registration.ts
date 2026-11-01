@@ -2,7 +2,8 @@
 // sending. The API stays the authority and re-checks every field.
 import type { FormEvent } from "react";
 
-export const registrationFields = ["name", "phone", "email", "address", "passengers"] as const;
+export const RIDE_DATE = "2026-11-06";
+export const registrationFields = ["name", "phone", "email", "address", "passengers", "ride_date", "ride_time"] as const;
 export type RegistrationField = (typeof registrationFields)[number];
 export type RegistrationValues = Record<RegistrationField, string>;
 export type RegistrationErrors = Partial<Record<RegistrationField, string>>;
@@ -53,5 +54,9 @@ export function validateRegistration(values: RegistrationValues): RegistrationEr
   const passengers = Number(values.passengers);
   if (!Number.isInteger(passengers) || passengers < 1 || passengers > 6)
     errors.passengers = "Choose between 1 and 6 passengers.";
+  if (values.ride_date !== RIDE_DATE)
+    errors.ride_date = "The ride date is November 6, 2026.";
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(values.ride_time))
+    errors.ride_time = "Choose your preferred ride time.";
   return errors;
 }

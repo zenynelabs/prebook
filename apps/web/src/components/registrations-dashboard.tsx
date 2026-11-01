@@ -68,6 +68,8 @@ export type Registration = {
   email: string | null;
   address: string;
   passengers: number;
+  ride_date?: string | null;
+  ride_time?: string | null;
   status: Status;
   payment_status: PaymentStatus;
   notes: string;
@@ -383,6 +385,10 @@ function EditPanel({
                   ` · Updated ${dateFormat.format(new Date(row.updated_at))}`}
               </SheetDescription>
             </SheetHeader>
+            <p>
+              Preferred ride: {row.ride_date ?? "Date not specified"}
+              {row.ride_time ? ` at ${row.ride_time} IST` : " · Time not specified"}
+            </p>
             <div className="edit-pair">
               <Field className="field">
                 <FieldLabel htmlFor="edit-status">Status</FieldLabel>
@@ -1406,6 +1412,11 @@ export default function RegistrationsDashboard({
                                   {row.ref &&
                                     ` · via ${affiliateNames.get(row.ref) ?? row.ref}`}
                                 </span>
+                                {row.ride_date && (
+                                  <span className="admin-sub">
+                                    Ride: {row.ride_date} · {row.ride_time} IST
+                                  </span>
+                                )}
                               </TableCell>
                               <TableCell className="cell-actions">
                                 <Button
